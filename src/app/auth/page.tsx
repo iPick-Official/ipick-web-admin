@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from 'next/image';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -31,8 +32,12 @@ export default function AuthPage() {
                 alert("Registration successful! You can now log in.");
                 setIsLogin(true);
             }
-        } catch (err: any) {
-            alert(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                alert(err.message);  // Safely access err.message if it's an instance of Error
+            } else {
+                alert("An unknown error occurred");
+            }
         }
     };
 
@@ -46,10 +51,12 @@ export default function AuthPage() {
 
                 {/* Logo above the card */}
                 <div className="absolute -top-14 left-1/2 transform -translate-x-1/2">
-                    <img
+                    <Image
                         src="/logo-komyut.png"
                         alt="KomyutPH Logo"
-                        className="w-20 h-20 drop-shadow-lg rounded-2xl bg-white"
+                        width={80}
+                        height={80}
+                        className="drop-shadow-lg rounded-2xl bg-white"
                     />
                 </div>
 
@@ -113,10 +120,12 @@ export default function AuthPage() {
                                     }
                                     className="w-full flex items-center justify-center bg-white/80 backdrop-blur-sm text-gray-700 py-2 rounded-xl border border-gray-200 shadow hover:bg-white transition"
                                 >
-                                    <img
+                                    <Image
                                         src="https://www.gstatic.com/images/branding/product/1x/gsa_64dp.png"
                                         alt="Google"
-                                        className="w-5 h-5 mr-2"
+                                        width={20}
+                                        height={20}
+                                        className="mr-2"
                                     />
                                     <span className="font-medium">Sign in with Google</span>
                                 </button>
