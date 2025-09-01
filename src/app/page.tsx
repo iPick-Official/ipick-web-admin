@@ -153,7 +153,7 @@ export default function Home() {
               <br /><br />
               For operators, our system delivers powerful insights into route performance, vehicle location, and driver behavior—enabling better decision-making, improved scheduling, and reduced fuel costs. The platform also supports traffic-aware routing and automated notifications to keep everyone informed on the go.
               <br /><br />
-              Whether you're catching a ride or managing a fleet, KomyutPH ensures transparency, reliability, and convenience in every journey. It&apos;s not just tracking—it&apos;s transforming how public transport works in the Philippines.
+              Whether you're catching a ride or managing a fleet, KomyutPH ensures transparency, reliability, and convenience in every journey. It&rsquo;s not just tracking—it&rsquo;s transforming how public transport works in the Philippines.
             </p>
           </div>
         </section>

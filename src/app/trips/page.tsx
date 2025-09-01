@@ -4,6 +4,17 @@ import { Sidebar } from "@/components/Sidebar";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
+type TripStatus = "On Time" | "Delayed" | "All";
+
+interface Trip {
+  id: number;
+  busName: string;
+  route: string;
+  driver: string;
+  departure: string;
+  status: TripStatus;
+}
+
 const mockTrips = [
   {
     id: 1,
@@ -82,11 +93,10 @@ export default function Trips() {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status as any)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
-                  statusFilter === status
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${statusFilter === status
                     ? "bg-orange-100 text-orange-600"
                     : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 {status}
               </button>
@@ -118,11 +128,10 @@ export default function Trips() {
                   <td className="py-3">{trip.departure}</td>
                   <td className="py-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        trip.status === "On Time"
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${trip.status === "On Time"
                           ? "bg-green-100 text-green-600"
                           : "bg-red-100 text-red-600"
-                      }`}
+                        }`}
                     >
                       {trip.status}
                     </span>
