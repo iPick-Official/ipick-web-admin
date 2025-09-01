@@ -15,7 +15,7 @@ interface Trip {
   status: TripStatus;
 }
 
-const mockTrips = [
+const mockTrips: Trip[] = [
   {
     id: 1,
     busName: "Bus 101",
@@ -59,8 +59,8 @@ const mockTrips = [
 ];
 
 export default function Trips() {
-  const [statusFilter, setStatusFilter] = useState<"All" | "On Time" | "Delayed">("All");
-  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<TripStatus>("All");
+  const [page, setPage] = useState<number>(1);
   const tripsPerPage = 3;
 
   const filteredTrips = mockTrips.filter((trip) =>
@@ -92,11 +92,12 @@ export default function Trips() {
             {["All", "On Time", "Delayed"].map((status) => (
               <button
                 key={status}
-                onClick={() => setStatusFilter(status as any)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${statusFilter === status
+                onClick={() => setStatusFilter(status as TripStatus)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                  statusFilter === status
                     ? "bg-orange-100 text-orange-600"
                     : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-100"
-                  }`}
+                }`}
               >
                 {status}
               </button>
@@ -128,10 +129,11 @@ export default function Trips() {
                   <td className="py-3">{trip.departure}</td>
                   <td className="py-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${trip.status === "On Time"
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        trip.status === "On Time"
                           ? "bg-green-100 text-green-600"
                           : "bg-red-100 text-red-600"
-                        }`}
+                      }`}
                     >
                       {trip.status}
                     </span>
