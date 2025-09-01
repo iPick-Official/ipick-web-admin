@@ -1,15 +1,14 @@
-// app/dashboard/page.tsx
+// app/settings/page.tsx
 "use client";
 
-import { MapView } from "@/components/MapView";
 import { Sidebar } from "@/components/Sidebar";
 
-export default function Dashboard() {
+export default function Settings() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 relative">
-        <MapView />
+        <h2>Settings Page</h2>
       </div>
     </div>
   );

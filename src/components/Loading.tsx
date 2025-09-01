@@ -7,8 +7,8 @@ export const Loading = () => {
             {/* Spider-Web Background Container */}
             <div id="spider-web-container" className="spider-web-container"></div>
             <div className="relative w-24 h-24">
-                <div className="absolute inset-0 border-4 border-[#375e7e] rounded-full animate-ripple"></div>
-                <div className="absolute inset-0 border-4 border-[#375e7e] rounded-full animate-ripple delay-300"></div>
+                <div className="absolute inset-0 border-4 border-orange-300 rounded-full animate-ripple"></div>
+                <div className="absolute inset-0 border-4 border-orange-300 rounded-full animate-ripple delay-300"></div>
             </div>
             <style>{`
         @keyframes ripple {
