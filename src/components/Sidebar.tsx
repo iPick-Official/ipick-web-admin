@@ -8,13 +8,19 @@ import {
   BusFront,
   BarChart2,
   Settings,
-  MapPin
+  MapPin,
+  UserCog,
+  Route,
+  History
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
-  { label: "Trips", icon: <BusFront size={20} />, path: "/trips" },
+  { label: "Trips", icon: <History size={20} />, path: "/trips" },
   { label: "Analytics", icon: <BarChart2 size={20} />, path: "/analytics" },
+  { label: "Driver Management", icon: <UserCog size={20} />, path: "/drivers" },
+  { label: "Unit Management", icon: <BusFront size={20} />, path: "/units" },
+  { label: "Routing Managment", icon: <Route size={20} />, path: "/routes" },
   { label: "Settings", icon: <Settings size={20} />, path: "/settings" },
 ];
 
@@ -23,13 +29,12 @@ export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect screen size
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    handleResize(); // Initial check
+    handleResize(); 
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);

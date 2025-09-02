@@ -7,8 +7,19 @@ import {
   DollarSign,
   Users,
 } from "lucide-react";
+import { MonthlyRidershipChart, RidershipData } from "@/components/MonthlyRidershipChart";
 
 export default function Analytics() {
+
+  const sampleData: RidershipData[] = [
+    { month: "Jan", riders: 1200 },
+    { month: "Feb", riders: 1500 },
+    { month: "Mar", riders: 1700 },
+    { month: "Apr", riders: 1600 },
+    { month: "May", riders: 1800 },
+    { month: "Jun", riders: 2000 },
+  ];
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
@@ -26,10 +37,7 @@ export default function Analytics() {
         {/* Chart Placeholder */}
         <div className="bg-white rounded-xl p-6 shadow mb-8">
           <h2 className="text-lg font-semibold text-gray-700 mb-4">Monthly Ridership Overview</h2>
-          <div className="h-64 flex items-center justify-center text-gray-400">
-            {/* Replace with real chart later */}
-            [ Chart Placeholder ]
-          </div>
+          <MonthlyRidershipChart data={sampleData} />
         </div>
 
         {/* Table */}

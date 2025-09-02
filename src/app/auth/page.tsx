@@ -2,12 +2,9 @@
 
 import { useState } from "react";
 import Image from 'next/image';
-import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { Loading } from "../../components/Loading";
 
 export default function AuthPage() {
-    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState("");
@@ -55,17 +52,6 @@ export default function AuthPage() {
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100 relative">
-            {/* Top nav back button */}
-            <nav className="w-full bg-white shadow fixed top-0 left-0 z-50">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-800 hover:text-orange-500 transition"
-                    >
-                        <ArrowLeft size={24} />
-                    </button>
-                </div>
-            </nav>
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-orange-100 opacity-70 blur-3xl z-0 pointer-events-none" />
             <div className="absolute inset-0 bg-orange opacity-60 filter blur-2xl rounded-full z-10 pointer-events-none" />
             {/* Auth Card */}
