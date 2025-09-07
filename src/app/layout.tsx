@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KomyutPH",
-  description: "Design for commuters in PH",
+  title: "iPick",
+  description: "Design for ridehail",
 };
 
 export default function RootLayout({

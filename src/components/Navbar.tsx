@@ -1,22 +1,124 @@
-"use client";
+'use client';
 
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Image from 'next/image';
+import { useState } from 'react';
+import Policies from './Policies';
+import Link from 'next/link'
 
-export const Navbar = () => {
-    const router = useRouter();
+export default function Navbar() {
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-gray-800 hover:text-orange-500 transition"
-                >
-                    <ArrowLeft size={24} />
-                    <span className="font-medium text-base">Back</span>
-                </button>
-            </div>
-        </nav>
+        <header className="absolute inset-x-0 top-0 z-50">
+            <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
+                <div className="flex items-center lg:flex-1">
+                    <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
+                        <span className="sr-only">iPick</span>
+                        <Image
+                            src="/logo.png"
+                            alt="iPick logo"
+                            className="h-8 w-8 rounded-full object-cover"
+                            width={32}
+                            height={32}
+                        />
+                        <span className="text-xl font-bold text-green-800">iPick</span>
+                    </Link>
+                </div>
+                <div className="flex lg:hidden">
+                    <button
+                        type="button"
+                        onClick={() => setMobileMenuOpen(true)}
+                        className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+                    >
+                        <span className="sr-only">Open main menu</span>
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            className="size-6"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <div className="hidden lg:flex lg:gap-x-12">
+                    <Policies />
+                    <a
+                        href="#"
+                        className="text-sm font-semibold text-gray-900 hover:text-green-700 transition duration-300"
+                    >
+                        Driver Centre
+                    </a>
+                    <a
+                        href="#"
+                        className="text-sm font-semibold text-gray-900 hover:text-green-700 transition duration-300"
+                    >
+                        Help Centre
+                    </a>
+                </div>
+
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                    <a href="#" className="text-sm font-semibold text-gray-700">
+                        Be our driver <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+            </nav>
+
+            {isMobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-50 bg-white p-6 overflow-y-auto">
+                    <div className="flex items-center justify-between">
+                        <a href="#" className="-m-1.5 p-1.5">
+                            <span className="sr-only">iPick</span>
+                            <Image
+                                src="/logo.png"
+                                alt=""
+                                className="h-8 w-auto"
+                                width={32}
+                                height={32}
+                            />
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                        >
+                            <span className="sr-only">Close menu</span>
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                className="size-6"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M6 18 18 6M6 6l12 12"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                    <div className="mt-6 flow-root">
+                        <div className="-my-6 divide-y divide-gray-500/10">
+                            <div className="space-y-2 py-6">
+                                <Policies />
+                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Driver Centre</a>
+                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Help Centre</a>
+                            </div>
+                            <div className="py-6">
+                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50">Log in</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </header>
     );
-};
+}

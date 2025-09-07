@@ -49,9 +49,9 @@ export default function Routes() {
             <div className="flex-1 p-6 overflow-auto bg-gray-50">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-semibold">Routing Management</h2>
-                    <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                        <Plus size={18} />
-                        Add Route
+                    <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg shadow transition">
+                        <Plus size={16} />
+                        <span className="text-sm font-medium">Add Route</span>
                     </button>
                 </div>
 
@@ -77,15 +77,15 @@ export default function Routes() {
                                     <td className="px-6 py-4">
                                         <span
                                             className={`px-2 py-1 text-xs rounded font-medium ${route.status === "Active"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
                                                 }`}
                                         >
                                             {route.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right space-x-2">
-                                        <button className="text-blue-600 hover:text-blue-800">
+                                    <td className="px-6 py-4 text-right space-x-5">
+                                        <button className="text-slate-600 hover:text-slate-800">
                                             <Pencil size={16} />
                                         </button>
                                         <button className="text-red-600 hover:text-red-800">

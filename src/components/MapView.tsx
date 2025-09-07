@@ -2,14 +2,24 @@
 
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
+// Fullscreen container style
 const containerStyle = {
   width: "100%",
   height: "100%",
 };
 
+// Approximate center of the Philippines
 const center = {
-  lat: 14.5995,
-  lng: 120.9842,
+  lat: 12.8797,
+  lng: 121.7740,
+};
+
+// Bounds to restrict map view (Philippines area)
+const PHILIPPINES_BOUNDS = {
+  north: 21.321,     // northernmost island
+  south: 4.393,      // southernmost island
+  west: 116.87,      // westernmost
+  east: 126.6,       // easternmost
 };
 
 const mapOptions = {
@@ -20,6 +30,10 @@ const mapOptions = {
   fullscreenControl: false,
   clickableIcons: false,
   gestureHandling: "greedy",
+  restriction: {
+    latLngBounds: PHILIPPINES_BOUNDS,
+    strictBounds: false,
+  },
   styles: [
     {
       featureType: "poi",
@@ -44,10 +58,10 @@ export const MapView = () => {
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
-      zoom={13}
+      zoom={6.5} // good for whole PH view
       options={mapOptions}
     >
-      {/* Your map children components here */}
+      {/* Children components (e.g., markers) go here */}
     </GoogleMap>
   );
 };
