@@ -21,7 +21,7 @@ export default function HeroHeader() {
     ];
 
     return (
-        <div className="bg-white">
+        <div className="bg-white overflow-x-hidden md:overflow-x-visible">
             <div className="relative isolate px-6 pt-14 lg:px-8 flex-grow">
                 <div
                     aria-hidden="true"
@@ -59,7 +59,7 @@ export default function HeroHeader() {
 
                         <div className="relative flex justify-center md:justify-end">
                             {/* Abstract background SVG */}
-                            <div className="absolute -top-20 -right-20 z-0 w-[500px] h-[700px] opacity-40">
+                            <div className="absolute -top-20 -right-20 z-0 w-[500px] h-[700px] opacity-40 pointer-events-none">
                                 <Image
                                     src="/abstract-bg.svg"
                                     alt="abstract background"

@@ -62,7 +62,7 @@ export default function BecomeDriver() {
 
     return (
         <>
-            <div className="bg-white min-h-screen flex flex-col">
+            <div className="bg-white min-h-screen flex flex-col overflow-x-hidden md:overflow-x-visible">
                 <Navbar />
 
                 {/* Hero Section */}
@@ -106,7 +106,7 @@ export default function BecomeDriver() {
 
                             <div className="relative flex justify-center md:justify-end">
                                 {/* Abstract background SVG */}
-                                <div className="absolute -top-20 -right-20 z-0 w-[500px] h-[700px] opacity-40">
+                                <div className="absolute -top-20 -right-20 z-0 w-[500px] h-[700px] opacity-40 pointer-events-none">
                                     <Image
                                         src="/abstract-bg.svg"
                                         alt="abstract background"
