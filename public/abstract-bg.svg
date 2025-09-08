@@ -1,0 +1,12 @@
+<!-- public/abstract-bg.svg -->
+<svg width="700" height="700" viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" clip-rule="evenodd"
+    d="M325.5 0C427.3 0 550 50 600 150C650 250 575 375 500 450C425 525 275 600 150 550C25 500 0 400 0 300C0 200 75 100 175 50C225 25 275 0 325.5 0Z"
+    fill="url(#gradient)" opacity="0.2" />
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="700" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDBA74" />
+      <stop offset="1" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+</svg>

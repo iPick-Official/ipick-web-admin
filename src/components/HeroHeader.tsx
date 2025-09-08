@@ -57,12 +57,24 @@ export default function HeroHeader() {
                             </div>
                         </div>
 
-                        <div className="flex justify-center md:justify-end">
+                        <div className="relative flex justify-center md:justify-end">
+                            {/* Abstract background SVG */}
+                            <div className="absolute -top-20 -right-20 z-0 w-[500px] h-[700px] opacity-40">
+                                <Image
+                                    src="/abstract-bg.svg"
+                                    alt="abstract background"
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
+
+                            {/* Foreground Image */}
                             <Image
                                 src="/phone-mockup.png"
-                                alt="iPick App on smartphone"
+                                alt="iPick Driver App on smartphone"
                                 width={300}
                                 height={700}
+                                className="relative z-10"
                             />
                         </div>
                     </div>
