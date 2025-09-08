@@ -2,11 +2,55 @@
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const sections = [
+    { id: 'introduction', title: '1. Introduction' },
+    { id: 'personal-data', title: '2. Personal Data' },
+    { id: 'personal-data-collection', title: '3. Personal Data Collection' },
+    { id: 'sensitive-personal-data', title: '4. Sensitive Personal Data' },
+    { id: 'rights', title: '5. Personal Data of Other Individuals' },
+    { id: 'minors', title: '6. Personal Data of Minors' },
+    { id: 'use-of', title: '7. Use of Personal Data' },
+    { id: 'disclosure', title: '8. Disclosure of Personal Data' },
+    { id: 'retention', title: '9. Retention of Personal Data' },
+    { id: 'cookies', title: '10. Cookies' },
+    { id: 'protection', title: '11. Protection of Personal Data' },
+    { id: 'respect', title: '12. Your Rights with Respect to Personal Data' },
+    { id: 'amendments', title: '13. Amendments and Updates' },
+    { id: 'contact', title: '14. Contact Us' },
+];
 
 export default function PrivacyPolicy() {
     const [tocOpen, setTocOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    useEffect(() => {
+        const handleObserver = (entries: IntersectionObserverEntry[]) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    setActiveId(entry.target.id);
+                    break;
+                }
+            }
+        };
+
+        observer.current = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: '0px 0px -70% 0px', // Trigger when section is ~30% from top
+            threshold: 0.1,
+        });
+
+        const elements = sections.map((section) => document.getElementById(section.id)).filter(Boolean) as HTMLElement[];
+
+        elements.forEach((el) => observer.current?.observe(el));
+
+        return () => {
+            observer.current?.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -44,24 +88,23 @@ export default function PrivacyPolicy() {
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                             {/* LEFT COLUMN - Table of Contents */}
                             {(tocOpen || isDesktop) && (
-                                <aside className={`lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start`}>
+                                <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
                                         <p className="text-sm font-semibold text-gray-700">Contents</p>
                                         <ul className="space-y-2">
-                                            <li><a href="#introduction" className="text-gray-600 hover:text-green-600">1. Introduction</a></li>
-                                            <li><a href="#personal-data" className="text-gray-600 hover:text-green-600">2. Personal Data</a></li>
-                                            <li><a href="#personal-data-collection" className="text-gray-600 hover:text-green-600">3. Personal Data Collection</a></li>
-                                            <li><a href="#sensitive-personal-data" className="text-gray-600 hover:text-green-600">4. Sensitive Personal Data</a></li>
-                                            <li><a href="#rights" className="text-gray-600 hover:text-green-600">5. Personal Data of Other Individuals</a></li>
-                                            <li><a href="#minors" className="text-gray-600 hover:text-green-600">6. Personal Data of Minors</a></li>
-                                            <li><a href="#use-of" className="text-gray-600 hover:text-green-600">7. Use of Personal Data</a></li>
-                                            <li><a href="#disclosure" className="text-gray-600 hover:text-green-600">8. Disclosure of Personal Data</a></li>
-                                            <li><a href="#retention" className="text-gray-600 hover:text-green-600">9. Retention of Personal Data</a></li>
-                                            <li><a href="#cookies" className="text-gray-600 hover:text-green-600">10. Cookies</a></li>
-                                            <li><a href="#protection" className="text-gray-600 hover:text-green-600">11. Protection of Personal Data</a></li>
-                                            <li><a href="#respect" className="text-gray-600 hover:text-green-600">12. Your Rights with Respect to Personal Data</a></li>
-                                            <li><a href="#amendments" className="text-gray-600 hover:text-green-600">13. Amendments and Updates</a></li>
-                                            <li><a href="#contact" className="text-gray-600 hover:text-green-600">14. Contact Us</a></li>
+                                            {sections.map((section) => (
+                                                <li key={section.id}>
+                                                    <a
+                                                        href={`#${section.id}`}
+                                                        className={`block transition-colors ${activeId === section.id
+                                                                ? 'text-green-600 font-semibold'
+                                                                : 'text-gray-600 hover:text-green-600'
+                                                            }`}
+                                                    >
+                                                        {section.title}
+                                                    </a>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </nav>
                                 </aside>
@@ -214,7 +257,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="disclosure">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Disclosure of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Disclosure of Personal Data</h2>
                                     <p>
                                         IPICK may need to share your Personal Data with various parties in connection with the purposes outlined in this Privacy Policy. These parties include:
                                     </p>
@@ -232,14 +275,14 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="retention">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Retention of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">9. Retention of Personal Data</h2>
                                     <p>
                                         IPICK retains your Personal Data for the period necessary to fulfill the Purposes outlined in this Privacy Notice unless a longer retention period is required or allowed by law. Once your Personal Data is no longer necessary for the Services or Purposes, or we no longer have a legal or business purpose for retaining your Personal Data, we take steps to erase, destroy, anonymize or prevent access or use of such Personal Data for any purpose other than compliance with this Privacy Notice, or for purposes of safety, security, fraud prevention and detection, in accordance with the requirements of applicable laws.
                                     </p>
                                 </section>
 
                                 <section id="cookies">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Cookies and Tracking Technologies</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">10. Cookies and Tracking Technologies</h2>
                                     <p>
                                         IPICK and third parties we partner with may use cookies, web beacons, tags, scripts, local shared objects (such as HTML5), advertising identifiers, and similar technologies in connection with your use of our Websites and Apps. These technologies may be persistent or session-based and can be stored on your browsers or devices.
                                     </p>
@@ -275,7 +318,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="protection">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">9. Protection of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">11. Protection of Personal Data</h2>
                                     <p>
                                         IPICK takes reasonable legal, organizational, and technical measures to protect your Personal Data. These measures are designed to prevent your data from being lost, misused, or accessed without authorization.
                                     </p>
@@ -290,7 +333,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="respect">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">10. Your Rights with Respect to Personal Data</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">12. Your Rights with Respect to Personal Data</h2>
                                     <p>
                                         In accordance with applicable laws and regulations, you may be entitled to exercise the following rights concerning your Personal Data:
                                     </p>
@@ -322,7 +365,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="amendments">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">11. Amendments and Updates</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">13. Amendments and Updates</h2>
                                     <p>
                                         IPICK may modify, update, or amend the terms in this Privacy Notice at any time. Any such amendments will be communicated to you through the Apps and/or other appropriate channels at least five (5) business days before the effective date.
                                     </p>
@@ -332,7 +375,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="contact">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">12. Contact Us</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">14. Contact Us</h2>
                                     <p>
                                         If you have any queries about this Privacy Notice or would like to exercise your rights as outlined herein, please fill out the provided form or directly contact our Data Protection Officer:
                                     </p>

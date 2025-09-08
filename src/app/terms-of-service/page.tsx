@@ -2,11 +2,42 @@
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const sections = [
+    { id: 'amendment', title: '1. Amendment To Terms Of Service Agreement' },
+    { id: 'standard', title: '2. Standard Operating Procedure' },
+    { id: 'terms', title: '3. Terms Of Service Agreement For Passengers' },
+];
 
 export default function TermsService() {
     const [tocOpen, setTocOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    useEffect(() => {
+        const handleObserver = (entries: IntersectionObserverEntry[]) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    setActiveId(entry.target.id);
+                    break;
+                }
+            }
+        };
+
+        observer.current = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: '0px 0px -70% 0px',
+            threshold: 0.1,
+        });
+
+        const elements = sections.map(({ id }) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+        elements.forEach((el) => observer.current?.observe(el));
+
+        return () => observer.current?.disconnect();
+    }, []);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -44,25 +75,23 @@ export default function TermsService() {
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                             {/* LEFT COLUMN - Table of Contents */}
                             {(tocOpen || isDesktop) && (
-                                <aside className={`lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start`}>
+                                <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
                                         <p className="text-sm font-semibold text-gray-700 capitalize">Contents</p>
                                         <ul className="space-y-2">
-                                            <li>
-                                                <a href="#amendment" className="text-gray-600 hover:text-green-600 capitalize">
-                                                    1. Amendment To Terms Of Service Agreement
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#standard" className="text-gray-600 hover:text-green-600 capitalize">
-                                                    2. Standard Operating Procedure
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#terms" className="text-gray-600 hover:text-green-600 capitalize">
-                                                    3. Terms Of Service Agreement For Passengers
-                                                </a>
-                                            </li>
+                                            {sections.map(({ id, title }) => (
+                                                <li key={id}>
+                                                    <a
+                                                        href={`#${id}`}
+                                                        className={`block transition-colors capitalize ${activeId === id
+                                                                ? 'text-green-600 font-semibold'
+                                                                : 'text-gray-600 hover:text-green-600'
+                                                            }`}
+                                                    >
+                                                        {title}
+                                                    </a>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </nav>
                                 </aside>

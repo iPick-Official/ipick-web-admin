@@ -2,11 +2,44 @@
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const sections = [
+    { id: 'general', title: '1. General Code of Conduct' },
+    { id: 'passenger', title: '2. Passenger Code of Conduct' },
+    { id: 'community', title: '3. IPICK Community Conduct' },
+    { id: 'breach', title: '4. Breach of Code' },
+    { id: 'commitment', title: '5. Commitment to Community' },
+];
 
 export default function CodeConduct() {
     const [tocOpen, setTocOpen] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    useEffect(() => {
+        const handleObserver = (entries: IntersectionObserverEntry[]) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    setActiveId(entry.target.id);
+                    break;
+                }
+            }
+        };
+
+        observer.current = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: '0px 0px -70% 0px', // triggers before top reaches viewport
+            threshold: 0.1,
+        });
+
+        const elements = sections.map(({ id }) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+        elements.forEach((el) => observer.current?.observe(el));
+
+        return () => observer.current?.disconnect();
+    }, []);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -44,15 +77,23 @@ export default function CodeConduct() {
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                             {/* LEFT COLUMN - Table of Contents */}
                             {(tocOpen || isDesktop) && (
-                                <aside className={`lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start`}>
+                                <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
                                         <p className="text-sm font-semibold text-gray-700">Contents</p>
                                         <ul className="space-y-2">
-                                            <li><a href="#general" className="text-gray-600 hover:text-green-600">1. General Code of Conduct</a></li>
-                                            <li><a href="#passenger" className="text-gray-600 hover:text-green-600">2. Passenger Code of Conduct</a></li>
-                                            <li><a href="#community" className="text-gray-600 hover:text-green-600">3. IPICK Community Conduct</a></li>
-                                            <li><a href="#breach" className="text-gray-600 hover:text-green-600">4. Breach of Code</a></li>
-                                            <li><a href="#commitment" className="text-gray-600 hover:text-green-600">5. Commitment to Community</a></li>
+                                            {sections.map(({ id, title }) => (
+                                                <li key={id}>
+                                                    <a
+                                                        href={`#${id}`}
+                                                        className={`block transition-colors ${activeId === id
+                                                                ? 'text-green-600 font-semibold'
+                                                                : 'text-gray-600 hover:text-green-600'
+                                                            }`}
+                                                    >
+                                                        {title}
+                                                    </a>
+                                                </li>
+                                            ))}
                                         </ul>
                                     </nav>
                                 </aside>
@@ -61,7 +102,7 @@ export default function CodeConduct() {
                             {/* RIGHT COLUMN - Content */}
                             <main className="lg:col-span-3 space-y-16 text-gray-700 leading-relaxed text-base">
                                 <section id="general">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">General Code of Conduct</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">1. General Code of Conduct</h2>
 
                                     <ul className="list-none text-base text-gray-700 space-y-4">
                                         <li>
@@ -102,7 +143,7 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="passenger">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">Passenger Code of Conduct</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Passenger Code of Conduct</h2>
 
                                     <div className="space-y-4 text-base text-gray-700">
                                         <div>
@@ -166,7 +207,7 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="community">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">iPick Community Conduct</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">3. iPick Community Conduct</h2>
 
                                     <div className="space-y-4 text-base text-gray-700">
                                         <div>

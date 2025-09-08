@@ -3,10 +3,15 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Policies from './Policies';
-import Link from 'next/link'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';  // Import the hook
 
 export default function Navbar() {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const pathname = usePathname();  // Get current path
+
+    // Check if the current page is become-driver
+    const isBecomeDriverPage = pathname === '/become-driver';
 
     return (
         <header className="absolute inset-x-0 top-0 z-50">
@@ -50,23 +55,26 @@ export default function Navbar() {
                 <div className="hidden lg:flex lg:gap-x-12">
                     <Policies />
                     <a
-                        href="#"
+                        href="/driver-center"
                         className="text-sm font-semibold text-gray-900 hover:text-green-700 transition duration-300"
                     >
-                        Driver Centre
+                        Driver Center
                     </a>
                     <a
-                        href="#"
+                        href="/help-center"
                         className="text-sm font-semibold text-gray-900 hover:text-green-700 transition duration-300"
                     >
-                        Help Centre
+                        Help Center
                     </a>
                 </div>
 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                    <a href="#" className="text-sm font-semibold text-gray-700">
-                        Be our driver <span aria-hidden="true">&rarr;</span>
-                    </a>
+                    {/* Only show "Become a Driver" link if NOT on the become-driver page */}
+                    {!isBecomeDriverPage && (
+                        <a href="/become-driver" className="text-sm font-semibold text-red-700">
+                            Become a Driver <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    )}
                 </div>
             </nav>
 
@@ -109,11 +117,16 @@ export default function Navbar() {
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="space-y-2 py-6">
                                 <Policies />
-                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Driver Centre</a>
-                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Help Centre</a>
+                                <a href="/driver-center" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Driver Center</a>
+                                <a href="/help-center" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">Help Center</a>
                             </div>
                             <div className="py-6">
-                                <a href="#" className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50">Log in</a>
+                                {/* Hide Become a Driver in mobile menu also */}
+                                {!isBecomeDriverPage && (
+                                    <a href="/become-driver" className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-red-700 hover:bg-gray-50">
+                                        Become a Driver
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>

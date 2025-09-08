@@ -63,7 +63,7 @@ export const Sidebar = () => {
         <Image
           src="/logo.png"
           alt="Jeepney Icon"
-          width={100} height={100}
+          width={30} height={30}
         />
         <h2
           className={`text-xl font-bold text-green-800 whitespace-nowrap transition-all duration-300 ${collapsed ? "opacity-0 scale-95 translate-x-[-10px]" : "opacity-100 scale-100 translate-x-0"

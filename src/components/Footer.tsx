@@ -25,22 +25,22 @@ const Footer: React.FC = () => {
                     <h4 className="text-md font-semibold text-gray-900 mb-2">Quick links</h4>
                     <ul className="space-y-2 text-sm">
                         <li>
-                            <a href="#about" className="hover:text-green-600">
-                                Driver Centre
+                            <a href="/driver-center" className="hover:text-green-600">
+                                Driver Center
                             </a>
                         </li>
                         <li>
-                            <a href="#services" className="hover:text-green-600">
-                                Help Centre
+                            <a href="/help-center" className="hover:text-green-600">
+                                Help Center
                             </a>
                         </li>
                         <li>
-                            <a href="#drivers" className="hover:text-green-600">
+                            <a href="/become-driver" className="hover:text-green-600">
                                 Become a Driver
                             </a>
                         </li>
                         <li>
-                            <a href="#faq" className="hover:text-green-600">
+                            <a href="/discounts" className="hover:text-green-600">
                                 Apply for Discounts
                             </a>
                         </li>
