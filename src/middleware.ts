@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
 
-  const isLoginPage = req.nextUrl.pathname.startsWith("/auth/login");
+  const isLoginPage = req.nextUrl.pathname.startsWith("/auth");
   const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
 
   if (isAdminPage && !token) {

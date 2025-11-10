@@ -3,28 +3,37 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Loading } from "../../../components/Loading";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const router = useRouter();
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
 
-            if (res.ok) {
-                window.location.href = '/admin/dashboard';
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.message || "Login failed");
+                return;
             }
+
+            // Redirect to protected route
+            router.push("/admin/dashboard");
         } catch (err) {
             console.error(err);
+            alert("Server error");
         } finally {
             setLoading(false);
         }

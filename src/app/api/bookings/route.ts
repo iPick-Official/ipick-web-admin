@@ -19,7 +19,7 @@ export async function GET() {
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "x-api-key": token,
           "Content-Type": "application/json",
         },
       }

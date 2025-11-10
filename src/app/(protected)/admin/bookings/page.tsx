@@ -112,6 +112,7 @@ export default function BookingsPage() {
                                 <option value="active">Active</option>
                                 <option value="finished">Finished</option>
                                 <option value="cancelled">Cancelled</option>
+                                <option value="inactive">Inactive</option>
                             </select>
                         </div>
 

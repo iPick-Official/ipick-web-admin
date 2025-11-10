@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     // Store token securely
     const res = NextResponse.json({ message: "Login successful" });
-    res.cookies.set("access_token", data.access_token, {
+    res.cookies.set("access_token", data.apiKey, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
