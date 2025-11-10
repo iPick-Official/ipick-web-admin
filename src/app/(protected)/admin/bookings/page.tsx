@@ -7,7 +7,6 @@ import { useEffect, useState, useMemo } from 'react';
 export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [sortAsc, setSortAsc] = useState<boolean>(false);
 
     const today = new Date().toISOString().split('T')[0];
     const [fromDate, setFromDate] = useState(today);
@@ -69,15 +68,8 @@ export default function BookingsPage() {
             });
         }
 
-        // Sort by date
-        filtered.sort((a, b) =>
-            sortAsc
-                ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-                : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
         return filtered;
-    }, [bookings, statusFilter, sortAsc, searchTerm, fromDate, toDate]);
+    }, [bookings, statusFilter, searchTerm, fromDate, toDate]);
 
     return (
         <div className="flex h-screen overflow-hidden bg-gray-50">

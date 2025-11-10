@@ -17,7 +17,7 @@ export interface Booking {
     costPerMin: number;
   };
   riderRating: { rating: number; comments: string };
-  driverRating: Array<any>;
+  driverRating: { rating: number; comments: string };
   tripStatus: number;
   referenceNumber: string;
 }

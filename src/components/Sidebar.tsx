@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from 'next/image';
 import {
   LayoutDashboard,
   BusFront,
@@ -80,7 +81,13 @@ export const Sidebar = () => {
     >
       {/* Sidebar Header */}
       <div className="flex items-center gap-3 p-2 transition-all duration-300 ease-in-out">
-        <img src="/logo.png" alt="Jeepney Icon" className="w-10 h-10" />
+        <Image
+          src="/logo.png"
+          alt="Jeepney Icon"
+          width={40}
+          height={40}
+          className="w-10 h-10"
+        />
       </div>
 
       {/* Navigation Items */}

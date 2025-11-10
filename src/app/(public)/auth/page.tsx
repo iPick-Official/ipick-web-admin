@@ -8,23 +8,25 @@ export default function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
-        setError('');
-        
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
+        setLoading(true);
 
-        if (res.ok) {
-            window.location.href = '/admin/dashboard';
-        } else {
-            const { message } = await res.json();
-            setError(message || 'Login failed');
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (res.ok) {
+                window.location.href = '/admin/dashboard';
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     }
 
