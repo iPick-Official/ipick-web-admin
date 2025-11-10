@@ -2,50 +2,31 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Loading } from "../../components/Loading";
+import { Loading } from "../../../components/Loading";
 
 export default function AuthPage() {
     const [loading, setLoading] = useState(false);
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
-        setLoading(true);
+        setError('');
+        
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
 
-        const formData = new URLSearchParams();
-        formData.append("requestData[0][Username]", username);
-        formData.append("requestData[0][Password]", password);
-
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Home/ValidateEmployee`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData.toString()
-            });
-
-            const data = await res.json();
-
-            if (!res.ok || !data.data || data.data.length === 0) {
-                throw new Error("Invalid credentials or no user found");
-            }
-
-            const user = data.data[0];
-            localStorage.setItem("user", JSON.stringify(user));
-            alert(`Welcome back, ${user.FirstName}!`);
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                alert(err.message);
-            } else {
-                alert("An unknown error occurred");
-            }
-        } finally {
-            setLoading(false);
+        if (res.ok) {
+            window.location.href = '/admin/dashboard';
+        } else {
+            const { message } = await res.json();
+            setError(message || 'Login failed');
         }
-    };
-
+    }
 
     if (loading) return <Loading />;
 
@@ -68,7 +49,7 @@ export default function AuthPage() {
                 </div>
 
                 <div className="mt-10">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         <input
                             type="text"
                             placeholder="Username"

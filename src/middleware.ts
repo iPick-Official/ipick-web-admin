@@ -1,0 +1,19 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get("access_token")?.value;
+
+  const isLoginPage = req.nextUrl.pathname.startsWith("/auth/login");
+  const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
+
+  if (isAdminPage && !token) {
+    return NextResponse.redirect(new URL("/auth", req.url));
+  }
+
+  if (isLoginPage && token) {
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  }
+
+  return NextResponse.next();
+}
