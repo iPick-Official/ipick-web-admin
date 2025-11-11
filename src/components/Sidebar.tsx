@@ -13,12 +13,15 @@ import {
   X,
 } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
+import { BsPerson, BsPersonFillGear } from "react-icons/bs";
 
 // Navigation items
 const navItems = [
   { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin/dashboard" },
   { label: "Bookings", icon: <History size={20} />, path: "/admin/bookings" },
   { label: "Analytics", icon: <BarChart2 size={20} />, path: "/admin/analytics" },
+  { label: "Drivers", icon: <BsPersonFillGear size={20} />, path: "/admin/drivers" },
+  { label: "Passengers", icon: <BsPerson size={20} />, path: "/admin/riders" },
 ];
 
 export const Sidebar = () => {
@@ -97,7 +100,7 @@ export const Sidebar = () => {
             height={40}
             className="w-10 h-10"
           />
-          <span className="font-semibold text-lg text-gray-800">
+          <span className="font-extrabold text-2xl bg-gradient-to-r from-green-700 via-green-800 to-green-900 bg-clip-text text-transparent">
             Central Hub
           </span>
         </div>

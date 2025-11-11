@@ -60,11 +60,9 @@ export default function BookingsPage() {
         // Search filter
         if (searchTerm.trim() !== '') {
             filtered = filtered.filter((b) => {
-                const rider = b.riderId ? b.riderId.toLowerCase() : '';
-                const driver = b.driverId ? b.driverId.toLowerCase() : '';
+                const bookingId = b.referenceNumber ? b.referenceNumber.toLowerCase() : '';
                 return (
-                    rider.includes(searchTerm.toLowerCase()) ||
-                    driver.includes(searchTerm.toLowerCase())
+                    bookingId.includes(searchTerm.toLowerCase())
                 );
             });
         }
@@ -96,35 +94,12 @@ export default function BookingsPage() {
         <div className="flex h-screen overflow-hidden bg-gray-50">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
-                {/* Totals Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                    {[
-                        { label: "Finished", value: totals.finished },
-                        { label: "Cancelled", value: totals.cancelled },
-                        { label: "Active", value: totals.active },
-                        { label: "Inactive", value: totals.inactive },
-                        { label: "Booked", value: totals.booked },
-                    ].map((item) => (
-                        <div
-                            key={item.label}
-                            className="relative bg-yellow-50 border-l-4 border-yellow-500 shadow-sm rounded-lg px-4 py-6"
-                        >
-                            {/* Label in top-left */}
-                            <p className="absolute top-2 left-4 text-gray-900 text-sm">{item.label}</p>
-
-                            {/* Value centered */}
-                            <div className="flex items-center justify-center h-full">
-                                <p className="text-yellow-700 font-bold text-2xl">{item.value}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
 
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800">Bookings</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Bookings</h2>
 
-                    <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
                         {[
                             { label: "From", value: fromDate, setter: setFromDate },
@@ -162,7 +137,7 @@ export default function BookingsPage() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search Rider or Driver..."
+                            placeholder="Search Booking ID"
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
                         <button
@@ -173,12 +148,36 @@ export default function BookingsPage() {
                     </div>
                 </div>
 
+                {/* Totals Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                        { label: "Finished", value: totals.finished },
+                        { label: "Cancelled", value: totals.cancelled },
+                        { label: "Active", value: totals.active },
+                        { label: "Inactive", value: totals.inactive },
+                        { label: "Booked", value: totals.booked },
+                    ].map((item) => (
+                        <div
+                            key={item.label}
+                            className="relative bg-orange-50 border-l-4 border-orange-500 shadow-sm rounded-lg px-4 py-6"
+                        >
+                            {/* Label in top-left */}
+                            <p className="absolute top-2 left-4 text-gray-900 text-sm">{item.label}</p>
+
+                            {/* Value centered */}
+                            <div className="flex items-center justify-center h-full">
+                                <p className="text-orange-700 font-bold text-2xl">{item.value}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Table */}
                 <div className="bg-white shadow-md rounded-lg overflow-auto">
                     <table className="min-w-full text-sm text-left border-collapse">
                         <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
                             <tr>
-                                {["Booking ID", "Rider", "Driver", "Status", "Fare", "Origin", "Destination"].map((col) => (
+                                {["Booking ID", "Rider ID", "Driver ID", "Status", "Fare", "Origin", "Destination"].map((col) => (
                                     <th key={col} className="px-6 py-3 font-medium text-left">
                                         {col}
                                     </th>
@@ -218,11 +217,11 @@ export default function BookingsPage() {
                                     return (
                                         <tr
                                             key={b._id}
-                                            className={`border-b ${isToday ? 'bg-yellow-50' : 'bg-white'} hover:bg-gray-50 transition`}
+                                            className={`border-b ${isToday ? 'bg-orange-50' : 'bg-white'} hover:bg-gray-50 transition`}
                                         >
                                             <td className="px-6 py-3">{b.referenceNumber || b._id}</td>
                                             <td className="px-6 py-3">{b.riderId}</td>
-                                            <td className="px-6 py-3">{b.driverId}</td>
+                                            <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
                                             <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>
                                             <td className="px-6 py-3 text-gray-800">₱{b.travelFare?.toFixed(2)}</td>
                                             <td className="px-6 py-3 text-gray-600">{b.origin?.name}</td>
