@@ -61,6 +61,11 @@ export default function RidersPage() {
         });
     }, [displayedRiders, sortOrder]);
 
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, fromDate, toDate]);
+
     // Pagination
     const totalPages = Math.ceil(sortedRiders.length / itemsPerPage);
     const paginatedRiders = sortedRiders.slice(
@@ -82,7 +87,6 @@ export default function RidersPage() {
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <h2 className="text-2xl font-semibold text-gray-800 ml-20">Passengers</h2>
-
                     <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
                         {[

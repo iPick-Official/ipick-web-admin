@@ -1,29 +1,32 @@
 'use client';
 
+import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
 
 export default function DriversPage() {
     const [drivers, setDrivers] = useState<Driver[]>([]);
-    const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 100;
 
-    const [fromDate, setFromDate] = useState<string>('');
-    const [toDate, setToDate] = useState<string>('');
-
+    // Fetch drivers once on mount
     useEffect(() => {
-        async function fetchDrivers() {
+        const fetchDrivers = async () => {
             try {
                 const res = await fetch('/api/user/drivers');
                 if (!res.ok) throw new Error('Failed to fetch drivers');
                 const data = await res.json();
                 setDrivers(data);
             } catch (error) {
-                console.error(error);
+                console.error('Error fetching drivers:', error);
             }
-        }
+        };
 
         fetchDrivers();
     }, []);
@@ -41,15 +44,17 @@ export default function DriversPage() {
         }
     };
 
-    // Filtered and sorted drivers
+    // Filters & sorting
     const displayedDrivers = useMemo(() => {
-        let filtered = [...drivers];
+        let filtered = drivers;
 
-        // Filter by createdAt date range
+        // Date range filter (using Date objects)
         if (fromDate && toDate) {
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
             filtered = filtered.filter((d) => {
-                const created = d.createdAt ? new Date(d.createdAt).toISOString().split('T')[0] : '';
-                return created >= fromDate && created <= toDate;
+                const created = d.createdAt ? new Date(d.createdAt) : null;
+                return created && created >= from && created <= to;
             });
         }
 
@@ -58,8 +63,8 @@ export default function DriversPage() {
             filtered = filtered.filter((d) => d.status === statusFilter);
         }
 
-        // Search by name, email, or mobile number
-        if (searchTerm.trim() !== '') {
+        // Search filter
+        if (searchTerm.trim()) {
             const term = searchTerm.toLowerCase();
             filtered = filtered.filter(
                 (d) =>
@@ -73,13 +78,26 @@ export default function DriversPage() {
     }, [drivers, statusFilter, searchTerm, fromDate, toDate]);
 
     const sortedDrivers = useMemo(() => {
-        return [...displayedDrivers].sort((a, b) => {
+        return displayedDrivers.slice().sort((a, b) => {
             const dateA = new Date(a.createdAt || '').getTime();
             const dateB = new Date(b.createdAt || '').getTime();
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
     }, [displayedDrivers, sortOrder]);
 
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, searchTerm, fromDate, toDate]);
+
+    // Pagination
+    const totalPages = Math.ceil(sortedDrivers.length / itemsPerPage);
+    const paginatedDrivers = sortedDrivers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    // Totals
     const totals = useMemo(() => {
         const approved = displayedDrivers.filter((d) => d.status === 'approved').length;
         const pending = displayedDrivers.filter((d) => d.status === 'pending').length;
@@ -91,7 +109,6 @@ export default function DriversPage() {
         <div className="flex h-screen overflow-hidden bg-gray-50">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
-
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <h2 className="text-2xl font-semibold text-gray-800 ml-20">Drivers</h2>
@@ -137,14 +154,18 @@ export default function DriversPage() {
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
 
-                        <button className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition">
+                        {/* Export (stubbed) */}
+                        <button
+                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            onClick={() => alert('Export feature not yet implemented')}
+                        >
                             Export
                         </button>
                     </div>
                 </div>
 
                 {/* Totals Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
                         { label: 'Approved', value: totals.approved },
                         { label: 'Pending', value: totals.pending },
@@ -175,7 +196,9 @@ export default function DriversPage() {
                                 <th className="px-6 py-3 font-medium text-left">
                                     <button
                                         className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                        onClick={() =>
+                                            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+                                        }
                                     >
                                         Created At
                                         <svg
@@ -185,31 +208,46 @@ export default function DriversPage() {
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
                                         >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M5 15l7-7 7 7"
+                                            />
                                         </svg>
                                     </button>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedDrivers.length === 0 ? (
+                            {paginatedDrivers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="text-center py-6 text-gray-500 italic">
+                                    <td
+                                        colSpan={8}
+                                        className="text-center py-6 text-gray-500 italic"
+                                    >
                                         No drivers found for selected filters.
                                     </td>
                                 </tr>
                             ) : (
-                                sortedDrivers.map((d) => (
-                                    <tr key={d.id} className="border-b hover:bg-gray-50 transition">
+                                paginatedDrivers.map((d) => (
+                                    <tr
+                                        key={d.id}
+                                        className="border-b hover:bg-gray-50 transition"
+                                    >
                                         <td className="px-6 py-3">{d.id}</td>
                                         <td className="px-6 py-3">{d.name}</td>
                                         <td className="px-6 py-3">{d.email}</td>
                                         <td className="px-6 py-3">{d.mobnum}</td>
                                         <td className="px-6 py-3">{d.carType}</td>
                                         <td className="px-6 py-3">{d.city}</td>
-                                        <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>{d.status}</td>
+                                        <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
+                                            {d.status}
+                                        </td>
                                         <td className="px-6 py-3 text-gray-500">
-                                            {d.createdAt ? new Date(d.createdAt).toLocaleString() : '-'}
+                                            {d.createdAt
+                                                ? new Date(d.createdAt).toLocaleString()
+                                                : '-'}
                                         </td>
                                     </tr>
                                 ))
@@ -217,6 +255,15 @@ export default function DriversPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </div>
         </div>
     );

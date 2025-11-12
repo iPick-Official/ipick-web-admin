@@ -1,5 +1,6 @@
 'use client';
 
+import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Booking } from '@/types/bookings';
 import { useEffect, useState, useMemo } from 'react';
@@ -13,6 +14,8 @@ export default function BookingsPage() {
     const [toDate, setToDate] = useState(today);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 100;
 
     useEffect(() => {
         async function fetchBookings() {
@@ -48,7 +51,7 @@ export default function BookingsPage() {
 
         // Filter by date range (defaults to today's date)
         filtered = filtered.filter((b) => {
-            const bookingDate = new Date(b.createdAt).toISOString().split('T')[0];
+            const bookingDate = new Date(b.updatedAt).toISOString().split('T')[0];
             return bookingDate >= fromDate && bookingDate <= toDate;
         });
 
@@ -73,12 +76,24 @@ export default function BookingsPage() {
     const sortedBookings = useMemo(() => {
         const sorted = [...displayedBookings];
         sorted.sort((a, b) => {
-            const dateA = new Date(a.createdAt).getTime();
-            const dateB = new Date(b.createdAt).getTime();
+            const dateA = new Date(a.updatedAt).getTime();
+            const dateB = new Date(b.updatedAt).getTime();
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
         return sorted;
     }, [displayedBookings, sortOrder]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, fromDate, toDate]);
+
+    // Pagination
+    const totalPages = Math.ceil(sortedBookings.length / itemsPerPage);
+    const paginatedRiders = sortedBookings.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     const totals = useMemo(() => {
         const finished = displayedBookings.filter(b => b.status === 'finished').length;
@@ -129,6 +144,7 @@ export default function BookingsPage() {
                                 <option value="finished">Finished</option>
                                 <option value="cancelled">Cancelled</option>
                                 <option value="inactive">Inactive</option>
+                                <option value="booked">Booked</option>
                             </select>
                         </div>
 
@@ -203,15 +219,15 @@ export default function BookingsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedBookings.length === 0 ? (
+                            {paginatedRiders.length === 0 ? (
                                 <tr>
                                     <td colSpan={9} className="text-center py-6 text-gray-500 italic">
                                         No bookings found for selected date(s).
                                     </td>
                                 </tr>
                             ) : (
-                                sortedBookings.map((b) => {
-                                    const bookingDate = b.createdAt.slice(0, 10);
+                                paginatedRiders.map((b) => {
+                                    const bookingDate = b.updatedAt.slice(0, 10);
                                     const isToday = bookingDate === today;
 
                                     return (
@@ -226,7 +242,7 @@ export default function BookingsPage() {
                                             <td className="px-6 py-3 text-gray-800">₱{b.travelFare?.toFixed(2)}</td>
                                             <td className="px-6 py-3 text-gray-600">{b.origin?.name}</td>
                                             <td className="px-6 py-3 text-gray-600">{b.destination?.name}</td>
-                                            <td className="px-6 py-3 text-gray-500">{new Date(b.createdAt).toLocaleString()}</td>
+                                            <td className="px-6 py-3 text-gray-500">{new Date(b.updatedAt).toLocaleString()}</td>
                                         </tr>
                                     );
                                 })
@@ -234,6 +250,13 @@ export default function BookingsPage() {
                         </tbody>
                     </table>
                 </div>
+                {totalPages > 1 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(page) => setCurrentPage(page)}
+                    />
+                )}
             </div>
         </div>
     );
