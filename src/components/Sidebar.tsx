@@ -136,16 +136,6 @@ export const Sidebar = () => {
           <LogOut size={20} />
           <span>Logout</span>
         </button>
-
-        {/* Confirm Dialog */}
-        <ConfirmDialog
-          open={showLogoutConfirm}
-          message="Are you sure you want to logout?"
-          onConfirm={handleLogout}
-          onCancel={() => setShowLogoutConfirm(false)}
-          confirmText="Yes, Logout"
-          cancelText="Cancel"
-        />
       </div>
 
       {/* Background Overlay (for mobile) */}
@@ -155,6 +145,15 @@ export const Sidebar = () => {
           onClick={() => setCollapsed(true)}
         />
       )}
+
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        message="Are you sure you want to logout?"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+        confirmText="Yes, Logout"
+        cancelText="Cancel"
+      />
     </>
   );
 };

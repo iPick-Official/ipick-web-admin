@@ -1,8 +1,20 @@
+// Reusable file/document structure
 export interface FileDocument {
   name: string;
   url: string;
 }
 
+// Vehicle Ownership
+export interface VehicleOwnership {
+  ownershipId: string;
+  description: string;
+  operatorsFullName: string;
+  operatorsAddress: string;
+  operatorsMobileNumber: string;
+  operatorDocuments: FileDocument;
+}
+
+// Personal Requirements
 export interface PersonalRequirements {
   profilePicture: FileDocument;
   nationality: string;
@@ -26,6 +38,7 @@ export interface PersonalRequirements {
   declarations: boolean;
 }
 
+// Transport Requirements
 export interface TransportRequirements {
   vehicleOwnership: VehicleOwnership;
   plateNumber: string;
@@ -53,16 +66,21 @@ export interface TransportRequirements {
   pAMI: FileDocument;
 }
 
-export interface VehicleOwnership {
-  ownershipId: string;
+// Wallet Transaction Log
+export interface WalletLog {
+  _id: string;
+  amount: number;
+  createdAt: string;
+  updatedAt: string;
+  bookingId: string;
+  userId: string;
+  userType: "driver" | "user" | string;
   description: string;
-  operatorsFullName: string;
-  operatorsAddress: string;
-  operatorsMobileNumber: string;
-  operatorDocuments: FileDocument;
 }
 
+// Driver Structure
 export interface Driver {
+  _id: string;
   id: string;
   name: string;
   firstName: string;
@@ -89,9 +107,28 @@ export interface Driver {
   messages: object[];
   places: object[];
   rideHistory: object[];
+  fcmToken: string;
   location: {
     lat: number;
     lng: number;
   };
-  fcmToken: string;
+}
+
+// Wallet Data
+export interface Wallet {
+  _id: string;
+  walletBalance: number;
+}
+
+// Combined API Response
+export interface DriverResponse {
+  driver: Driver;
+  wallet: Wallet;
+  walletLogs: WalletLog[];
+}
+
+// Optional wallet on driver type
+export interface DriverWithWallet extends Driver {
+  wallet?: Wallet;
+  walletLogs?: WalletLog[];
 }

@@ -1,11 +1,24 @@
 'use client';
 
+import Modal from '@/components/Modal';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
-import { Driver } from '@/types/drivers';
+import { Driver, DriverResponse, DriverWithWallet } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
 
+interface DriverModalProps {
+    isOpen: boolean;
+    setIsOpen: (val: boolean) => void;
+    loading: boolean;
+    selectedDriver: any; // Replace with proper type if available
+    wallet: any;
+}
+
 export default function DriversPage() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
+    const [walletLogs, setWalletLogs] = useState<any[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +27,182 @@ export default function DriversPage() {
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
+
+    const [activeTab, setActiveTab] = useState("Details");
+    const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet"];
+
+    const renderTabContent = () => {
+        if (!selectedDriver) return <p className="text-gray-500">No driver found.</p>;
+
+        switch (activeTab) {
+            /** ─────────────────────────────── DETAILS TAB ─────────────────────────────── **/
+            case "Details":
+                return (
+                    <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                        {/* Profile Picture */}
+                        <div className="flex-shrink-0 flex justify-center md:justify-start">
+                            <img
+                                src={selectedDriver.personalRequirements?.profilePicture?.url || "/default-profile.png"}
+                                alt={`${selectedDriver.name} Profile`}
+                                className="w-60 h-60 rounded-full border-2 border-gray-200 shadow-md object-cover"
+                            />
+                        </div>
+
+                        {/* Driver Details */}
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-gray-700 text-sm md:text-base">
+                            {[
+                                ["ID", selectedDriver.id],
+                                ["Name", selectedDriver.name],
+                                ["Email", selectedDriver.email],
+                                ["Mobile", selectedDriver.mobnum],
+                                ["Car Type", selectedDriver.carType || "-"],
+                                ["City", selectedDriver.city],
+                                ["Status", selectedDriver.status],
+                                ["Wallet Balance", `₱${selectedDriver.wallet?.walletBalance.toFixed(2) || "0.00"}`],
+                                ["Created At", selectedDriver.createdAt ? new Date(selectedDriver.createdAt).toLocaleString() : "-"]
+                            ].map(([label, value]) => (
+                                <p key={label}>
+                                    <span className="font-semibold text-gray-900">{label}:</span> {value}
+                                </p>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            /** ─────────────────────────────── PERSONAL TAB ─────────────────────────────── **/
+            case "Personal":
+                const pr = selectedDriver.personalRequirements;
+                return (
+                    <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
+                        <p><span className="font-semibold text-gray-900">Nationality:</span> {pr.nationality || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">PWD:</span> {pr.pwd ? "Yes" : "No"}</p>
+                        <p><span className="font-semibold text-gray-900">Emergency Contact:</span> {pr.emergencyContactName || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">License Number:</span> {pr.driverLicenseNumber || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">License Expiry:</span> {pr.driverLicenseExpDate || "-"}</p>
+                    </div>
+                );
+
+            /** ─────────────────────────────── TRANSPORT TAB ─────────────────────────────── **/
+            case "Transport":
+                const tr = selectedDriver.transportRequirements;
+                return (
+                    <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
+                        <p><span className="font-semibold text-gray-900">Plate Number:</span> {tr.plateNumber || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">OR Number:</span> {tr.orNumber || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">CR Number:</span> {tr.crNumber || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">Vehicle:</span> {`${tr.carBrand || "-"} ${tr.carModel || ""}`}</p>
+                        <p><span className="font-semibold text-gray-900">Color:</span> {tr.carColor || "-"}</p>
+                    </div>
+                );
+
+            /** ─────────────────────────────── RIDE HISTORY TAB ─────────────────────────────── **/
+            case "Ride History":
+                return selectedDriver.rideHistory.length ? (
+                    <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
+                        {selectedDriver.rideHistory.map((ride: any, idx: number) => (
+                            <li key={idx}>{ride}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500">No ride history available.</p>
+                );
+
+            /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
+            case "Messages":
+                return selectedDriver.messages.length ? (
+                    <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
+                        {selectedDriver.messages.map((msg: any, idx: number) => (
+                            <li key={idx}>{msg}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500">No messages available.</p>
+                );
+
+            /** ─────────────────────────────── WALLET TAB ─────────────────────────────── **/
+            case "Wallet":
+                const totalCredits = walletLogs
+                    .filter(log => log.amount > 0)
+                    .reduce((sum, log) => sum + log.amount, 0);
+                const totalDebits = walletLogs
+                    .filter(log => log.amount < 0)
+                    .reduce((sum, log) => sum + log.amount, 0);
+
+                return (
+                    <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+                        {/* Wallet Summary */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                            {[
+                                { label: "Balance", value: selectedDriver.wallet?.walletBalance || 0 },
+                                { label: "Credits", value: totalCredits },
+                                { label: "Deductions", value: Math.abs(totalDebits) },
+                            ].map((item) => (
+                                <div key={item.label} className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                    <p className="text-gray-700 text-xs font-medium">{item.label}</p>
+                                    <p className="text-lg font-semibold text-orange-600">₱{item.value.toFixed(2)}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Transaction History */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                                Transaction History ({walletLogs.length})
+                            </h3>
+                            <div className="overflow-x-auto rounded-lg border border-gray-200">
+                                <table className="min-w-full text-sm text-left border-collapse">
+                                    <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-6 py-3">Booking ID</th>
+                                            <th className="px-6 py-3">Description</th>
+                                            <th className="px-6 py-3 text-right">Amount</th>
+                                            <th className="px-6 py-3">Date</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {walletLogs.length === 0 ? (
+                                            <tr>
+                                                <td
+                                                    colSpan={4}
+                                                    className="px-6 py-6 text-center text-gray-500 italic"
+                                                >
+                                                    No wallet transactions found.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            walletLogs.map((log, idx) => (
+                                                <tr
+                                                    key={idx}
+                                                    className="border-b last:border-0 hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <td className="px-6 py-4 text-gray-600">{log.bookingId}</td>
+                                                    <td className="px-6 py-4 text-gray-700">{log.description}</td>
+                                                    <td
+                                                        className={`px-6 py-4 text-right font-semibold ${log.amount >= 0 ? "text-green-600" : "text-red-500"
+                                                            }`}
+                                                    >
+                                                        {log.amount >= 0 ? "+" : ""}
+                                                        ₱{log.amount.toFixed(2)}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-gray-500">
+                                                        {new Date(log.createdAt).toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            /** ─────────────────────────────── DEFAULT ─────────────────────────────── **/
+            default:
+                return null;
+        }
+    };
 
     // Fetch drivers once on mount
     useEffect(() => {
@@ -30,6 +219,24 @@ export default function DriversPage() {
 
         fetchDrivers();
     }, []);
+
+    async function fetchDriverDetails(id: string) {
+        setLoading(true);
+        setSelectedDriver(null);
+        try {
+            const res = await fetch(`/api/admin/getDriver/${id}`);
+            if (!res.ok) throw new Error("Failed to fetch driver");
+
+            const data: DriverResponse = await res.json();
+            setSelectedDriver({ ...data.driver, wallet: data.wallet });
+            setWalletLogs(data.walletLogs || []);
+            setIsOpen(true); // open modal after fetching
+        } catch (err) {
+            console.error("Error fetching driver details:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -68,6 +275,7 @@ export default function DriversPage() {
             const term = searchTerm.toLowerCase();
             filtered = filtered.filter(
                 (d) =>
+                    d.id?.toLowerCase().includes(term) ||
                     d.name?.toLowerCase().includes(term) ||
                     d.email?.toLowerCase().includes(term) ||
                     d.mobnum?.includes(term)
@@ -222,18 +430,18 @@ export default function DriversPage() {
                         <tbody>
                             {paginatedDrivers.length === 0 ? (
                                 <tr>
-                                    <td
-                                        colSpan={8}
-                                        className="text-center py-6 text-gray-500 italic"
-                                    >
+                                    <td colSpan={8} className="text-center py-6 text-gray-500 italic">
                                         No drivers found for selected filters.
                                     </td>
                                 </tr>
                             ) : (
                                 paginatedDrivers.map((d) => (
                                     <tr
-                                        key={d.id}
-                                        className="border-b hover:bg-gray-50 transition"
+                                        key={d._id}
+                                        onClick={() => {
+                                            fetchDriverDetails(d._id);
+                                        }}
+                                        className="border-b hover:bg-gray-50 transition cursor-pointer"
                                     >
                                         <td className="px-6 py-3">{d.id}</td>
                                         <td className="px-6 py-3">{d.name}</td>
@@ -245,15 +453,43 @@ export default function DriversPage() {
                                             {d.status}
                                         </td>
                                         <td className="px-6 py-3 text-gray-500">
-                                            {d.createdAt
-                                                ? new Date(d.createdAt).toLocaleString()
-                                                : '-'}
+                                            {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}
                                         </td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
+                    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={selectedDriver?.name} size="full">
+                        {loading ? (
+                            <p className="text-center text-gray-500 py-10">Loading...</p>
+                        ) : (
+                            <div className="flex flex-col h-full">
+                                {/* Navigation Tabs */}
+                                <div className="overflow-x-auto border-b mb-6">
+                                    <nav className="flex space-x-2 md:space-x-4 px-2 md:px-4">
+                                        {tabs.map((tab) => (
+                                            <button
+                                                key={tab}
+                                                onClick={() => setActiveTab(tab)}
+                                                className={`whitespace-nowrap py-2 px-4 md:px-6 rounded-t-lg font-medium transition-colors duration-200${activeTab === tab
+                                                    ? "bg-blue-500 text-gray-500 shadow-lg"
+                                                    : "text-gray-600 hover:text-orange-500 hover:bg-gray-100"
+                                                    }`}
+                                            >
+                                                {tab}
+                                            </button>
+                                        ))}
+                                    </nav>
+                                </div>
+
+                                {/* Tab Content */}
+                                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 rounded-b-lg shadow-inner">
+                                    {renderTabContent()}
+                                </div>
+                            </div>
+                        )}
+                    </Modal>
                 </div>
 
                 {/* Pagination */}

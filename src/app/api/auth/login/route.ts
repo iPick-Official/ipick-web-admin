@@ -4,6 +4,7 @@ export async function POST(req: Request) {
   try {
     const { username, password } = await req.json();
 
+    // Call your NestJS backend
     const backendRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
       {
@@ -18,12 +19,16 @@ export async function POST(req: Request) {
     if (!backendRes.ok) {
       return NextResponse.json(
         { message: data.message || "Invalid login" },
-        { status: 401 }
+        { status: backendRes.status }
       );
     }
 
-    // Store token securely
-    const res = NextResponse.json({ message: "Login successful" });
+    // Store the access token in a secure, HTTP-only cookie
+    const res = NextResponse.json({
+      message: "Login successful",
+      admin: data.admin,
+    });
+
     res.cookies.set("access_token", data.apiKey, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -34,7 +39,7 @@ export async function POST(req: Request) {
 
     return res;
   } catch (err) {
-    console.error(err);
+    console.error("Login API error:", err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
