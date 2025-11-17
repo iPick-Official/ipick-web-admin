@@ -3,22 +3,15 @@
 import Modal from '@/components/Modal';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
-import { Driver, DriverResponse, DriverWithWallet } from '@/types/drivers';
+import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
-
-interface DriverModalProps {
-    isOpen: boolean;
-    setIsOpen: (val: boolean) => void;
-    loading: boolean;
-    selectedDriver: any; // Replace with proper type if available
-    wallet: any;
-}
+import Image from "next/image";
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
-    const [walletLogs, setWalletLogs] = useState<any[]>([]);
+    const [walletLogs, setWalletLogs] = useState<WalletLog[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -41,11 +34,14 @@ export default function DriversPage() {
                     <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0 flex justify-center md:justify-start">
-                            <img
+                            <Image
                                 src={selectedDriver.personalRequirements?.profilePicture?.url || "/default-profile.png"}
                                 alt={`${selectedDriver.name} Profile`}
-                                className="w-60 h-60 rounded-full border-2 border-gray-200 shadow-md object-cover"
+                                width={240}   // 60 * 4 (tailwind w-60 ≈ 240px)
+                                height={240}
+                                className="rounded-full border-2 border-gray-200 shadow-md object-cover"
                             />
+
                         </div>
 
                         {/* Driver Details */}
@@ -96,28 +92,28 @@ export default function DriversPage() {
                 );
 
             /** ─────────────────────────────── RIDE HISTORY TAB ─────────────────────────────── **/
-            case "Ride History":
-                return selectedDriver.rideHistory.length ? (
-                    <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
-                        {selectedDriver.rideHistory.map((ride: any, idx: number) => (
-                            <li key={idx}>{ride}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-500">No ride history available.</p>
-                );
+            // case "Ride History":
+            //     return selectedDriver.rideHistory.length ? (
+            //         <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
+            //             {selectedDriver.rideHistory.map((ride: string, idx: number) => (
+            //                 <li key={idx}>{ride}</li>
+            //             ))}
+            //         </ul>
+            //     ) : (
+            //         <p className="text-gray-500">No ride history available.</p>
+            //     );
 
-            /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
-            case "Messages":
-                return selectedDriver.messages.length ? (
-                    <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
-                        {selectedDriver.messages.map((msg: any, idx: number) => (
-                            <li key={idx}>{msg}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-500">No messages available.</p>
-                );
+            // /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
+            // case "Messages":
+            //     return selectedDriver.messages.length ? (
+            //         <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
+            //             {selectedDriver.messages.map((msg: any, idx: number) => (
+            //                 <li key={idx}>{msg}</li>
+            //             ))}
+            //         </ul>
+            //     ) : (
+            //         <p className="text-gray-500">No messages available.</p>
+            //     );
 
             /** ─────────────────────────────── WALLET TAB ─────────────────────────────── **/
             case "Wallet":
