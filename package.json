@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.934.0",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
     "@next-auth/mongodb-adapter": "^1.1.3",
