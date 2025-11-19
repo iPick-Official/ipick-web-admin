@@ -13,7 +13,7 @@ export default function BookingsPage() {
     const [fromDate, setFromDate] = useState(today);
     const [toDate, setToDate] = useState(today);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
 

@@ -8,7 +8,7 @@ import { Pagination } from '@/components/Pagination'; // import the pagination c
 export default function RidersPage() {
     const [riders, setRiders] = useState<Riders[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);

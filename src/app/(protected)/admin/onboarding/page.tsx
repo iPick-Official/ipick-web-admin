@@ -6,9 +6,8 @@ import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
 import Image from "next/image";
-import { useSignedS3Url } from '@/hooks/useSignedS3Url';
 
-export default function DriversPage() {
+export default function OnboardingPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
@@ -16,7 +15,7 @@ export default function DriversPage() {
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -25,57 +24,24 @@ export default function DriversPage() {
     const [activeTab, setActiveTab] = useState("Details");
     const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet"];
 
-    // --- Top level hooks for all documents ---
-    const docKeys = {
-        // Personal Docs
-        profile: selectedDriver?.personalRequirements?.profilePicture?.url,
-        pwdFile: selectedDriver?.personalRequirements?.pwdFile?.url,
-        vaccinationCert: selectedDriver?.personalRequirements?.vaccinationCertificate?.url,
-        driverLicenseFront: selectedDriver?.personalRequirements?.driverLicenseFront?.url,
-        driverLicenseBack: selectedDriver?.personalRequirements?.driverLicenseBack?.url,
-        otherDoc: selectedDriver?.personalRequirements?.documentImg?.url,
-        // Transport Docs
-        operatorDocs: selectedDriver?.transportRequirements?.vehicleOwnership?.operatorDocuments?.url,
-        ownerDocs: selectedDriver?.transportRequirements?.ownerDocuments?.url,
-        operatorsDoc: selectedDriver?.transportRequirements?.operatorsDocument?.url,
-        vehicleOR: selectedDriver?.transportRequirements?.vehicleOR?.url,
-        vehicleCR: selectedDriver?.transportRequirements?.vehicleCR?.url,
-        vehicleSalesInvoice: selectedDriver?.transportRequirements?.vehicleSalesInvoice?.url,
-        authorizationLetterPageOne: selectedDriver?.transportRequirements?.authorizationLetterPageOne?.url,
-        authorizationLetterPageTwo: selectedDriver?.transportRequirements?.authorizationLetterPageTwo?.url,
-        sPAPageOne: selectedDriver?.transportRequirements?.sPAPageOne?.url,
-        sPAPageTwo: selectedDriver?.transportRequirements?.sPAPageTwo?.url,
-        pAPageOne: selectedDriver?.transportRequirements?.pAPageOne?.url,
-        pAPageTwo: selectedDriver?.transportRequirements?.pAPageTwo?.url,
-        cPCPageOne: selectedDriver?.transportRequirements?.cPCPageOne?.url,
-        cPCPageTwo: selectedDriver?.transportRequirements?.cPCPageTwo?.url,
-        mEPAPageOne: selectedDriver?.transportRequirements?.mEPAPageOne?.url,
-        mEPAPageTwo: selectedDriver?.transportRequirements?.mEPAPageTwo?.url,
-        pAMI: selectedDriver?.transportRequirements?.pAMI?.url,
-    };
-
-    // Use the hook for each key
-    const signedUrls = Object.fromEntries(
-        Object.entries(docKeys).map(([key, url]) => [key, useSignedS3Url(url).signedUrl])
-    );
-
-    // --- Render function ---
     const renderTabContent = () => {
         if (!selectedDriver) return <p className="text-gray-500">No driver found.</p>;
 
         switch (activeTab) {
+            /** ─────────────────────────────── DETAILS TAB ─────────────────────────────── **/
             case "Details":
                 return (
                     <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0 flex justify-center md:justify-start">
                             <Image
-                                src={signedUrls.profile || "/logo.png"}
+                                src={"/logo.png"}
                                 alt={`${selectedDriver.name} Profile`}
-                                width={240}
+                                width={240}   // 60 * 4 (tailwind w-60 ≈ 240px)
                                 height={240}
-                                className="w-60 h-60 border-2 border-gray-200 shadow-md object-cover"
+                                className="rounded-full border-2 border-gray-200 shadow-md object-cover"
                             />
+
                         </div>
 
                         {/* Driver Details */}
@@ -99,47 +65,17 @@ export default function DriversPage() {
                     </div>
                 );
 
+            /** ─────────────────────────────── PERSONAL TAB ─────────────────────────────── **/
             case "Personal":
                 const pr = selectedDriver.personalRequirements;
-
                 return (
                     <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
-                        {[
-                            { label: "Nationality", value: pr.nationality },
-                            { label: "PWD", value: pr.pwd ? "Yes" : "No" },
-                            { label: "Emergency Contact", value: pr.emergencyContactName },
-                            { label: "License Number", value: pr.driverLicenseNumber },
-                            { label: "License Expiry", value: pr.driverLicenseExpDate },
-                        ].map(({ label, value }) => (
-                            <p key={label}>
-                                <span className="font-semibold text-gray-900">{label}:</span> {value || "-"}
-                            </p>
-                        ))}
-
-                        {[
-                            { label: "PWD File", signedUrl: signedUrls.pwdFile },
-                            { label: "Vaccination Certificate", signedUrl: signedUrls.vaccinationCert },
-                            { label: "Driver License Front", signedUrl: signedUrls.driverLicenseFront },
-                            { label: "Driver License Back", signedUrl: signedUrls.driverLicenseBack },
-                            { label: "Other Document", signedUrl: signedUrls.otherDoc },
-                        ].map(
-                            ({ label, signedUrl }) =>
-                                signedUrl && (
-                                    <p key={label}>
-                                        <span className="font-semibold text-gray-900">{label}:</span>{" "}
-                                        <a
-                                            href={signedUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            View
-                                        </a>
-                                    </p>
-                                )
-                        )}
+                        <p><span className="font-semibold text-gray-900">Nationality:</span> {pr.nationality || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">PWD:</span> {pr.pwd ? "Yes" : "No"}</p>
+                        <p><span className="font-semibold text-gray-900">Emergency Contact:</span> {pr.emergencyContactName || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">License Number:</span> {pr.driverLicenseNumber || "-"}</p>
+                        <p><span className="font-semibold text-gray-900">License Expiry:</span> {pr.driverLicenseExpDate || "-"}</p>
                     </div>
-
                 );
 
             /** ─────────────────────────────── TRANSPORT TAB ─────────────────────────────── **/
@@ -147,48 +83,11 @@ export default function DriversPage() {
                 const tr = selectedDriver.transportRequirements;
                 return (
                     <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
-                        {/* Basic vehicle info */}
                         <p><span className="font-semibold text-gray-900">Plate Number:</span> {tr.plateNumber || "-"}</p>
                         <p><span className="font-semibold text-gray-900">OR Number:</span> {tr.orNumber || "-"}</p>
                         <p><span className="font-semibold text-gray-900">CR Number:</span> {tr.crNumber || "-"}</p>
                         <p><span className="font-semibold text-gray-900">Vehicle:</span> {`${tr.carBrand || "-"} ${tr.carModel || ""}`}</p>
                         <p><span className="font-semibold text-gray-900">Color:</span> {tr.carColor || "-"}</p>
-
-                        {/* Transport document links */}
-                        {[
-                            { label: "Operator Documents", signedUrl: signedUrls.operatorDocs },
-                            { label: "Owner Documents", signedUrl: signedUrls.ownerDocs },
-                            { label: "Operators Document", signedUrl: signedUrls.operatorsDoc },
-                            { label: "Vehicle OR", signedUrl: signedUrls.vehicleOR },
-                            { label: "Vehicle CR", signedUrl: signedUrls.vehicleCR },
-                            { label: "Vehicle Sales Invoice", signedUrl: signedUrls.vehicleSalesInvoice },
-                            { label: "Authorization Letter Page 1", signedUrl: signedUrls.authorizationLetterPageOne },
-                            { label: "Authorization Letter Page 2", signedUrl: signedUrls.authorizationLetterPageTwo },
-                            { label: "SPA Page 1", signedUrl: signedUrls.sPAPageOne },
-                            { label: "SPA Page 2", signedUrl: signedUrls.sPAPageTwo },
-                            { label: "PA Page 1", signedUrl: signedUrls.pAPageOne },
-                            { label: "PA Page 2", signedUrl: signedUrls.pAPageTwo },
-                            { label: "CPC Page 1", signedUrl: signedUrls.cPCPageOne },
-                            { label: "CPC Page 2", signedUrl: signedUrls.cPCPageTwo },
-                            { label: "MEPA Page 1", signedUrl: signedUrls.mEPAPageOne },
-                            { label: "MEPA Page 2", signedUrl: signedUrls.mEPAPageTwo },
-                            { label: "PAMI", signedUrl: signedUrls.pAMI },
-                        ].map(
-                            ({ label, signedUrl }) =>
-                                signedUrl && (
-                                    <p key={label}>
-                                        <span className="font-semibold text-gray-900">{label}:</span>{" "}
-                                        <a
-                                            href={signedUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            View
-                                        </a>
-                                    </p>
-                                )
-                        )}
                     </div>
                 );
 
@@ -351,6 +250,7 @@ export default function DriversPage() {
     // Filters & sorting
     const displayedDrivers = useMemo(() => {
         let filtered = drivers;
+        filtered = filtered.filter((d) => d.status === 'pending');
 
         // Date range filter (using Date objects)
         if (fromDate && toDate) {
@@ -360,11 +260,6 @@ export default function DriversPage() {
                 const created = d.createdAt ? new Date(d.createdAt) : null;
                 return created && created >= from && created <= to;
             });
-        }
-
-        // Status filter
-        if (statusFilter !== 'all') {
-            filtered = filtered.filter((d) => d.status === statusFilter);
         }
 
         // Search filter
@@ -416,7 +311,7 @@ export default function DriversPage() {
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Drivers</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Drivers Onboarding</h2>
 
                     <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
@@ -434,21 +329,6 @@ export default function DriversPage() {
                                 />
                             </div>
                         ))}
-
-                        {/* Status Filter */}
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm text-gray-600">Status:</label>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
-                            >
-                                <option value="all">All</option>
-                                <option value="approved">Approved</option>
-                                <option value="pending">Pending</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
 
                         {/* Search */}
                         <input
