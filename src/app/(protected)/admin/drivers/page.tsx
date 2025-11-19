@@ -5,8 +5,8 @@ import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
+import { useSignedDocs } from '@/hooks/useSignedDocs';
 import Image from "next/image";
-import { useSignedS3Url } from '@/hooks/useSignedS3Url';
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -55,9 +55,7 @@ export default function DriversPage() {
     };
 
     // Use the hook for each key
-    const signedUrls = Object.fromEntries(
-        Object.entries(docKeys).map(([key, url]) => [key, useSignedS3Url(url).signedUrl])
-    );
+    const signedUrls = useSignedDocs(docKeys);
 
     // --- Render function ---
     const renderTabContent = () => {

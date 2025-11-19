@@ -11,7 +11,7 @@ function extractS3Key(input: string | null | undefined) {
 
   try {
     const url = new URL(input);
-    let key = url.pathname;
+    const key = url.pathname; // ✅ use const
     return key.startsWith("/") ? key.slice(1) : key;
   } catch {
     return input;
@@ -29,7 +29,7 @@ export function useSignedS3Url(rawKey: string | null | undefined) {
     const key = extractS3Key(rawKey);
     if (!key) return;
 
-    // ✔ 1. Return immediately if cached
+    // ✔ Return immediately if cached
     if (signedUrlCache.has(key)) {
       setSignedUrl(signedUrlCache.get(key)!);
       return;
@@ -49,14 +49,13 @@ export function useSignedS3Url(rawKey: string | null | undefined) {
         const data = await res.json();
 
         if (data.url) {
-          // ✔ 2. Cache it
           signedUrlCache.set(key, data.url);
           setSignedUrl(data.url);
         } else {
           setError("Failed to generate signed URL");
         }
-      } catch (err) {
-        setError("Error fetching signed URL");
+      } catch {
+        setError("Error fetching signed URL"); // ✅ removed unused 'err'
       } finally {
         setLoading(false);
       }
