@@ -4,11 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { Loading } from "../../../components/Loading";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     async function handleLogin(e: React.FormEvent) {
@@ -43,48 +45,67 @@ export default function AuthPage() {
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100 relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-orange-100 opacity-70 blur-3xl z-0 pointer-events-none" />
-            <div className="absolute inset-0 bg-orange opacity-60 filter blur-2xl rounded-full z-10 pointer-events-none" />
+            <div className="p-8 bg-white shadow-2xl rounded-xl w-full max-w-sm mx-auto transform transition duration-500">
 
-            {/* Auth Card */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg w-96 relative">
                 {/* Logo */}
-                <div className="absolute -top-14 left-1/2 transform -translate-x-1/2">
-                    <Image
+                <div className="flex justify-center mb-6">
+                    <img
                         src="/logo.png"
-                        alt="ipick Logo"
-                        width={80}
-                        height={80}
-                        className="drop-shadow-lg rounded-xl bg-white p-1"
+                        alt="App Logo"
+                        className="h-16 w-16 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
                     />
                 </div>
 
-                <div className="mt-10">
-                    <form onSubmit={handleLogin} className="space-y-4">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h2>
+
+                <form onSubmit={handleLogin} className="space-y-6">
+
+                    {/* Username Input */}
+                    <div>
+                        <label htmlFor="username" className="text-sm font-medium text-gray-600 block mb-1">Username</label>
                         <input
+                            id="username"
                             type="text"
-                            placeholder="Username"
+                            placeholder="Enter your username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition duration-150 text-gray-700"
                             required
                         />
+                    </div>
+
+                    {/* Password Input */}
+                    <div className="relative">
+                        <label htmlFor="password" className="text-sm font-medium text-gray-600 block mb-1">Password</label>
                         <input
-                            type="password"
-                            placeholder="Password"
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:ring-4 focus:ring-green-100 focus:border-green-500 transition duration-150 text-gray-700 pr-12"
                             required
                         />
+
+                        {/* Eye Icon */}
                         <button
-                            type="submit"
-                            className="w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800 duration-300 transition"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500 hover:text-gray-700 transition duration-150"
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
                         >
-                            Login
+                            {showPassword ? <EyeOff /> : <Eye />}
                         </button>
-                    </form>
-                </div>
+                    </div>
+
+                    {/* Login Button */}
+                    <button
+                        type="submit"
+                        className="w-full bg-green-600 text-white font-semibold py-3 rounded-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition duration-300 transform hover:scale-[1.01]"
+                    >
+                        Login
+                    </button>
+                </form>
             </div>
         </div>
     );

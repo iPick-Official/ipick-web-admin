@@ -44,6 +44,7 @@ export default function RidersPage() {
             const term = searchTerm.toLowerCase();
             filtered = filtered.filter(
                 (r) =>
+                    r.id?.toLowerCase().includes(term) ||
                     r.name?.toLowerCase().includes(term) ||
                     r.email?.toLowerCase().includes(term) ||
                     r.mobnum?.includes(term)
@@ -139,60 +140,62 @@ export default function RidersPage() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-auto">
-                    <table className="min-w-full text-sm text-left border-collapse">
-                        <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
-                            <tr>
-                                {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged In'].map((col) => (
-                                    <th key={col} className="px-6 py-3 font-medium text-left">
-                                        {col}
-                                    </th>
-                                ))}
-                                <th className="px-6 py-3 font-medium text-left">
-                                    <button
-                                        className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                    >
-                                        Created At
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                        </svg>
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedRiders.length === 0 ? (
+                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                    <div className="overflow-y-auto max-h-[75vh]">
+                        <table className="min-w-full text-sm text-left border-collapse">
+                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
                                 <tr>
-                                    <td colSpan={7} className="text-center py-6 text-gray-500 italic">
-                                        No riders found for selected filters.
-                                    </td>
+                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged In'].map((col) => (
+                                        <th key={col} className="px-6 py-3 font-medium text-left">
+                                            {col}
+                                        </th>
+                                    ))}
+                                    <th className="px-6 py-3 font-medium text-left">
+                                        <button
+                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
+                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                        >
+                                            Created At
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                            </svg>
+                                        </button>
+                                    </th>
                                 </tr>
-                            ) : (
-                                paginatedRiders.map((r) => (
-                                    <tr key={r._id} className="border-b hover:bg-gray-50 transition">
-                                        <td className="px-6 py-3">{r.id}</td>
-                                        <td className="px-6 py-3">{r.name || '-'}</td>
-                                        <td className="px-6 py-3">{r.email || '-'}</td>
-                                        <td className="px-6 py-3">{r.mobnum || '-'}</td>
-                                        <td className="px-6 py-3">{r.address || '-'}</td>
-                                        <td className={`px-6 py-3 font-semibold ${r.isLogged ? 'text-green-600' : 'text-gray-500'}`}>
-                                            {r.isLogged ? 'Yes' : 'No'}
-                                        </td>
-                                        <td className="px-6 py-3 text-gray-500">
-                                            {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
+                            </thead>
+                            <tbody>
+                                {paginatedRiders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="text-center py-6 text-gray-500 italic">
+                                            No riders found for selected filters.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    paginatedRiders.map((r) => (
+                                        <tr key={r._id} className="border-b hover:bg-gray-50 transition">
+                                            <td className="px-6 py-3">{r.id}</td>
+                                            <td className="px-6 py-3">{r.name || '-'}</td>
+                                            <td className="px-6 py-3">{r.email || '-'}</td>
+                                            <td className="px-6 py-3">{r.mobnum || '-'}</td>
+                                            <td className="px-6 py-3">{r.address || '-'}</td>
+                                            <td className={`px-6 py-3 font-semibold ${r.isLogged ? 'text-green-600' : 'text-gray-500'}`}>
+                                                {r.isLogged ? 'Yes' : 'No'}
+                                            </td>
+                                            <td className="px-6 py-3 text-gray-500">
+                                                {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Pagination */}

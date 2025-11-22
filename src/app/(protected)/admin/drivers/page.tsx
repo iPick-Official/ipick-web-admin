@@ -27,6 +27,7 @@ export default function DriversPage() {
 
     // --- Top level hooks for all documents ---
     const docKeys = {
+
         // Personal Docs
         profile: selectedDriver?.personalRequirements?.profilePicture?.url,
         pwdFile: selectedDriver?.personalRequirements?.pwdFile?.url,
@@ -34,6 +35,7 @@ export default function DriversPage() {
         driverLicenseFront: selectedDriver?.personalRequirements?.driverLicenseFront?.url,
         driverLicenseBack: selectedDriver?.personalRequirements?.driverLicenseBack?.url,
         otherDoc: selectedDriver?.personalRequirements?.documentImg?.url,
+
         // Transport Docs
         operatorDocs: selectedDriver?.transportRequirements?.vehicleOwnership?.operatorDocuments?.url,
         ownerDocs: selectedDriver?.transportRequirements?.ownerDocuments?.url,
@@ -487,104 +489,103 @@ export default function DriversPage() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-auto">
-                    <table className="min-w-full text-sm text-left border-collapse">
-                        <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
-                            <tr>
-                                {['ID', 'Name', 'Email', 'Mobile', 'Car Type', 'City', 'Status'].map((col) => (
-                                    <th key={col} className="px-6 py-3 font-medium text-left">
-                                        {col}
-                                    </th>
-                                ))}
-                                <th className="px-6 py-3 font-medium text-left">
-                                    <button
-                                        className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                        onClick={() =>
-                                            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-                                        }
-                                    >
-                                        Created At
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M5 15l7-7 7 7"
-                                            />
-                                        </svg>
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedDrivers.length === 0 ? (
+                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                    <div className="overflow-y-auto max-h-[75vh]">
+                        <table className="min-w-full text-sm text-left border-collapse">
+                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200 sticky top-0 z-10">
                                 <tr>
-                                    <td colSpan={8} className="text-center py-6 text-gray-500 italic">
-                                        No drivers found for selected filters.
-                                    </td>
+                                    {['ID', 'Name', 'Email', 'Mobile', 'Car Type', 'City', 'Status'].map((col) => (
+                                        <th key={col} className="px-6 py-3 font-medium text-left bg-gray-200">
+                                            {col}
+                                        </th>
+                                    ))}
+                                    <th className="px-6 py-3 font-medium text-left bg-gray-200">
+                                        <button
+                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
+                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                        >
+                                            Created At
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M5 15l7-7 7 7"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </th>
                                 </tr>
-                            ) : (
-                                paginatedDrivers.map((d) => (
-                                    <tr
-                                        key={d._id}
-                                        onClick={() => {
-                                            fetchDriverDetails(d._id);
-                                        }}
-                                        className="border-b hover:bg-gray-50 transition cursor-pointer"
-                                    >
-                                        <td className="px-6 py-3">{d.id}</td>
-                                        <td className="px-6 py-3">{d.name}</td>
-                                        <td className="px-6 py-3">{d.email}</td>
-                                        <td className="px-6 py-3">{d.mobnum}</td>
-                                        <td className="px-6 py-3">{d.carType}</td>
-                                        <td className="px-6 py-3">{d.city}</td>
-                                        <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
-                                            {d.status}
-                                        </td>
-                                        <td className="px-6 py-3 text-gray-500">
-                                            {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}
+                            </thead>
+
+                            <tbody>
+                                {paginatedDrivers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={8} className="text-center py-6 text-gray-500 italic">
+                                            No drivers found for selected filters.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={selectedDriver?.name} size="full">
-                        {loading ? (
-                            <p className="text-center text-gray-500 py-10">Loading...</p>
-                        ) : (
-                            <div className="flex flex-col h-full">
-                                {/* Navigation Tabs */}
-                                <div className="overflow-x-auto border-b mb-6">
-                                    <nav className="flex space-x-2 md:space-x-4 px-2 md:px-4">
-                                        {tabs.map((tab) => (
-                                            <button
-                                                key={tab}
-                                                onClick={() => setActiveTab(tab)}
-                                                className={`whitespace-nowrap py-2 px-4 md:px-6 rounded-t-lg font-medium transition-colors duration-200${activeTab === tab
-                                                    ? "bg-blue-500 text-gray-500 shadow-lg"
-                                                    : "text-gray-600 hover:text-orange-500 hover:bg-gray-100"
-                                                    }`}
-                                            >
-                                                {tab}
-                                            </button>
-                                        ))}
-                                    </nav>
-                                </div>
+                                ) : (
+                                    paginatedDrivers.map((d) => (
+                                        <tr
+                                            key={d._id}
+                                            onClick={() => fetchDriverDetails(d._id)}
+                                            className="border-b hover:bg-gray-50 transition cursor-pointer"
+                                        >
+                                            <td className="px-6 py-3">{d.id}</td>
+                                            <td className="px-6 py-3">{d.name}</td>
+                                            <td className="px-6 py-3">{d.email}</td>
+                                            <td className="px-6 py-3">{d.mobnum}</td>
+                                            <td className="px-6 py-3">{d.carType}</td>
+                                            <td className="px-6 py-3">{d.city}</td>
+                                            <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
+                                                {d.status}
+                                            </td>
+                                            <td className="px-6 py-3 text-gray-500">
+                                                {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={selectedDriver?.name} size="full">
+                            {loading ? (
+                                <p className="text-center text-gray-500 py-10">Loading...</p>
+                            ) : (
+                                <div className="flex flex-col h-full">
+                                    {/* Navigation Tabs */}
+                                    <div className="overflow-x-auto border-b mb-6">
+                                        <nav className="flex space-x-2 md:space-x-4 px-2 md:px-4">
+                                            {tabs.map((tab) => (
+                                                <button
+                                                    key={tab}
+                                                    onClick={() => setActiveTab(tab)}
+                                                    className={`whitespace-nowrap py-2 px-4 md:px-6 rounded-t-lg font-medium transition-colors duration-200${activeTab === tab
+                                                        ? "bg-blue-500 text-gray-500 shadow-lg"
+                                                        : "text-gray-600 hover:text-orange-500 hover:bg-gray-100"
+                                                        }`}
+                                                >
+                                                    {tab}
+                                                </button>
+                                            ))}
+                                        </nav>
+                                    </div>
 
-                                {/* Tab Content */}
-                                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 rounded-b-lg shadow-inner">
-                                    {renderTabContent()}
+                                    {/* Tab Content */}
+                                    <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 rounded-b-lg shadow-inner">
+                                        {renderTabContent()}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </Modal>
+                            )}
+                        </Modal>
+                    </div>
                 </div>
 
                 {/* Pagination */}
