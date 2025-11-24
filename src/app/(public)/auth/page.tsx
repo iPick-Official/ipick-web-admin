@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Loading } from "../../../components/Loading";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 
 export default function AuthPage() {
     const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function AuthPage() {
 
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
-                    <img
+                    <Image
                         src="/logo.png"
                         alt="App Logo"
                         className="h-16 w-16 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"

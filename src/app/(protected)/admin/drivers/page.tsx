@@ -4,13 +4,15 @@ import Modal from '@/components/Modal';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, Key } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
 import Image from "next/image";
+import { RideHistory } from '@/types/history';
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [rideHistory, setRideHistory] = useState<RideHistory | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
     const [walletLogs, setWalletLogs] = useState<WalletLog[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -193,16 +195,71 @@ export default function DriversPage() {
                 );
 
             /** ─────────────────────────────── RIDE HISTORY TAB ─────────────────────────────── **/
-            // case "Ride History":
-            //     return selectedDriver.rideHistory.length ? (
-            //         <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
-            //             {selectedDriver.rideHistory.map((ride: string, idx: number) => (
-            //                 <li key={idx}>{ride}</li>
-            //             ))}
-            //         </ul>
-            //     ) : (
-            //         <p className="text-gray-500">No ride history available.</p>
-            //     );
+            case "Ride History":
+                // Extract rides safely
+                const rides = rideHistory?.driver || [];
+
+                // Calculate totals
+                const totalFinished = rides.filter((ride: { status: string; }) => ride.status === "finished").length;
+                const totalCancelled = rides.filter((ride: { status: string; }) => ride.status === "cancelled").length;
+
+                // Display component
+                return (
+                    <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+                        {/* Ride Summary */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+                            {[
+                                { label: "Finished Rides", value: totalFinished },
+                                { label: "Cancelled Rides", value: totalCancelled },
+                            ].map((item) => (
+                                <div key={item.label} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <p className="text-gray-700 text-xs font-medium">{item.label}</p>
+                                    <p className="text-lg font-semibold text-blue-600">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Ride History Table */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                                Ride History ({rides.length})
+                            </h3>
+                            <div className="overflow-x-auto rounded-lg border border-gray-200">
+                                <table className="min-w-full text-sm text-left border-collapse">
+                                    <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-6 py-3">Date</th>
+                                            <th className="px-6 py-3">Origin</th>
+                                            <th className="px-6 py-3">Destination</th>
+                                            <th className="px-6 py-3 text-right">Fare (₱)</th>
+                                            <th className="px-6 py-3">Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {rides.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-6 text-center text-gray-500 italic">
+                                                    No ride history available.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            rides.map((ride: { timestamp: string | number | Date; origin: { name: string; }; destination: { name: string; }; travelFare: number; status: string; }, idx: Key | null | undefined) => (
+                                                <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4">{new Date(ride.timestamp).toLocaleDateString()}</td>
+                                                    <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
+                                                    <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
+                                                    <td className="px-6 py-4 text-right font-semibold">₱{ride.travelFare?.toFixed(2) || "0.00"}</td>
+                                                    <td className="px-6 py-4 capitalize">{ride.status || "-"}</td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                );
 
             // /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
             // case "Messages":
@@ -317,20 +374,29 @@ export default function DriversPage() {
         fetchDrivers();
     }, []);
 
-    async function fetchDriverDetails(id: string) {
+    async function fetchDriverDetailsWithHistory(id: string) {
         setLoading(true);
         setSelectedDriver(null);
+        setWalletLogs([]);
         try {
-            const res = await fetch(`/api/admin/getDriver/${id}`);
-            if (!res.ok) throw new Error("Failed to fetch driver");
+            // Fetch driver details
+            const resDriver = await fetch(`/api/admin/getDriver/${id}`);
+            if (!resDriver.ok) throw new Error("Failed to fetch driver");
 
-            const data: DriverResponse = await res.json();
+            const data: DriverResponse = await resDriver.json();
             setSelectedDriver({ ...data.driver, wallet: data.wallet });
             setWalletLogs(data.walletLogs || []);
-            setIsOpen(true); // open modal after fetching
+
+            const resHistory = await fetch(`/api/admin/getDriverHistory/${data.driver.id}`);
+            if (!resHistory.ok) throw new Error("Failed to fetch driver history");
+
+            const historyData = await resHistory.json();
+            setRideHistory(historyData || []);
+            setIsOpen(true);
         } catch (err) {
-            console.error("Error fetching driver details:", err);
-        } finally {
+            console.error("Error fetching driver details or history:", err);
+        }
+        finally {
             setLoading(false);
         }
     }
@@ -535,7 +601,7 @@ export default function DriversPage() {
                                     paginatedDrivers.map((d) => (
                                         <tr
                                             key={d._id}
-                                            onClick={() => fetchDriverDetails(d._id)}
+                                            onClick={() => fetchDriverDetailsWithHistory(d._id)}
                                             className="border-b hover:bg-gray-50 transition cursor-pointer"
                                         >
                                             <td className="px-6 py-3">{d.id}</td>

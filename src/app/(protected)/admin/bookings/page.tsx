@@ -189,66 +189,68 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-auto">
-                    <table className="min-w-full text-sm text-left border-collapse">
-                        <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
-                            <tr>
-                                {["Booking ID", "Rider ID", "Driver ID", "Status", "Fare", "Origin", "Destination"].map((col) => (
-                                    <th key={col} className="px-6 py-3 font-medium text-left">
-                                        {col}
-                                    </th>
-                                ))}
-                                {/* Timestamp column with sort button */}
-                                <th className="px-6 py-3 font-medium text-left">
-                                    <button
-                                        className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                        onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                    >
-                                        Timestamp
-                                        {sortOrder === 'asc' ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                            </svg>
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedRiders.length === 0 ? (
+                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                    <div className="overflow-y-auto max-h-[75vh]">
+                        <table className="min-w-full text-sm text-left border-collapse">
+                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
                                 <tr>
-                                    <td colSpan={9} className="text-center py-6 text-gray-500 italic">
-                                        No bookings found for selected date(s).
-                                    </td>
-                                </tr>
-                            ) : (
-                                paginatedRiders.map((b) => {
-                                    const bookingDate = b.updatedAt.slice(0, 10);
-                                    const isToday = bookingDate === today;
-
-                                    return (
-                                        <tr
-                                            key={b._id}
-                                            className={`border-b ${isToday ? 'bg-orange-50' : 'bg-white'} hover:bg-gray-50 transition`}
+                                    {["Booking ID", "Rider ID", "Driver ID", "Status", "Fare", "Origin", "Destination"].map((col) => (
+                                        <th key={col} className="px-6 py-3 font-medium text-left">
+                                            {col}
+                                        </th>
+                                    ))}
+                                    {/* Timestamp column with sort button */}
+                                    <th className="px-6 py-3 font-medium text-left">
+                                        <button
+                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
+                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                                         >
-                                            <td className="px-6 py-3">{b.referenceNumber || b._id}</td>
-                                            <td className="px-6 py-3">{b.riderId}</td>
-                                            <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
-                                            <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>
-                                            <td className="px-6 py-3 text-gray-800">₱{b.travelFare?.toFixed(2)}</td>
-                                            <td className="px-6 py-3 text-gray-600">{b.origin?.name}</td>
-                                            <td className="px-6 py-3 text-gray-600">{b.destination?.name}</td>
-                                            <td className="px-6 py-3 text-gray-500">{new Date(b.updatedAt).toLocaleString()}</td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
+                                            Timestamp
+                                            {sortOrder === 'asc' ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                </svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedRiders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={9} className="text-center py-6 text-gray-500 italic">
+                                            No bookings found for selected date(s).
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    paginatedRiders.map((b) => {
+                                        const bookingDate = b.updatedAt.slice(0, 10);
+                                        const isToday = bookingDate === today;
+
+                                        return (
+                                            <tr
+                                                key={b._id}
+                                                className={`border-b ${isToday ? 'bg-orange-50' : 'bg-white'} hover:bg-gray-50 transition`}
+                                            >
+                                                <td className="px-6 py-3">{b.referenceNumber || b._id}</td>
+                                                <td className="px-6 py-3">{b.riderId}</td>
+                                                <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
+                                                <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>
+                                                <td className="px-6 py-3 text-gray-800">₱{b.travelFare?.toFixed(2)}</td>
+                                                <td className="px-6 py-3 text-gray-600">{b.origin?.name}</td>
+                                                <td className="px-6 py-3 text-gray-600">{b.destination?.name}</td>
+                                                <td className="px-6 py-3 text-gray-500">{new Date(b.updatedAt).toLocaleString()}</td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 {totalPages > 1 && (
                     <Pagination

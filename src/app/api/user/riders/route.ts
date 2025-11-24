@@ -13,7 +13,7 @@ export async function GET() {
       );
     }
 
-    // Call your NestJS backend
+    // Call your NestJS backend using streaming
     const backendRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/getAllRiders`,
       {
@@ -25,18 +25,29 @@ export async function GET() {
       }
     );
 
-    const data = await backendRes.json();
-
     if (!backendRes.ok) {
-      return NextResponse.json(data, { status: backendRes.status });
+      const errorData = await backendRes.json().catch(() => null);
+      return NextResponse.json(errorData || { message: "Backend error" }, {
+        status: backendRes.status,
+      });
     }
 
-    // Return the bookings to the frontend
-    return NextResponse.json(data);
+    // Stream the response directly to the client
+    const stream = backendRes.body;
+    if (!stream) {
+      return NextResponse.json(
+        { message: "No data from backend" },
+        { status: 500 }
+      );
+    }
+
+    return new NextResponse(stream, {
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Error fetching riders:", error);
     return NextResponse.json(
-      { message: "Failed to fetch bookings" },
+      { message: "Failed to fetch riders" },
       { status: 500 }
     );
   }

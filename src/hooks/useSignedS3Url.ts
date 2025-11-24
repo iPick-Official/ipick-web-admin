@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 
-const signedUrlCache = new Map<string, string>();
+const DEBOUNCE_MS = 300;
 
 /** Extract key from a full S3 URL */
 function extractS3Key(input: string | null | undefined) {
   if (!input) return null;
 
-  // Already a key
   if (!input.startsWith("http")) return input;
 
   try {
     const url = new URL(input);
-    const key = url.pathname; // ✅ use const
+    const key = url.pathname;
     return key.startsWith("/") ? key.slice(1) : key;
   } catch {
     return input;
@@ -23,46 +22,53 @@ export function useSignedS3Url(rawKey: string | null | undefined) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const key = extractS3Key(rawKey);
+
   useEffect(() => {
-    if (!rawKey) return;
-
-    const key = extractS3Key(rawKey);
-    if (!key) return;
-
-    // ✔ Return immediately if cached
-    if (signedUrlCache.has(key)) {
-      setSignedUrl(signedUrlCache.get(key)!);
+    // If there's no key → reset state and stop
+    if (!key) {
+      setSignedUrl(null);
+      setLoading(false);
+      setError(null);
       return;
     }
 
-    const fetchUrl = async () => {
-      setLoading(true);
-      setError(null);
+    let isCancelled = false;
+    const timer = setTimeout(() => {
+      const fetchUrl = async () => {
+        setLoading(true);
+        setError(null);
 
-      try {
-        const res = await fetch("/api/driver-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key }),
-        });
+        try {
+          const res = await fetch("/api/driver-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key }),
+          });
 
-        const data = await res.json();
+          const data = await res.json();
+          if (isCancelled) return;
 
-        if (data.url) {
-          signedUrlCache.set(key, data.url);
-          setSignedUrl(data.url);
-        } else {
-          setError("Failed to generate signed URL");
+          if (data.url) {
+            setSignedUrl(data.url);
+          } else {
+            setError("Failed to generate signed URL");
+          }
+        } catch {
+          if (!isCancelled) setError("Error fetching signed URL");
+        } finally {
+          if (!isCancelled) setLoading(false);
         }
-      } catch {
-        setError("Error fetching signed URL"); // ✅ removed unused 'err'
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchUrl();
-  }, [rawKey]);
+      fetchUrl();
+    }, DEBOUNCE_MS);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [key]);
 
   return { signedUrl, loading, error };
 }
