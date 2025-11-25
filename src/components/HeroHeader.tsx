@@ -39,7 +39,7 @@ export default function HeroHeader() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                         <div className="text-center md:text-left">
                             <h1 className="text-5xl font-semibold tracking-tight text-green-700 sm:text-7xl">
-                                iPick. <span className="text-orange-600">Bringing you to places</span>
+                                iPick. <span className="text-orange-500">Bringing you to places</span>
                             </h1>
                             <p className="mt-8 text-lg font-medium text-gray-500 sm:text-xl">
                                 Hatid ka namin saan mo man gustuhin, buong puso at may malasakit.

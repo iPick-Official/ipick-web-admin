@@ -20,13 +20,11 @@ export default function Navbar() {
                     <Link href="/" className="-m-1.5 p-1.5 flex items-center space-x-2">
                         <span className="sr-only">iPick</span>
                         <Image
-                            src="/logo.png"
+                            src="/logo-word.png"
                             alt="iPick logo"
-                            className="h-8 w-8 rounded-full object-cover"
-                            width={32}
-                            height={32}
+                            width={100}
+                            height={100}
                         />
-                        <span className="text-xl font-bold text-green-800">iPick</span>
                     </Link>
                 </div>
                 <div className="flex lg:hidden">

@@ -41,7 +41,7 @@ export default function Policies() {
     return (
         <Popover className="relative">
             <PopoverButton className="inline-flex items-center text-sm font-semibold text-gray-900 hover:text-green-700 transition duration-300">
-                <span>Policies</span>
+                <span>Legal</span>
                 <ChevronDownIcon aria-hidden="true" className="size-5 ml-1" />
             </PopoverButton>
 

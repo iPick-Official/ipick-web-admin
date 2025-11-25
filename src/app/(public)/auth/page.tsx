@@ -51,8 +51,9 @@ export default function AuthPage() {
                 <div className="flex justify-center mb-6">
                     <Image
                         src="/logo.png"
-                        alt="App Logo"
-                        className="h-16 w-16 object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
+                        alt="Logo"
+                        width="60"
+                        height="60"
                     />
                 </div>
 

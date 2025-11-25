@@ -63,7 +63,7 @@ export default function BookingsPage() {
         // Search filter
         if (searchTerm.trim() !== '') {
             filtered = filtered.filter((b) => {
-                const bookingId = b.referenceNumber ? b.referenceNumber.toLowerCase() : '';
+                const bookingId = b._id ? b._id.toLowerCase() : '';
                 return (
                     bookingId.includes(searchTerm.toLowerCase())
                 );
@@ -236,7 +236,7 @@ export default function BookingsPage() {
                                                 key={b._id}
                                                 className={`border-b ${isToday ? 'bg-orange-50' : 'bg-white'} hover:bg-gray-50 transition`}
                                             >
-                                                <td className="px-6 py-3">{b.referenceNumber || b._id}</td>
+                                                <td className="px-6 py-3">{b._id || b._id}</td>
                                                 <td className="px-6 py-3">{b.riderId}</td>
                                                 <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
                                                 <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>

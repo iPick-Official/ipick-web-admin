@@ -25,6 +25,20 @@ interface Ride {
   computations: Computations;
 }
 
-export interface RideHistory {
-  driver: Ride[];
+export interface Message {
+  _id: string;
+  bookingId: string;
+  riderId: string;
+  driverId: string;
+  msg: string;
+  sender: "driver" | "rider";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DriverDataResponse {
+  driver: {
+    history: Ride[];
+    messages: Message[];
+  };
 }

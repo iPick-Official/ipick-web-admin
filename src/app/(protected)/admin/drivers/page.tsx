@@ -1,18 +1,18 @@
 'use client';
 
 import Modal from '@/components/Modal';
+import Image from "next/image";
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo, Key } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
-import Image from "next/image";
-import { RideHistory } from '@/types/history';
+import { DriverDataResponse, Message } from '@/types/history';
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [rideHistory, setRideHistory] = useState<RideHistory | null>(null);
+    const [rideHistory, setRideHistory] = useState<DriverDataResponse | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
     const [walletLogs, setWalletLogs] = useState<WalletLog[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -74,8 +74,8 @@ export default function DriversPage() {
                             <Image
                                 src={signedUrls.profile || "/logo.png"}
                                 alt={`${selectedDriver.name} Profile`}
-                                width={240}
-                                height={240}
+                                width="240"
+                                height="240"
                                 className="w-60 h-60 border-2 border-gray-200 shadow-md object-cover"
                             />
                         </div>
@@ -197,7 +197,7 @@ export default function DriversPage() {
             /** ─────────────────────────────── RIDE HISTORY TAB ─────────────────────────────── **/
             case "Ride History":
                 // Extract rides safely
-                const rides = rideHistory?.driver || [];
+                const rides = rideHistory?.driver?.history || [];
 
                 // Calculate totals
                 const totalFinished = rides.filter((ride: { status: string; }) => ride.status === "finished").length;
@@ -262,16 +262,69 @@ export default function DriversPage() {
                 );
 
             // /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
-            // case "Messages":
-            //     return selectedDriver.messages.length ? (
-            //         <ul className="bg-white rounded-xl shadow-md p-6 list-disc list-inside text-gray-700">
-            //             {selectedDriver.messages.map((msg: any, idx: number) => (
-            //                 <li key={idx}>{msg}</li>
-            //             ))}
-            //         </ul>
-            //     ) : (
-            //         <p className="text-gray-500">No messages available.</p>
-            //     );
+            case "Messages":
+                const messages: Message[] = rideHistory?.driver?.messages || [];
+
+                return messages.length ? (
+                    <div className="bg-white rounded-xl shadow-md p-6 h-[500px] overflow-y-auto space-y-6">
+                        {messages.map((m: Message, idx: number) => {
+                            const isDriver = m.sender === "driver";
+
+                            return (
+                                <div
+                                    key={idx}
+                                    className={`flex w-full ${isDriver ? "justify-end" : "justify-start"}`}
+                                >
+                                    <div
+                                        className={`
+                                max-w-[75%] px-4 py-3 rounded-xl shadow-md relative
+                                ${isDriver ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}
+                            `}
+                                    >
+                                        {/* Sender Label */}
+                                        <p
+                                            className={`
+                                    text-xs font-semibold mb-1 
+                                    ${isDriver ? "text-blue-200" : "text-gray-600"}
+                                `}
+                                        >
+                                            {isDriver ? "Driver" : "Rider"}
+                                        </p>
+
+                                        {/* Main Message Text */}
+                                        <p className="text-sm whitespace-pre-line leading-relaxed">
+                                            {m.msg}
+                                        </p>
+
+                                        {/* Metadata Section */}
+                                        <div
+                                            className={`
+                                    mt-3 p-2 rounded-lg text-[11px] space-y-1
+                                    ${isDriver ? "bg-blue-500/40" : "bg-gray-200"}
+                                `}
+                                        >
+                                            <p><span className="font-semibold">Booking:</span> {m.bookingId}</p>
+                                            <p><span className="font-semibold">Rider:</span> {m.riderId}</p>
+                                            <p><span className="font-semibold">Driver:</span> {m.driverId}</p>
+                                        </div>
+
+                                        {/* Timestamp */}
+                                        <p
+                                            className={`
+                                    text-[10px] mt-2 text-right
+                                    ${isDriver ? "text-blue-200" : "text-gray-500"}
+                                `}
+                                        >
+                                            {new Date(m.createdAt).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <p className="text-gray-500">No messages available.</p>
+                );
 
             /** ─────────────────────────────── WALLET TAB ─────────────────────────────── **/
             case "Wallet":

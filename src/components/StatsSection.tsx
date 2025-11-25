@@ -7,10 +7,10 @@ import { HiShieldCheck } from 'react-icons/hi';
 import { FaDownload, FaUsers, FaUserTie } from 'react-icons/fa';
 
 const stats = [
-    { id: 1, name: 'Safety', value: 99.9, suffix: '%', icon: HiShieldCheck },
-    { id: 2, name: 'Downloads', value: 5000, icon: FaDownload },
+    { id: 1, name: 'Safety', value: 99, suffix: '%', icon: HiShieldCheck },
+    { id: 2, name: 'Downloads', value: 3000, icon: FaDownload },
     { id: 3, name: 'Drivers', value: 500, icon: FaUserTie },
-    { id: 4, name: 'Passengers', value: 46000, icon: FaUsers },
+    { id: 4, name: 'Passengers', value: 6000, icon: FaUsers },
 ];
 
 export default function StatsSection() {

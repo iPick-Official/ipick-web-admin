@@ -86,7 +86,7 @@ export default function BecomeDriver() {
                             {/* Text Content */}
                             <div className="text-center md:text-left">
                                 <h1 className="text-5xl font-semibold tracking-tight text-green-700 sm:text-7xl">
-                                    iPick Driver. <span className="text-orange-600">Drive. Earn. Empower.</span>
+                                    iPick Driver. <span className="text-orange-500">Drive. Earn. Empower.</span>
                                 </h1>
                                 <p className="mt-8 text-lg font-medium text-gray-500 sm:text-xl">
                                     Be your own boss. Drive with iPick and enjoy flexible hours, steady income, and full support every step of the way.
