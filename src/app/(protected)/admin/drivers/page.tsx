@@ -141,7 +141,6 @@ export default function DriversPage() {
                                 )
                         )}
                     </div>
-
                 );
 
             /** ─────────────────────────────── TRANSPORT TAB ─────────────────────────────── **/
@@ -196,14 +195,10 @@ export default function DriversPage() {
 
             /** ─────────────────────────────── RIDE HISTORY TAB ─────────────────────────────── **/
             case "Ride History":
-                // Extract rides safely
-                const rides = rideHistory?.driver?.history || [];
-
-                // Calculate totals
+                const rides = (rideHistory?.driver?.history || [])
+                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
                 const totalFinished = rides.filter((ride: { status: string; }) => ride.status === "finished").length;
                 const totalCancelled = rides.filter((ride: { status: string; }) => ride.status === "cancelled").length;
-
-                // Display component
                 return (
                     <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
                         {/* Ride Summary */}
@@ -225,37 +220,40 @@ export default function DriversPage() {
                                 Ride History ({rides.length})
                             </h3>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
-                                <table className="min-w-full text-sm text-left border-collapse">
-                                    <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
-                                        <tr>
-                                            <th className="px-6 py-3">Date</th>
-                                            <th className="px-6 py-3">Origin</th>
-                                            <th className="px-6 py-3">Destination</th>
-                                            <th className="px-6 py-3 text-right">Fare (₱)</th>
-                                            <th className="px-6 py-3">Status</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {rides.length === 0 ? (
+                                {/* Scrollable body */}
+                                <div className="max-h-64 overflow-y-auto">
+                                    <table className="min-w-full text-sm text-left border-collapse">
+                                        <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-6 text-center text-gray-500 italic">
-                                                    No ride history available.
-                                                </td>
+                                                <th className="px-6 py-3">Date</th>
+                                                <th className="px-6 py-3">Origin</th>
+                                                <th className="px-6 py-3">Destination</th>
+                                                <th className="px-6 py-3 text-right">Fare (₱)</th>
+                                                <th className="px-6 py-3">Status</th>
                                             </tr>
-                                        ) : (
-                                            rides.map((ride: { timestamp: string | number | Date; origin: { name: string; }; destination: { name: string; }; travelFare: number; status: string; }, idx: Key | null | undefined) => (
-                                                <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4">{new Date(ride.timestamp).toLocaleDateString()}</td>
-                                                    <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
-                                                    <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
-                                                    <td className="px-6 py-4 text-right font-semibold">₱{ride.travelFare?.toFixed(2) || "0.00"}</td>
-                                                    <td className="px-6 py-4 capitalize">{ride.status || "-"}</td>
+                                        </thead>
+
+                                        <tbody>
+                                            {rides.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={5} className="px-6 py-6 text-center text-gray-500 italic">
+                                                        No ride history available.
+                                                    </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ) : (
+                                                rides.map((ride: { timestamp: string | number | Date; origin: { name: string; }; destination: { name: string; }; travelFare: number; status: string; }, idx: Key | null | undefined) => (
+                                                    <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                                                        <td className="px-6 py-4">{new Date(ride.timestamp).toLocaleDateString()}</td>
+                                                        <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
+                                                        <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
+                                                        <td className="px-6 py-4 text-right font-semibold">₱{ride.travelFare?.toFixed(2) || "0.00"}</td>
+                                                        <td className="px-6 py-4 capitalize">{ride.status || "-"}</td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -263,7 +261,8 @@ export default function DriversPage() {
 
             // /** ─────────────────────────────── MESSAGES TAB ─────────────────────────────── **/
             case "Messages":
-                const messages: Message[] = rideHistory?.driver?.messages || [];
+                const messages: Message[] = (rideHistory?.driver?.messages || [])
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
                 return messages.length ? (
                     <div className="bg-white rounded-xl shadow-md p-6 h-[500px] overflow-y-auto space-y-6">
