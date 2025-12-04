@@ -64,6 +64,28 @@ export default function DriversPage() {
     // --- Render function ---
     const renderTabContent = () => {
         if (!selectedDriver) return <p className="text-gray-500">No driver found.</p>;
+        const updateDriverStatus = async (driverId: string, newStatus: string) => {
+            try {
+                const res = await fetch(`/api/driver/${driverId}/status`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: newStatus }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.message || "Failed to update status");
+                    return;
+                }
+
+                alert("Status updated successfully!");
+                window.location.reload();
+            } catch (error) {
+                console.error("Error updating driver:", error);
+                alert("Error updating driver");
+            }
+        };
 
         switch (activeTab) {
             case "Details":
@@ -88,8 +110,8 @@ export default function DriversPage() {
                                 ["Email", selectedDriver.email],
                                 ["Mobile", selectedDriver.mobnum],
                                 ["Car Type", selectedDriver.carType || "-"],
-                                ["City", selectedDriver.city],
-                                ["Status", selectedDriver.status],
+                                ["Address", `${selectedDriver.address} ${selectedDriver.city} ${selectedDriver.province} ${selectedDriver.zipCode}`],
+                                ["Status", selectedDriver.status.toUpperCase()],
                                 ["Wallet Balance", `₱${selectedDriver.wallet?.walletBalance.toFixed(2) || "0.00"}`],
                                 ["Created At", selectedDriver.createdAt ? new Date(selectedDriver.createdAt).toLocaleString() : "-"]
                             ].map(([label, value]) => (
@@ -98,6 +120,39 @@ export default function DriversPage() {
                                 </p>
                             ))}
                         </div>
+                        {selectedDriver.status === "approved" && (
+                            <div className="flex flex-col space-y-3">
+
+                                {/* Deactivate button */}
+                                <button
+                                    className="px-4 py-2 border border-red-500 text-red-600 hover:bg-red-50 font-medium rounded-lg transition-colors"
+                                    onClick={() => updateDriverStatus(selectedDriver.id, "deactivated")}
+                                >
+                                    Deactivate
+                                </button>
+
+                                {/* Disapprove button */}
+                                <button
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"
+                                    onClick={() => updateDriverStatus(selectedDriver._id, "pending")}
+                                >
+                                    Disapproved
+                                </button>
+                            </div>
+                        )}
+
+                        {selectedDriver.status === "pending" && (
+                            <div className="flex flex-col space-y-3">
+
+                                {/* Approve button */}
+                                <button
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow transition-all"
+                                    onClick={() => updateDriverStatus(selectedDriver._id, "approved")}
+                                >
+                                    Approved
+                                </button>
+                            </div>
+                        )}
                     </div>
                 );
 
@@ -247,7 +302,7 @@ export default function DriversPage() {
                                                         <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
                                                         <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
                                                         <td className="px-6 py-4 text-right font-semibold">₱{ride.travelFare?.toFixed(2) || "0.00"}</td>
-                                                        <td className="px-6 py-4 capitalize">{ride.status || "-"}</td>
+                                                        <td className="px-6 py-4 capitalize">{ride.status.toUpperCase() || "-"}</td>
                                                     </tr>
                                                 ))
                                             )}
@@ -432,14 +487,14 @@ export default function DriversPage() {
         setWalletLogs([]);
         try {
             // Fetch driver details
-            const resDriver = await fetch(`/api/admin/getDriver/${id}`);
+            const resDriver = await fetch(`/api/driver/${id}/information`);
             if (!resDriver.ok) throw new Error("Failed to fetch driver");
 
             const data: DriverResponse = await resDriver.json();
             setSelectedDriver({ ...data.driver, wallet: data.wallet });
             setWalletLogs(data.walletLogs || []);
 
-            const resHistory = await fetch(`/api/admin/getDriverHistory/${data.driver.id}`);
+            const resHistory = await fetch(`/api/driver/${data.driver.id}/history`);
             if (!resHistory.ok) throw new Error("Failed to fetch driver history");
 
             const historyData = await resHistory.json();
@@ -663,7 +718,7 @@ export default function DriversPage() {
                                             <td className="px-6 py-3">{d.carType}</td>
                                             <td className="px-6 py-3">{d.city}</td>
                                             <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
-                                                {d.status}
+                                                {d.status.toUpperCase()}
                                             </td>
                                             <td className="px-6 py-3 text-gray-500">
                                                 {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}

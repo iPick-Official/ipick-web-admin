@@ -22,6 +22,7 @@ const navItems = [
   { label: "Analytics", icon: <BarChart2 size={20} />, path: "/admin/analytics" },
   { label: "Drivers", icon: <BsPersonFillGear size={20} />, path: "/admin/drivers" },
   { label: "Passengers", icon: <BsPerson size={20} />, path: "/admin/riders" },
+  { label: "JSON View", icon: <BsPerson size={20} />, path: "/admin/json-view" },
 ];
 
 export const Sidebar = () => {

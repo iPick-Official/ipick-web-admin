@@ -41,16 +41,6 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" }:
 
                 {/* Body */}
                 <div className="p-4">{children}</div>
-
-                {/* Footer */}
-                <div className="flex justify-end gap-2 p-4 border-t">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                        Close
-                    </button>
-                </div>
             </div>
         </div>
     );
