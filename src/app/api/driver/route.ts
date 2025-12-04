@@ -45,9 +45,9 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching drivers:", error);
+    console.error("Error fetching riders:", error);
     return NextResponse.json(
-      { message: "Failed to fetch drivers" },
+      { message: "Failed to fetch riders" },
       { status: 500 }
     );
   }

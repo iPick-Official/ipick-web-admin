@@ -15,17 +15,18 @@ export default function JsonViewPage() {
     // Parse JSON automatically (live preview)
     const autoParse = (value: string) => {
         try {
-            const json = JSON.parse(value);
+            const json = JSON.parse(value) as object;
             setParsed(json);
             setError(null);
-        } catch (e: any) {
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Unknown JSON parse error";
             setParsed(null);
-            setError(e.message);
+            setError(message);
         }
     };
 
     // Auto parse as user types
-    const handleInputChange = (e: any) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setInput(value);
         autoParse(value);
@@ -34,13 +35,14 @@ export default function JsonViewPage() {
     // Auto-format JSON
     const handleFormat = () => {
         try {
-            const json = JSON.parse(input);
+            const json = JSON.parse(input) as object;
             const pretty = JSON.stringify(json, null, 2);
             setInput(pretty);
             setParsed(json);
             setError(null);
-        } catch (e: any) {
-            setError(e.message);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Unknown error";
+            setError(message);
         }
     };
 
@@ -67,9 +69,9 @@ export default function JsonViewPage() {
     };
 
     // File Drag & Drop
-    const handleDrop = async (e: DragEvent) => {
+    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        const file = e.dataTransfer?.files?.[0];
+        const file = e.dataTransfer.files?.[0];
         if (!file) return;
 
         const text = await file.text();
@@ -77,16 +79,16 @@ export default function JsonViewPage() {
         autoParse(text);
     };
 
-    const handleDragOver = (e: DragEvent) => {
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
     };
 
     // Compute total count
-    const getTotalCount = (data: any) => {
+    const getTotalCount = (data: unknown): number => {
         if (Array.isArray(data)) {
             return data.length;
         } else if (data && typeof data === "object") {
-            return Object.keys(data).length;
+            return Object.keys(data as object).length;
         }
         return 0;
     };
@@ -99,8 +101,8 @@ export default function JsonViewPage() {
             {/* Drag & Drop Zone */}
             <div
                 ref={dropRef}
-                onDrop={handleDrop as any}
-                onDragOver={handleDragOver as any}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
                 className="border-2 border-dashed border-gray-400 p-6 rounded-lg text-center text-gray-600 bg-gray-50"
             >
                 Drag & Drop JSON file here

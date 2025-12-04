@@ -1,27 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    // Resolve params if it's a Promise
+    const resolvedParams = await context.params;
+    const { id } = resolvedParams;
 
-    // Read statusDto from body
+    // Parse JSON body
     const statusDto = await req.json();
 
-    // Get secure token from cookies
+    // Get token from cookies
     const token = (await cookies()).get("access_token")?.value;
-
     if (!token) {
-      return NextResponse.json(
-        { message: "Unauthorized: No token found" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Call your NestJS backend
+    // Call NestJS backend
     const backendRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/${id}/status`,
       {
@@ -41,7 +39,6 @@ export async function PATCH(
       });
     }
 
-    // Stream backend response
     const stream = backendRes.body;
     if (!stream) {
       return NextResponse.json(
@@ -51,9 +48,7 @@ export async function PATCH(
     }
 
     return new NextResponse(stream, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error updating driver status:", error);

@@ -469,7 +469,7 @@ export default function DriversPage() {
     useEffect(() => {
         const fetchDrivers = async () => {
             try {
-                const res = await fetch('/api/user/drivers');
+                const res = await fetch('/api/driver');
                 if (!res.ok) throw new Error('Failed to fetch drivers');
                 const data = await res.json();
                 setDrivers(data);
