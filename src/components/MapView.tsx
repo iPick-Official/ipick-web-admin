@@ -21,6 +21,7 @@ const PHILIPPINES_BOUNDS = {
   east: 126.6,
 };
 
+// Map options with tilt & rotation enabled
 const mapOptions = {
   disableDefaultUI: true,
   zoomControl: true,
@@ -33,10 +34,7 @@ const mapOptions = {
     latLngBounds: PHILIPPINES_BOUNDS,
     strictBounds: false,
   },
-  styles: [
-    { featureType: "poi", stylers: [{ visibility: "off" }] },
-    { featureType: "transit", stylers: [{ visibility: "off" }] },
-  ],
+  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID
 };
 
 export const MapView = () => {
@@ -49,7 +47,7 @@ export const MapView = () => {
   useEffect(() => {
     async function fetchDrivers() {
       try {
-        const res = await fetch("/api/user/drivers");
+        const res = await fetch("/api/driver");
         if (!res.ok) throw new Error("Failed to fetch drivers");
         const data = await res.json();
         setDrivers(data);
@@ -61,8 +59,45 @@ export const MapView = () => {
     fetchDrivers();
   }, []);
 
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading Maps...</div>;
+  if (loadError)
+    return (
+      <div className="flex items-center justify-center h-full w-full bg-gray-50">
+        <div className="text-red-600 text-lg font-semibold">
+          ⚠️ Failed to load Google Maps. Please try again later.
+        </div>
+      </div>
+    );
+
+  if (!isLoaded)
+    return (
+      <div className="flex items-center justify-center h-full w-full bg-gray-50">
+        <div className="flex flex-col items-center">
+          <svg
+            className="animate-spin h-12 w-12 text-blue-500 mb-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          <span className="text-gray-600 text-lg font-medium">
+            Loading map...
+          </span>
+        </div>
+      </div>
+    );
 
   return (
     <GoogleMap
@@ -71,18 +106,19 @@ export const MapView = () => {
       zoom={10}
       options={mapOptions}
     >
-      {drivers.map((driver) => (
-        driver.location && (
-          <Marker
-            key={driver.id}
-            position={{
-              lat: driver.location.lat,
-              lng: driver.location.lng,
-            }}
-            title={`${driver.firstName} ${driver.surName}`}
-          />
-        )
-      ))}
+      {drivers.map(
+        (driver) =>
+          driver.location && (
+            <Marker
+              key={driver.id}
+              position={{
+                lat: driver.location.lat,
+                lng: driver.location.lng,
+              }}
+              title={`${driver.firstName} ${driver.surName}`}
+            />
+          )
+      )}
     </GoogleMap>
   );
 };

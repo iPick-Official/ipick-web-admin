@@ -17,7 +17,7 @@ export default function RidersPage() {
     useEffect(() => {
         async function fetchRiders() {
             try {
-                const res = await fetch('/api/user/riders');
+                const res = await fetch('/api/rider');
                 if (!res.ok) throw new Error('Failed to fetch riders');
                 const data = await res.json();
                 setRiders(data);

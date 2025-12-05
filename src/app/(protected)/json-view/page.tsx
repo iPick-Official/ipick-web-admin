@@ -11,6 +11,7 @@ export default function JsonViewPage() {
     const [error, setError] = useState<string | null>(null);
 
     const dropRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Parse JSON automatically (live preview)
     const autoParse = (value: string) => {
@@ -25,14 +26,12 @@ export default function JsonViewPage() {
         }
     };
 
-    // Auto parse as user types
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setInput(value);
         autoParse(value);
     };
 
-    // Auto-format JSON
     const handleFormat = () => {
         try {
             const json = JSON.parse(input) as object;
@@ -46,14 +45,12 @@ export default function JsonViewPage() {
         }
     };
 
-    // Copy JSON
     const handleCopy = async () => {
         if (!parsed) return;
         await navigator.clipboard.writeText(JSON.stringify(parsed, null, 2));
         alert("Copied to clipboard!");
     };
 
-    // Download JSON
     const handleDownload = () => {
         if (!parsed) return;
         const blob = new Blob([JSON.stringify(parsed, null, 2)], {
@@ -66,6 +63,16 @@ export default function JsonViewPage() {
         a.download = "data.json";
         a.click();
         URL.revokeObjectURL(url);
+    };
+
+    // File selection (new feature)
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const text = await file.text();
+        setInput(text);
+        autoParse(text);
     };
 
     // File Drag & Drop
@@ -83,29 +90,34 @@ export default function JsonViewPage() {
         e.preventDefault();
     };
 
-    // Compute total count
     const getTotalCount = (data: unknown): number => {
-        if (Array.isArray(data)) {
-            return data.length;
-        } else if (data && typeof data === "object") {
-            return Object.keys(data as object).length;
-        }
+        if (Array.isArray(data)) return data.length;
+        if (data && typeof data === "object") return Object.keys(data as object).length;
         return 0;
     };
 
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6">
             <Sidebar />
-            <h1 className="text-3xl font-bold mb-4">Advanced JSON Visualizer</h1>
+            <h1 className="text-3xl font-bold mb-4">JSON Visualizer</h1>
+            {/* Hidden file input */}
+            <input
+                type="file"
+                accept=".json,application/json"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="hidden"
+            />
 
-            {/* Drag & Drop Zone */}
+            {/* Click + Drag & Drop Zone */}
             <div
                 ref={dropRef}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                className="border-2 border-dashed border-gray-400 p-6 rounded-lg text-center text-gray-600 bg-gray-50"
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-400 p-6 rounded-lg text-center text-gray-600 bg-gray-50 cursor-pointer"
             >
-                Drag & Drop JSON file here
+                Click or Drag & Drop JSON file here
             </div>
 
             {/* Input */}
@@ -141,14 +153,12 @@ export default function JsonViewPage() {
                 </button>
             </div>
 
-            {/* Error */}
             {error && (
                 <div className="text-red-600 border border-red-400 p-2 rounded bg-red-50">
                     {error}
                 </div>
             )}
 
-            {/* Output */}
             {parsed && (
                 <div className="bg-gray-50 p-4 rounded space-y-2">
                     <div className="text-gray-700 font-medium">

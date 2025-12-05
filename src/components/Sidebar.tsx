@@ -17,12 +17,12 @@ import { BsPerson, BsPersonFillGear } from "react-icons/bs";
 
 // Navigation items
 const navItems = [
-  { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin/dashboard" },
-  { label: "Bookings", icon: <History size={20} />, path: "/admin/bookings" },
-  { label: "Analytics", icon: <BarChart2 size={20} />, path: "/admin/analytics" },
-  { label: "Drivers", icon: <BsPersonFillGear size={20} />, path: "/admin/drivers" },
-  { label: "Passengers", icon: <BsPerson size={20} />, path: "/admin/riders" },
-  { label: "JSON View", icon: <BsPerson size={20} />, path: "/admin/json-view" },
+  { label: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
+  { label: "Bookings", icon: <History size={20} />, path: "/bookings" },
+  { label: "Analytics", icon: <BarChart2 size={20} />, path: "/analytics" },
+  { label: "Drivers", icon: <BsPersonFillGear size={20} />, path: "/drivers" },
+  { label: "Passengers", icon: <BsPerson size={20} />, path: "/riders" },
+  { label: "JSON View", icon: <BsPerson size={20} />, path: "/json-view" },
 ];
 
 export const Sidebar = () => {

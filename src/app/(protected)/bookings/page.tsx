@@ -102,7 +102,9 @@ export default function BookingsPage() {
         const inactive = displayedBookings.filter(b => b.status === 'inactive').length;
         const booked = displayedBookings.filter(b => b.status === 'booked').length;
 
-        return { finished, cancelled, active, inactive, booked };
+        const totalBookings = displayedBookings.length;
+
+        return { finished, cancelled, active, inactive, booked, totalBookings };
     }, [displayedBookings]);
 
     return (
@@ -165,8 +167,9 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Totals Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
                     {[
+                        { label: "Bookings", value: totals.totalBookings },
                         { label: "Finished", value: totals.finished },
                         { label: "Cancelled", value: totals.cancelled },
                         { label: "Active", value: totals.active },

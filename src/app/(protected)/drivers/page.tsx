@@ -65,6 +65,10 @@ export default function DriversPage() {
     const renderTabContent = () => {
         if (!selectedDriver) return <p className="text-gray-500">No driver found.</p>;
         const updateDriverStatus = async (driverId: string, newStatus: string) => {
+            // Ask for confirmation first
+            const confirmed = confirm(`Are you sure you want to change the driver's status to "${newStatus}"?`);
+            if (!confirmed) return; // User cancelled
+
             try {
                 const res = await fetch(`/api/driver/${driverId}/status`, {
                     method: "PATCH",
@@ -78,8 +82,6 @@ export default function DriversPage() {
                     alert(data.message || "Failed to update status");
                     return;
                 }
-
-                alert("Status updated successfully!");
                 window.location.reload();
             } catch (error) {
                 console.error("Error updating driver:", error);
