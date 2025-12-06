@@ -73,10 +73,11 @@ export default function BookingsPage() {
             filtered = filtered.filter((b) => {
                 const bookingId = b._id ? b._id.toLowerCase() : '';
                 const driverId = b.driverId ? b.driverId.toLowerCase() : '';
+                const riderId = b.riderId ? b.riderId.toLowerCase() : '';
 
                 return (
                     bookingId.includes(term) ||
-                    driverId.includes(term)
+                    driverId.includes(term) || riderId.includes(term)
                 );
             });
         }

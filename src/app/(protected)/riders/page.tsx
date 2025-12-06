@@ -3,10 +3,12 @@
 import { Sidebar } from '@/components/Sidebar';
 import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
-import { Pagination } from '@/components/Pagination'; // import the pagination component
+import { Pagination } from '@/components/Pagination';
+import { Loading } from '@/components/Loading';
 
 export default function RidersPage() {
     const [riders, setRiders] = useState<Riders[]>([]);
+    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [fromDate, setFromDate] = useState<string>('');
@@ -16,6 +18,7 @@ export default function RidersPage() {
 
     useEffect(() => {
         async function fetchRiders() {
+            setLoading(true);
             try {
                 const res = await fetch('/api/rider');
                 if (!res.ok) throw new Error('Failed to fetch riders');
@@ -23,6 +26,8 @@ export default function RidersPage() {
                 setRiders(data);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -170,7 +175,15 @@ export default function RidersPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedRiders.length === 0 ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={9} className="py-6">
+                                            <div className="flex items-center justify-center w-full h-full">
+                                                <Loading />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : paginatedRiders.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="text-center py-6 text-gray-500 italic">
                                             No riders found for selected filters.

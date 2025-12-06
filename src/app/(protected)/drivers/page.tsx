@@ -9,6 +9,7 @@ import { useEffect, useState, useMemo, Key } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
 import { DriverDataResponse, Message } from '@/types/history';
 import { Eye } from 'lucide-react';
+import { Loading } from '@/components/Loading';
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -129,7 +130,7 @@ export default function DriversPage() {
                                 {/* Deactivate button */}
                                 <button
                                     className="px-4 py-2 border border-red-500 text-red-600 hover:bg-red-50 font-medium rounded-lg transition-colors"
-                                    onClick={() => updateDriverStatus(selectedDriver.id, "deactivated")}
+                                    onClick={() => updateDriverStatus(selectedDriver.id, "inactive")}
                                 >
                                     Deactivate
                                 </button>
@@ -139,20 +140,24 @@ export default function DriversPage() {
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"
                                     onClick={() => updateDriverStatus(selectedDriver._id, "pending")}
                                 >
-                                    Disapproved
+                                    Disapprove
                                 </button>
                             </div>
                         )}
 
                         {selectedDriver.status === "pending" && (
                             <div className="flex flex-col space-y-3">
-
-                                {/* Approve button */}
+                                <button
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"
+                                    onClick={() => updateDriverStatus(selectedDriver._id, "rejected")}
+                                >
+                                    Reject
+                                </button>
                                 <button
                                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow transition-all"
                                     onClick={() => updateDriverStatus(selectedDriver._id, "approved")}
                                 >
-                                    Approved
+                                    Approve
                                 </button>
                             </div>
                         )}
@@ -471,6 +476,7 @@ export default function DriversPage() {
     // Fetch drivers once on mount
     useEffect(() => {
         const fetchDrivers = async () => {
+            setLoading(true);
             try {
                 const res = await fetch('/api/driver');
                 if (!res.ok) throw new Error('Failed to fetch drivers');
@@ -478,6 +484,8 @@ export default function DriversPage() {
                 setDrivers(data);
             } catch (error) {
                 console.error('Error fetching drivers:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -704,7 +712,15 @@ export default function DriversPage() {
                             </thead>
 
                             <tbody>
-                                {paginatedDrivers.length === 0 ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={9} className="py-6">
+                                            <div className="flex items-center justify-center w-full h-full">
+                                                <Loading />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : paginatedDrivers.length === 0 ? (
                                     <tr>
                                         <td colSpan={9} className="text-center py-6 text-gray-500 italic">
                                             No drivers found for selected filters.
@@ -738,7 +754,13 @@ export default function DriversPage() {
                         </table>
                         <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={selectedDriver?.name} size="full">
                             {loading ? (
-                                <p className="text-center text-gray-500 py-10">Loading...</p>
+                                <tr>
+                                    <td colSpan={9} className="py-6">
+                                        <div className="flex items-center justify-center w-full h-full">
+                                            <Loading />
+                                        </div>
+                                    </td>
+                                </tr>
                             ) : (
                                 <div className="flex flex-col h-full">
                                     {/* Navigation Tabs */}
