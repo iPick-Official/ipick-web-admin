@@ -62,10 +62,15 @@ export default function BookingsPage() {
 
         // Search filter
         if (searchTerm.trim() !== '') {
+            const term = searchTerm.toLowerCase();
+
             filtered = filtered.filter((b) => {
                 const bookingId = b._id ? b._id.toLowerCase() : '';
+                const driverId = b.driverId ? b.driverId.toLowerCase() : '';
+
                 return (
-                    bookingId.includes(searchTerm.toLowerCase())
+                    bookingId.includes(term) ||
+                    driverId.includes(term)
                 );
             });
         }

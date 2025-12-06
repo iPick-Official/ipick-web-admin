@@ -669,7 +669,7 @@ export default function DriversPage() {
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200 sticky top-0 z-10">
                                 <tr>
-                                    {['ID', 'Name', 'Email', 'Mobile', 'Car Type', 'City', 'Status'].map((col) => (
+                                    {['ID', 'Name', 'Email', 'Mobile', 'Car Type', 'Plate No.', 'Status'].map((col) => (
                                         <th key={col} className="px-6 py-3 font-medium text-left bg-gray-200">
                                             {col}
                                         </th>
@@ -718,7 +718,7 @@ export default function DriversPage() {
                                             <td className="px-6 py-3">{d.email}</td>
                                             <td className="px-6 py-3">{d.mobnum}</td>
                                             <td className="px-6 py-3">{d.carType}</td>
-                                            <td className="px-6 py-3">{d.city}</td>
+                                            <td className="px-6 py-3">{d.transportRequirements.plateNumber}</td>
                                             <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
                                                 {d.status.toUpperCase()}
                                             </td>
