@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx
+// app/admin/dashboard/page.tsx
 "use client";
 
 import { MapView } from "@/components/MapView";

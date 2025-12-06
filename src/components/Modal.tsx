@@ -6,7 +6,7 @@ interface ModalProps {
     onClose: () => void;
     title?: string;
     children: ReactNode;
-    size?: "sm" | "md" | "lg" | "xl" | "full"; // added full
+    size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
 export default function Modal({ isOpen, onClose, title, children, size = "md" }: ModalProps) {

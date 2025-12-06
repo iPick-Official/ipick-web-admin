@@ -8,6 +8,7 @@ import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/dri
 import { useEffect, useState, useMemo, Key } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
 import { DriverDataResponse, Message } from '@/types/history';
+import { Eye } from 'lucide-react';
 
 export default function DriversPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -483,7 +484,7 @@ export default function DriversPage() {
         fetchDrivers();
     }, []);
 
-    async function fetchDriverDetailsWithHistory(id: string) {
+    async function fetchDetailHistory(id: string) {
         setLoading(true);
         setSelectedDriver(null);
         setWalletLogs([]);
@@ -696,13 +697,16 @@ export default function DriversPage() {
                                             </svg>
                                         </button>
                                     </th>
+                                    <th className="px-6 py-3 font-medium text-right bg-gray-200">
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
 
                             <tbody>
                                 {paginatedDrivers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="text-center py-6 text-gray-500 italic">
+                                        <td colSpan={9} className="text-center py-6 text-gray-500 italic">
                                             No drivers found for selected filters.
                                         </td>
                                     </tr>
@@ -710,7 +714,6 @@ export default function DriversPage() {
                                     paginatedDrivers.map((d) => (
                                         <tr
                                             key={d._id}
-                                            onClick={() => fetchDriverDetailsWithHistory(d._id)}
                                             className="border-b hover:bg-gray-50 transition cursor-pointer"
                                         >
                                             <td className="px-6 py-3">{d.id}</td>
@@ -724,6 +727,9 @@ export default function DriversPage() {
                                             </td>
                                             <td className="px-6 py-3 text-gray-500">
                                                 {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}
+                                            </td>
+                                            <td className="px-6 py-3 text-green-700 flex justify-end" onClick={() => fetchDetailHistory(d._id)}>
+                                                <Eye />
                                             </td>
                                         </tr>
                                     ))

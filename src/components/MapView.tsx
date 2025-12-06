@@ -2,7 +2,8 @@
 
 import { Driver } from "@/types/drivers";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { Loading } from "./Loading";
 
 const containerStyle = {
   width: "100%",
@@ -21,7 +22,6 @@ const PHILIPPINES_BOUNDS = {
   east: 126.6,
 };
 
-// Map options with tilt & rotation enabled
 const mapOptions = {
   disableDefaultUI: true,
   zoomControl: true,
@@ -34,7 +34,7 @@ const mapOptions = {
     latLngBounds: PHILIPPINES_BOUNDS,
     strictBounds: false,
   },
-  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID
+  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID,
 };
 
 export const MapView = () => {
@@ -43,14 +43,22 @@ export const MapView = () => {
   });
 
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [zoom, setZoom] = useState(10); // initial zoom
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   useEffect(() => {
     async function fetchDrivers() {
       try {
         const res = await fetch("/api/driver");
         if (!res.ok) throw new Error("Failed to fetch drivers");
-        const data = await res.json();
-        setDrivers(data);
+
+        const data: Driver[] = await res.json();
+        const approvedLoggedDrivers = data.filter(
+          (driver) =>
+            driver.status === "approved" && driver.isLogged === true
+        );
+
+        setDrivers(approvedLoggedDrivers);
       } catch (error) {
         console.error(error);
       }
@@ -63,59 +71,58 @@ export const MapView = () => {
     return (
       <div className="flex items-center justify-center h-full w-full bg-gray-50">
         <div className="text-red-600 text-lg font-semibold">
-          ⚠️ Failed to load Google Maps. Please try again later.
+          Failed to load Google Maps. Please try again later.
         </div>
       </div>
     );
 
-  if (!isLoaded)
-    return (
-      <div className="flex items-center justify-center h-full w-full bg-gray-50">
-        <div className="flex flex-col items-center">
-          <svg
-            className="animate-spin h-12 w-12 text-blue-500 mb-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            />
-          </svg>
-          <span className="text-gray-600 text-lg font-medium">
-            Loading map...
-          </span>
-        </div>
-      </div>
-    );
+  if (!isLoaded) return <Loading />;
+
+  const handleZoomChanged = () => {
+    if (mapRef.current) {
+      setZoom(mapRef.current.getZoom() || 10);
+    }
+  };
 
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
-      zoom={10}
+      zoom={zoom}
       options={mapOptions}
+      onLoad={(map) => {
+        mapRef.current = map;
+      }}
+      onZoomChanged={handleZoomChanged}
     >
       {drivers.map(
         (driver) =>
           driver.location && (
             <Marker
               key={driver.id}
+              title={`${driver.firstName} ${driver.surName}`}
               position={{
                 lat: driver.location.lat,
                 lng: driver.location.lng,
               }}
-              title={`${driver.firstName} ${driver.surName}`}
+              label={
+                zoom >= 13
+                  ? {
+                    text: `${driver.firstName} ${driver.surName}`,
+                    color: "black",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }
+                  : undefined
+              }
+              icon={
+                zoom >= 13
+                  ? {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new window.google.maps.Point(15, -10),
+                  }
+                  : undefined
+              }
             />
           )
       )}

@@ -1,11 +1,14 @@
 'use client';
 
+import { Loading } from '@/components/Loading';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Booking } from '@/types/bookings';
 import { useEffect, useState, useMemo } from 'react';
 
 export default function BookingsPage() {
+
+    const [loading, setLoading] = useState(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -19,6 +22,7 @@ export default function BookingsPage() {
 
     useEffect(() => {
         async function fetchBookings() {
+            setLoading(true);
             try {
                 const res = await fetch('/api/bookings');
                 if (!res.ok) throw new Error('Failed to fetch bookings');
@@ -26,6 +30,8 @@ export default function BookingsPage() {
                 setBookings(data);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -228,7 +234,15 @@ export default function BookingsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedRiders.length === 0 ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={9} className="py-6">
+                                            <div className="flex items-center justify-center w-full h-full">
+                                                <Loading />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : paginatedRiders.length === 0 ? (
                                     <tr>
                                         <td colSpan={9} className="text-center py-6 text-gray-500 italic">
                                             No bookings found for selected date(s).
@@ -242,9 +256,9 @@ export default function BookingsPage() {
                                         return (
                                             <tr
                                                 key={b._id}
-                                                className={`border-b ${isToday ? 'bg-orange-50' : 'bg-white'} hover:bg-gray-50 transition`}
+                                                className={`border-b ${isToday ? "bg-orange-50" : "bg-white"} hover:bg-gray-50 transition`}
                                             >
-                                                <td className="px-6 py-3">{b._id || b._id}</td>
+                                                <td className="px-6 py-3">{b._id}</td>
                                                 <td className="px-6 py-3">{b.riderId}</td>
                                                 <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
                                                 <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>
