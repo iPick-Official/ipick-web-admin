@@ -2,7 +2,7 @@
 
 import { Driver } from "@/types/drivers";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Loading } from "./Loading";
 import { createCircularMarker } from "@/app/utils/createCircularMarker";
 import { containerStyle, center, mapOptions } from "@/app/utils/mapUtils";
@@ -17,6 +17,7 @@ export const MapView = () => {
   const [avatars, setAvatars] = useState<Record<string, string>>({});
   const [zoom, setZoom] = useState(10);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const avatarCacheRef = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
     async function fetchDrivers() {
@@ -41,34 +42,81 @@ export const MapView = () => {
   useEffect(() => {
     if (!drivers.length) return;
 
+    let isCancelled = false;
+
     const fetchAvatars = async () => {
-      const avatarEntries = await Promise.all(
-        drivers.map(async (driver) => {
-          const raw = driver.personalRequirements?.profilePicture?.url;
-          if (!raw) return null;
-
-          try {
-            const signedUrl = await fetchSignedS3Url(raw);
-            if (!signedUrl) return null;
-
-            const circular = await createCircularMarker(signedUrl, 55, "#008000");
-            return [driver._id, circular] as [string, string];
-          } catch (err) {
-            // console.error(`Failed to load avatar for driver ${driver._id}:`, err);
-            return null;
-          }
-        })
+      const driversWithPics = drivers.filter(
+        (d) => d.personalRequirements?.profilePicture?.url
       );
 
-      const avatarMap: Record<string, string> = Object.fromEntries(
-        avatarEntries.filter((e): e is [string, string] => e !== null)
-      );
+      const avatarPromises = driversWithPics.map(async (driver) => {
+        if (avatarCacheRef.current.has(driver._id)) {
+          return [driver._id, avatarCacheRef.current.get(driver._id)!] as [string, string];
+        }
 
-      setAvatars(avatarMap);
+        try {
+          const signedUrl = await fetchSignedS3Url(driver.personalRequirements!.profilePicture!.url);
+          if (!signedUrl) return null;
+
+          const circular = await createCircularMarker(signedUrl, 55, "#008000");
+          avatarCacheRef.current.set(driver._id, circular);
+          return [driver._id, circular] as [string, string];
+        } catch {
+          return null;
+        }
+      });
+
+      const results = await Promise.allSettled(avatarPromises);
+
+      if (!isCancelled) {
+        const avatarEntries: [string, string][] = results
+          .filter((r): r is PromiseFulfilledResult<[string, string]> => r.status === "fulfilled" && r.value !== null)
+          .map((r) => r.value);
+
+        const avatarMap: Record<string, string> = Object.fromEntries(avatarEntries);
+
+        setAvatars((prev) => {
+          const keysEqual =
+            Object.keys(prev).length === Object.keys(avatarMap).length &&
+            Object.keys(prev).every((k) => prev[k] === avatarMap[k]);
+          return keysEqual ? prev : avatarMap;
+        });
+      }
     };
 
     fetchAvatars();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [drivers]);
+
+  const driverMarkers = useMemo(() => {
+    return drivers
+      .filter((driver) => driver.location)
+      .map((driver) => {
+        const icon = avatars[driver._id]
+          ? {
+            url: avatars[driver._id],
+            scaledSize: new window.google.maps.Size(40, 40),
+            anchor: new window.google.maps.Point(20, 20),
+            labelOrigin: new window.google.maps.Point(20, 50),
+          }
+          : undefined;
+
+        const label =
+          zoom >= 13
+            ? {
+              text: `${driver.firstName.toUpperCase()} ${driver.surName.toUpperCase()}`,
+              color: "black",
+              fontSize: "14px",
+              fontWeight: "bold",
+            }
+            : undefined;
+
+        return { driver, icon, label };
+      });
+  }, [drivers, avatars, zoom]);
 
   if (loadError)
     return (
@@ -96,39 +144,18 @@ export const MapView = () => {
       onLoad={(map) => { mapRef.current = map; }}
       onZoomChanged={handleZoomChanged}
     >
-      {drivers.map(
-        (driver) =>
-          driver.location && (
-            <Marker
-              key={driver._id}
-              title={`${driver.firstName} ${driver.surName}`}
-              position={{
-                lat: driver.location.lat,
-                lng: driver.location.lng,
-              }}
-              icon={
-                avatars[driver._id]
-                  ? {
-                    url: avatars[driver._id],
-                    scaledSize: new window.google.maps.Size(40, 40),
-                    anchor: new window.google.maps.Point(20, 20),
-                    labelOrigin: new window.google.maps.Point(20, 50),
-                  }
-                  : undefined
-              }
-              label={
-                zoom >= 13
-                  ? {
-                    text: `${driver.firstName.toUpperCase()} ${driver.surName.toUpperCase()}`,
-                    color: "black",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }
-                  : undefined
-              }
-            />
-          )
-      )}
+      {driverMarkers.map(({ driver, icon, label }) => (
+        <Marker
+          key={driver._id}
+          title={`${driver.firstName} ${driver.surName}`}
+          position={{
+            lat: driver.location!.lat,
+            lng: driver.location!.lng,
+          }}
+          icon={icon}
+          label={label}
+        />
+      ))}
     </GoogleMap>
   );
 };
