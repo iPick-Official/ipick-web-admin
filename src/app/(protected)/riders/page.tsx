@@ -5,6 +5,7 @@ import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Loading } from '@/components/Loading';
+import { Eye } from 'lucide-react';
 
 export default function RidersPage() {
     const [riders, setRiders] = useState<Riders[]>([]);
@@ -150,7 +151,7 @@ export default function RidersPage() {
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
                                 <tr>
-                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged In'].map((col) => (
+                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged In', 'Action'].map((col) => (
                                         <th key={col} className="px-6 py-3 font-medium text-left">
                                             {col}
                                         </th>
@@ -193,7 +194,7 @@ export default function RidersPage() {
                                     paginatedRiders.map((r) => (
                                         <tr key={r._id} className="border-b hover:bg-gray-50 transition">
                                             <td className="px-6 py-3">{r.id}</td>
-                                            <td className="px-6 py-3">{r.name || '-'}</td>
+                                            <td className="px-6 py-3">{r.name.toUpperCase() || '-'}</td>
                                             <td className="px-6 py-3">{r.email || '-'}</td>
                                             <td className="px-6 py-3">{r.mobnum || '-'}</td>
                                             <td className="px-6 py-3">{r.address || '-'}</td>
@@ -202,6 +203,9 @@ export default function RidersPage() {
                                             </td>
                                             <td className="px-6 py-3 text-gray-500">
                                                 {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
+                                            </td>
+                                            <td className="px-6 py-3 text-green-700 flex justify-end">
+                                                <Eye />
                                             </td>
                                         </tr>
                                     ))

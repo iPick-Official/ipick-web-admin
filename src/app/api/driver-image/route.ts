@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrivateFileUrl } from "@/lib/uploadService";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export async function POST(req: Request) {
   const { key } = await req.json();
@@ -15,5 +16,21 @@ export async function POST(req: Request) {
       { error: "Failed to get signed URL" },
       { status: 500 }
     );
+  }
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const key = req.query.key as string;
+  if (!key) return res.status(400).json({ error: "Missing 'key'" });
+
+  try {
+    const signedUrl = await getPrivateFileUrl(key);
+    res.status(200).json({ signedUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate signed URL" });
   }
 }

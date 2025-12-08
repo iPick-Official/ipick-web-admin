@@ -4,38 +4,9 @@ import { Driver } from "@/types/drivers";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { useEffect, useState, useRef } from "react";
 import { Loading } from "./Loading";
-
-const containerStyle = {
-  width: "100%",
-  height: "100%",
-};
-
-const center = {
-  lat: 14.5995,
-  lng: 120.9842,
-};
-
-const PHILIPPINES_BOUNDS = {
-  north: 21.321,
-  south: 4.393,
-  west: 116.87,
-  east: 126.6,
-};
-
-const mapOptions = {
-  disableDefaultUI: true,
-  zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
-  fullscreenControl: false,
-  clickableIcons: false,
-  gestureHandling: "greedy",
-  restriction: {
-    latLngBounds: PHILIPPINES_BOUNDS,
-    strictBounds: false,
-  },
-  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID,
-};
+import { getSignedUrlClient } from "@/lib/uploadService";
+import { createCircularMarker } from "@/app/utils/createCircularMarker";
+import { containerStyle, center, mapOptions } from "@/app/utils/mapUtils";
 
 export const MapView = () => {
   const { isLoaded, loadError } = useJsApiLoader({
@@ -43,9 +14,11 @@ export const MapView = () => {
   });
 
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [avatars, setAvatars] = useState<Record<string, string>>({});
   const [zoom, setZoom] = useState(10); // initial zoom
   const mapRef = useRef<google.maps.Map | null>(null);
 
+  // Fetch drivers
   useEffect(() => {
     async function fetchDrivers() {
       try {
@@ -54,8 +27,7 @@ export const MapView = () => {
 
         const data: Driver[] = await res.json();
         const approvedLoggedDrivers = data.filter(
-          (driver) =>
-            driver.status === "approved" && driver.isLogged === true
+          (driver) => driver.status === "approved" && driver.isLogged
         );
 
         setDrivers(approvedLoggedDrivers);
@@ -66,6 +38,40 @@ export const MapView = () => {
 
     fetchDrivers();
   }, []);
+
+  // Fetch avatars concurrently
+  useEffect(() => {
+    if (!drivers.length) return;
+
+    const fetchAvatars = async () => {
+      const avatarEntries = await Promise.all(
+        drivers.map(async (driver) => {
+          const raw = driver.personalRequirements?.profilePicture?.url;
+          if (!raw) return null;
+
+          try {
+            const signedUrl = await getSignedUrlClient(raw);
+            if (!signedUrl) return null;
+
+            const circular = await createCircularMarker(signedUrl, 55, "#2ecc71");
+            return [driver._id, circular] as [string, string];
+          } catch (err) {
+            console.error(`Failed to load avatar for driver ${driver._id}:`, err);
+            return null;
+          }
+        })
+      );
+
+      // Filter out failed entries and convert to object
+      const avatarMap: Record<string, string> = Object.fromEntries(
+        avatarEntries.filter((e): e is [string, string] => e !== null)
+      );
+
+      setAvatars(avatarMap);
+    };
+
+    fetchAvatars();
+  }, [drivers]);
 
   if (loadError)
     return (
@@ -91,7 +97,7 @@ export const MapView = () => {
       zoom={zoom}
       options={mapOptions}
       onLoad={(map) => {
-        mapRef.current = map;
+        mapRef.current = map; // assign the map
       }}
       onZoomChanged={handleZoomChanged}
     >
@@ -105,21 +111,23 @@ export const MapView = () => {
                 lat: driver.location.lat,
                 lng: driver.location.lng,
               }}
-              label={
-                zoom >= 13
+              icon={
+                avatars[driver._id]
                   ? {
-                    text: `${driver.firstName} ${driver.surName}`,
+                    url: avatars[driver._id], // circular avatar
+                    scaledSize: new window.google.maps.Size(40, 40),
+                    anchor: new window.google.maps.Point(27, 27),
+                    labelOrigin: new window.google.maps.Point(27, 60),
+                  }
+                  : undefined // default Google Maps pin
+              }
+              label={
+                zoom >= 13 && avatars[driver._id]
+                  ? {
+                    text: `${driver.firstName.toUpperCase()} ${driver.surName.toUpperCase()}`,
                     color: "black",
                     fontSize: "14px",
                     fontWeight: "bold",
-                  }
-                  : undefined
-              }
-              icon={
-                zoom >= 13
-                  ? {
-                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                    labelOrigin: new window.google.maps.Point(15, -10),
                   }
                   : undefined
               }

@@ -44,3 +44,18 @@ export async function getPrivateFileUrl(key: string): Promise<string> {
 
   return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
+
+export async function getSignedUrlClient(key: string | null | undefined) {
+  if (!key) return null;
+
+  try {
+    const res = await fetch(`/api/s3-url?key=${encodeURIComponent(key)}`);
+    if (!res.ok) throw new Error("Failed to fetch signed URL from API");
+
+    const data = await res.json();
+    return data.signedUrl ?? null;
+  } catch (err) {
+    console.error("Failed to fetch signed URL:", err);
+    return null;
+  }
+}

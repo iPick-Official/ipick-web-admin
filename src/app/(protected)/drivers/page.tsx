@@ -733,7 +733,7 @@ export default function DriversPage() {
                                             className="border-b hover:bg-gray-50 transition cursor-pointer"
                                         >
                                             <td className="px-6 py-3">{d.id}</td>
-                                            <td className="px-6 py-3">{d.name}</td>
+                                            <td className="px-6 py-3">{d.name.toUpperCase()}</td>
                                             <td className="px-6 py-3">{d.email}</td>
                                             <td className="px-6 py-3">{d.mobnum}</td>
                                             <td className="px-6 py-3">{d.carType}</td>
