@@ -1,0 +1,62 @@
+Initial Interview – Full Stack Developer
+1. Tell me about yourself.
+
+Answer:
+"I’m a Senior Software Engineer with experience in full-stack development, mobile apps, and IoT platforms. Recently, I architected a production-ready bus ticketing system for iKomyutPH, integrating GPS tracking, onboard cameras, and real-time dashboards. I also built a cross-platform ride-hailing app for iPick, handling backend APIs, payments, and real-time driver-rider matching. I enjoy solving complex problems end-to-end—from database design to cloud deployment—and mentoring teams on scalable, maintainable systems."
+
+Tip: Keep it 1–2 minutes and highlight your relevant full-stack skills.
+
+2. What technologies are you most comfortable with?
+
+Answer:
+"I work extensively with the Node.js ecosystem and NestJS for backend development. For frontend, I have experience with Next.js and Ionic/Capacitor for cross-platform apps. I’ve designed high-volume MongoDB schemas, integrated IoT devices using MQTT/WebSockets, and deployed scalable systems on AWS and GCP. I also implement CI/CD pipelines and ensure secure, maintainable deployments."
+
+3. Can you explain your experience with REST APIs and real-time communication?
+
+Answer:
+"I’ve built RESTful APIs using NestJS for ride-hailing and fleet management systems, following best practices for authentication, versioning, and scalability. For real-time communication, I’ve used WebSockets and MQTT to stream telemetry from IoT devices and provide live updates to dashboards and mobile apps, ensuring low latency and fault tolerance."
+
+4. How do you approach database design?
+
+Answer:
+"I focus on designing schemas for scalability and query efficiency. For example, in fleet management, I used MongoDB with geospatial indexes to handle GPS data and time-series telemetry. I also implement sharding and TTL indexes for high-volume data, optimize aggregation queries, and ensure consistency between edge devices and the cloud."
+
+5. Describe a project where you handled both frontend and backend.
+
+Answer:
+"In iPick, I built a cross-platform ride-hailing app. On the frontend, I used Ionic to deliver a native-like user experience. On the backend, I implemented NestJS APIs for driver-rider matching, payments, and trip management. I also integrated WebSockets for real-time updates. This project gave me full ownership from architecture to deployment, ensuring a seamless user experience across platforms."
+
+6. How do you ensure code quality and maintainability?
+
+Answer:
+"I follow modular design patterns, write reusable components, and enforce consistent coding standards through code reviews. I also maintain test coverage for critical modules and refactor legacy code to reduce technical debt. Mentoring junior developers is also part of my approach to ensure long-term maintainability across the team."
+
+7. How do you handle cloud deployment and scalability?
+
+Answer:
+"I’ve deployed microservices and backend APIs on AWS and GCP using containerized architectures for high availability. I design systems to scale horizontally, implement auto-scaling, use message queues for decoupling, and monitor services with CloudWatch or GCP Monitoring. I also optimize cost without sacrificing performance, for example by caching expensive API calls."
+
+8. How do you troubleshoot performance issues?
+
+Answer:
+"I start by analyzing logs, metrics, and database queries to identify bottlenecks. For example, in the ride-hailing app, I optimized Google Maps API usage with caching and deferred queries to reduce latency and costs. I also profile backend APIs, optimize queries, and implement asynchronous processing for high-load operations."
+
+9. Can you describe a time you solved a critical problem?
+
+Answer:
+"At iPick, we discovered an AWS S3 bucket misconfiguration exposing sensitive data. I led the resolution by enforcing strict IAM roles, server-side encryption, lifecycle rules, and audit logging. I also set up automated alerts to prevent future misconfigurations. This ensured data security without impacting ongoing operations."
+
+10. Why do you want to join this company?
+
+Answer:
+"I’m excited about the opportunity to contribute to impactful, user-focused software. I enjoy building end-to-end solutions, and your company’s projects align with my experience in full-stack development, real-time systems, and scalable architecture. I’m also motivated by collaborative teams where I can mentor others and grow as a developer."
+
+11. Behavioral Question – How do you handle tight deadlines?
+
+Answer:
+"I prioritize tasks based on impact and dependencies, break down work into manageable components, and communicate proactively with stakeholders. I focus on delivering a functional MVP first, then iterate and refine. For example, in the bus ticketing project, we delivered an MVP to onboard buses within a month and iterated based on field feedback."
+
+12. What are your strengths as a full-stack developer?
+
+Answer:
+"I have strong end-to-end problem-solving skills, from designing databases and APIs to building responsive frontends and real-time dashboards. I’m comfortable with cloud deployment, IoT integration, and mentoring teams. My ability to see the big picture while handling technical details helps me deliver scalable and maintainable systems."

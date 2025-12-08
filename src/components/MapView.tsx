@@ -4,9 +4,9 @@ import { Driver } from "@/types/drivers";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { useEffect, useState, useRef } from "react";
 import { Loading } from "./Loading";
-import { getSignedUrlClient } from "@/lib/uploadService";
 import { createCircularMarker } from "@/app/utils/createCircularMarker";
 import { containerStyle, center, mapOptions } from "@/app/utils/mapUtils";
+import { fetchSignedS3Url } from "@/hooks/useSignedS3Url";
 
 export const MapView = () => {
   const { isLoaded, loadError } = useJsApiLoader({
@@ -15,10 +15,9 @@ export const MapView = () => {
 
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [avatars, setAvatars] = useState<Record<string, string>>({});
-  const [zoom, setZoom] = useState(10); // initial zoom
+  const [zoom, setZoom] = useState(10);
   const mapRef = useRef<google.maps.Map | null>(null);
 
-  // Fetch drivers
   useEffect(() => {
     async function fetchDrivers() {
       try {
@@ -27,7 +26,7 @@ export const MapView = () => {
 
         const data: Driver[] = await res.json();
         const approvedLoggedDrivers = data.filter(
-          (driver) => driver.status === "approved" && driver.isLogged
+          (driver) => driver.status === "approved" && driver.isLogged === true
         );
 
         setDrivers(approvedLoggedDrivers);
@@ -39,7 +38,6 @@ export const MapView = () => {
     fetchDrivers();
   }, []);
 
-  // Fetch avatars concurrently
   useEffect(() => {
     if (!drivers.length) return;
 
@@ -50,19 +48,18 @@ export const MapView = () => {
           if (!raw) return null;
 
           try {
-            const signedUrl = await getSignedUrlClient(raw);
+            const signedUrl = await fetchSignedS3Url(raw);
             if (!signedUrl) return null;
 
-            const circular = await createCircularMarker(signedUrl, 55, "#2ecc71");
+            const circular = await createCircularMarker(signedUrl, 55, "#008000");
             return [driver._id, circular] as [string, string];
           } catch (err) {
-            console.error(`Failed to load avatar for driver ${driver._id}:`, err);
+            // console.error(`Failed to load avatar for driver ${driver._id}:`, err);
             return null;
           }
         })
       );
 
-      // Filter out failed entries and convert to object
       const avatarMap: Record<string, string> = Object.fromEntries(
         avatarEntries.filter((e): e is [string, string] => e !== null)
       );
@@ -96,16 +93,14 @@ export const MapView = () => {
       center={center}
       zoom={zoom}
       options={mapOptions}
-      onLoad={(map) => {
-        mapRef.current = map; // assign the map
-      }}
+      onLoad={(map) => { mapRef.current = map; }}
       onZoomChanged={handleZoomChanged}
     >
       {drivers.map(
         (driver) =>
           driver.location && (
             <Marker
-              key={driver.id}
+              key={driver._id}
               title={`${driver.firstName} ${driver.surName}`}
               position={{
                 lat: driver.location.lat,
@@ -114,15 +109,15 @@ export const MapView = () => {
               icon={
                 avatars[driver._id]
                   ? {
-                    url: avatars[driver._id], // circular avatar
+                    url: avatars[driver._id],
                     scaledSize: new window.google.maps.Size(40, 40),
-                    anchor: new window.google.maps.Point(27, 27),
-                    labelOrigin: new window.google.maps.Point(27, 60),
+                    anchor: new window.google.maps.Point(20, 20),
+                    labelOrigin: new window.google.maps.Point(20, 50),
                   }
-                  : undefined // default Google Maps pin
+                  : undefined
               }
               label={
-                zoom >= 13 && avatars[driver._id]
+                zoom >= 13
                   ? {
                     text: `${driver.firstName.toUpperCase()} ${driver.surName.toUpperCase()}`,
                     color: "black",

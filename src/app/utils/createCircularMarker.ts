@@ -1,7 +1,7 @@
 export function createCircularMarker(
   imageUrl: string,
   size = 45,
-  borderColor = "#008000", // online (green) — customize this dynamically
+  borderColor = "#008000",
   borderWidth = 4
 ): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -23,17 +23,27 @@ export function createCircularMarker(
       ctx.fillStyle = borderColor;
       ctx.fill();
 
-      // Draw the avatar
+      // Clip to inner circle
+      const innerRadius = (size - borderWidth * 2) / 2;
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, (size - borderWidth * 2) / 2, 0, Math.PI * 2);
+      ctx.arc(size / 2, size / 2, innerRadius, 0, Math.PI * 2);
+      ctx.closePath();
       ctx.clip();
-      ctx.drawImage(
-        img,
-        borderWidth,
-        borderWidth,
-        size - borderWidth * 2,
-        size - borderWidth * 2
+
+      // Scale image to fill circle without stretching
+      const scale = Math.max(
+        (innerRadius * 2) / img.width,
+        (innerRadius * 2) / img.height
       );
+      const drawWidth = img.width * scale;
+      const drawHeight = img.height * scale;
+      const dx = size / 2 - drawWidth / 2;
+      const dy = size / 2 - drawHeight / 2;
+
+      ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+
+      ctx.restore();
 
       resolve(canvas.toDataURL());
     };

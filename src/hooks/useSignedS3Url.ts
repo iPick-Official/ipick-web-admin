@@ -72,3 +72,26 @@ export function useSignedS3Url(rawKey: string | null | undefined) {
 
   return { signedUrl, loading, error };
 }
+
+export async function fetchSignedS3Url(
+  rawKey: string | null | undefined
+): Promise<string | null> {
+  if (!rawKey) return null;
+
+  const key = extractS3Key(rawKey);
+  if (!key) return null;
+
+  try {
+    const res = await fetch("/api/driver-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key }),
+    });
+
+    const data = await res.json();
+    return data.url || null;
+  } catch (err) {
+    console.error("Error fetching signed URL:", err);
+    return null;
+  }
+}
