@@ -32,7 +32,7 @@ export default function AuthPage() {
             }
 
             // Redirect to protected route
-            router.push("/dashboard");
+            router.push("/admin/dashboard");
         } catch (err) {
             console.error(err);
             alert("Server error");

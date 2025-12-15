@@ -5,14 +5,14 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
 
   const isLoginPage = req.nextUrl.pathname.startsWith("/auth");
-  const isAdminPage = req.nextUrl.pathname.startsWith("/dashboard");
+  const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
 
   if (isAdminPage && !token) {
     return NextResponse.redirect(new URL("/auth", req.url));
   }
 
   if (isLoginPage && token) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 
   return NextResponse.next();
