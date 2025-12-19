@@ -3,11 +3,14 @@
 import { Loading } from '@/components/Loading';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
+import SortButton from '@/components/SortButton';
+import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
+import { Eye } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 
 export default function BookingsPage() {
-
+    const { sortOrder, toggleSort } = useSort("desc");
     const [loading, setLoading] = useState(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -16,7 +19,6 @@ export default function BookingsPage() {
     const [fromDate, setFromDate] = useState(today);
     const [toDate, setToDate] = useState(today);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
 
@@ -46,6 +48,8 @@ export default function BookingsPage() {
                 return 'text-blue-600';
             case 'cancelled':
                 return 'text-red-600';
+            case 'booked':
+                return 'text-yellow-600';
             default:
                 return 'text-gray-500';
         }
@@ -120,13 +124,13 @@ export default function BookingsPage() {
     }, [displayedBookings]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-50">
+        <div className="flex h-screen overflow-hidden">
             <Sidebar />
-            <div className="flex-1 p-8 overflow-auto space-y-6">
+            <div className="flex-1 p-8 overflow-auto space-y-6 bg-white dark:bg-zinc-900">
 
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Bookings</h2>
+                    <h2 className="text-2xl font-semibold ml-20">Bookings</h2>
 
                     <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
@@ -135,7 +139,7 @@ export default function BookingsPage() {
                             { label: "To", value: toDate, setter: setToDate },
                         ].map((d) => (
                             <div key={d.label} className="flex items-center gap-2">
-                                <label className="text-sm text-gray-600">{d.label}:</label>
+                                <label className="text-sm">{d.label}:</label>
                                 <input
                                     type="date"
                                     value={d.value}
@@ -147,11 +151,11 @@ export default function BookingsPage() {
 
                         {/* Status Filter */}
                         <div className="flex items-center gap-2">
-                            <label className="text-sm text-gray-600">Status:</label>
+                            <label className="text-sm">Status:</label>
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
+                                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
                             >
                                 <option value="all">All</option>
                                 <option value="active">Active</option>
@@ -190,24 +194,24 @@ export default function BookingsPage() {
                     ].map((item) => (
                         <div
                             key={item.label}
-                            className="relative bg-orange-50 border-l-4 border-orange-500 shadow-sm rounded-lg px-4 py-6"
+                            className="relative bg-orange-50 dark:bg-zinc-800 border-l-4 border-orange-500 dark:border-green-800 shadow-sm rounded-lg px-4 py-6"
                         >
                             {/* Label in top-left */}
-                            <p className="absolute top-2 left-4 text-gray-900 text-sm">{item.label}</p>
+                            <p className="absolute top-2 left-4 text-sm">{item.label}</p>
 
                             {/* Value centered */}
                             <div className="flex items-center justify-center h-full">
-                                <p className="text-orange-700 font-bold text-2xl">{item.value}</p>
+                                <p className="text-orange-700 dark:text-orange-300 font-bold text-2xl">{item.value}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-gray-200 dark:bg-zinc-800">
                     <div className="overflow-y-auto max-h-[75vh]">
                         <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
+                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
                                 <tr>
                                     {["Booking ID", "Rider ID", "Driver ID", "Status", "Fare", "Origin", "Destination"].map((col) => (
                                         <th key={col} className="px-6 py-3 font-medium text-left">
@@ -216,22 +220,13 @@ export default function BookingsPage() {
                                     ))}
                                     {/* Timestamp column with sort button */}
                                     <th className="px-6 py-3 font-medium text-left">
-                                        <button
-                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        >
-                                            Timestamp
-                                            {sortOrder === 'asc' ? (
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                                </svg>
-                                            ) : (
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            )}
-                                        </button>
+                                        <SortButton
+                                            label="Created At"
+                                            sortOrder={sortOrder}
+                                            onToggle={toggleSort}
+                                        />
                                     </th>
+                                    <th className="px-6 py-3 font-medium text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -257,16 +252,21 @@ export default function BookingsPage() {
                                         return (
                                             <tr
                                                 key={b._id}
-                                                className={`border-b ${isToday ? "bg-orange-50" : "bg-white"} hover:bg-gray-50 transition`}
+                                                className={`border-b ${isToday ? "bg-orange-50" : "bg-white"} hover:bg-gray-200 dark:hover:bg-zinc-500 transition`}
                                             >
-                                                <td className="px-6 py-3">{b._id}</td>
-                                                <td className="px-6 py-3">{b.riderId}</td>
-                                                <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
-                                                <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status}</td>
-                                                <td className="px-6 py-3 text-gray-800">₱{b.travelFare?.toFixed(2)}</td>
-                                                <td className="px-6 py-3 text-gray-600">{b.origin?.name}</td>
-                                                <td className="px-6 py-3 text-gray-600">{b.destination?.name}</td>
-                                                <td className="px-6 py-3 text-gray-500">{new Date(b.updatedAt).toLocaleString()}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{b._id}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.riderId}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.driverId || "Unassigned"}</td>
+                                                <td className={`px-6 py-3 font-semibold dark:bg-zinc-800 ${getStatusColor(b.status)}`}>{b.status.toUpperCase()}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">₱{b.travelFare?.toFixed(2)}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.origin?.name}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.destination?.name}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">{new Date(b.updatedAt).toLocaleString()}</td>
+                                                <td className="px-6 py-3 dark:bg-zinc-800">
+                                                    <div className="flex items-center text-green-700 justify-center">
+                                                        <Eye />
+                                                    </div>
+                                                </td>
                                             </tr>
                                         );
                                     })

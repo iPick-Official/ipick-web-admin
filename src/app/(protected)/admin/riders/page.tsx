@@ -6,12 +6,14 @@ import { useEffect, useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Loading } from '@/components/Loading';
 import { Eye } from 'lucide-react';
+import { useSort } from '@/hooks/useSort';
+import SortButton from '@/components/SortButton';
 
 export default function RidersPage() {
+    const { sortOrder, toggleSort } = useSort("desc");
     const [riders, setRiders] = useState<Riders[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -88,12 +90,12 @@ export default function RidersPage() {
     }, [displayedRiders]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-50">
+        <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Passengers</h2>
+                    <h2 className="text-2xl font-semibold ml-20">Passengers</h2>
                     <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
                         {[
@@ -101,7 +103,7 @@ export default function RidersPage() {
                             { label: 'To', value: toDate, setter: setToDate },
                         ].map((d) => (
                             <div key={d.label} className="flex items-center gap-2">
-                                <label className="text-sm text-gray-600">{d.label}:</label>
+                                <label className="text-sm">{d.label}:</label>
                                 <input
                                     type="date"
                                     value={d.value}
@@ -149,30 +151,21 @@ export default function RidersPage() {
                 <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
                     <div className="overflow-y-auto max-h-[75vh]">
                         <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200">
+                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200 sticky top-0 z-10">
                                 <tr>
-                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged In', 'Action'].map((col) => (
+                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged'].map((col) => (
                                         <th key={col} className="px-6 py-3 font-medium text-left">
                                             {col}
                                         </th>
                                     ))}
                                     <th className="px-6 py-3 font-medium text-left">
-                                        <button
-                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        >
-                                            Created At
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                                            </svg>
-                                        </button>
+                                        <SortButton
+                                            label="Created At"
+                                            sortOrder={sortOrder}
+                                            onToggle={toggleSort}
+                                        />
                                     </th>
+                                    <th className="px-6 py-3 font-medium text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -193,11 +186,11 @@ export default function RidersPage() {
                                 ) : (
                                     paginatedRiders.map((r) => (
                                         <tr key={r._id} className="border-b hover:bg-gray-50 transition">
-                                            <td className="px-6 py-3">{r.id}</td>
-                                            <td className="px-6 py-3">{r.name.toUpperCase() || '-'}</td>
-                                            <td className="px-6 py-3">{r.email || '-'}</td>
-                                            <td className="px-6 py-3">{r.mobnum || '-'}</td>
-                                            <td className="px-6 py-3">{r.address || '-'}</td>
+                                            <td className="px-6 py-3 text-gray-500">{r.id}</td>
+                                            <td className="px-6 py-3 text-gray-500">{r.name.toUpperCase() || '-'}</td>
+                                            <td className="px-6 py-3 text-gray-500">{r.email || '-'}</td>
+                                            <td className="px-6 py-3 text-gray-500">{r.mobnum || '-'}</td>
+                                            <td className="px-6 py-3 text-gray-500">{r.address || '-'}</td>
                                             <td className={`px-6 py-3 font-semibold ${r.isLogged ? 'text-green-600' : 'text-gray-500'}`}>
                                                 {r.isLogged ? 'Yes' : 'No'}
                                             </td>

@@ -2,6 +2,7 @@
 
 import Modal from '@/components/Modal';
 import Image from "next/image";
+import SortButton from '@/components/SortButton';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
@@ -10,8 +11,10 @@ import { useSignedDocs } from '@/hooks/useSignedDocs';
 import { DriverDataResponse, Message } from '@/types/history';
 import { Eye } from 'lucide-react';
 import { Loading } from '@/components/Loading';
+import { useSort } from '@/hooks/useSort';
 
 export default function DriversPage() {
+    const { sortOrder, toggleSort } = useSort("desc");
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [rideHistory, setRideHistory] = useState<DriverDataResponse | null>(null);
@@ -20,7 +23,6 @@ export default function DriversPage() {
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -595,13 +597,12 @@ export default function DriversPage() {
     }, [displayedDrivers]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-50">
+        <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-20">Drivers</h2>
-
+                    <h2 className="text-2xl font-semibold ml-20">Drivers</h2>
                     <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
                         {/* Date Filters */}
                         {[
@@ -609,7 +610,7 @@ export default function DriversPage() {
                             { label: 'To', value: toDate, setter: setToDate },
                         ].map((d) => (
                             <div key={d.label} className="flex items-center gap-2">
-                                <label className="text-sm text-gray-600">{d.label}:</label>
+                                <label className="text-sm">{d.label}:</label>
                                 <input
                                     type="date"
                                     value={d.value}
@@ -621,11 +622,11 @@ export default function DriversPage() {
 
                         {/* Status Filter */}
                         <div className="flex items-center gap-2">
-                            <label className="text-sm text-gray-600">Status:</label>
+                            <label className="text-sm">Status:</label>
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
+                                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
                             >
                                 <option value="all">All</option>
                                 <option value="approved">Approved</option>
@@ -683,31 +684,14 @@ export default function DriversPage() {
                                             {col}
                                         </th>
                                     ))}
-                                    <th className="px-6 py-3 font-medium text-left bg-gray-200">
-                                        <button
-                                            className="flex items-center gap-1 hover:text-gray-600 transition uppercase"
-                                            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                        >
-                                            Created At
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`}
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M5 15l7-7 7 7"
-                                                />
-                                            </svg>
-                                        </button>
+                                    <th className="px-6 py-3 font-medium text-left">
+                                        <SortButton
+                                            label="Created At"
+                                            sortOrder={sortOrder}
+                                            onToggle={toggleSort}
+                                        />
                                     </th>
-                                    <th className="px-6 py-3 font-medium text-right bg-gray-200">
-                                        Action
-                                    </th>
+                                    <th className="px-6 py-3 font-medium text-right">Action</th>
                                 </tr>
                             </thead>
 
@@ -732,12 +716,12 @@ export default function DriversPage() {
                                             key={d._id}
                                             className="border-b hover:bg-gray-50 transition cursor-pointer"
                                         >
-                                            <td className="px-6 py-3">{d.id}</td>
-                                            <td className="px-6 py-3">{d.name.toUpperCase()}</td>
-                                            <td className="px-6 py-3">{d.email}</td>
-                                            <td className="px-6 py-3">{d.mobnum}</td>
-                                            <td className="px-6 py-3">{d.carType}</td>
-                                            <td className="px-6 py-3">{d.transportRequirements.plateNumber}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.id}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.name.toUpperCase()}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.email}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.mobnum}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.carType}</td>
+                                            <td className="px-6 py-3 text-gray-500">{d.transportRequirements.plateNumber}</td>
                                             <td className={`px-6 py-3 font-semibold ${getStatusColor(d.status)}`}>
                                                 {d.status.toUpperCase()}
                                             </td>
