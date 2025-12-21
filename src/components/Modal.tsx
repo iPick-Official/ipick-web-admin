@@ -2,23 +2,24 @@
 import { ReactNode } from "react";
 
 interface ModalProps {
-    isOpen: boolean;
+    isOpen?: boolean;
     onClose: () => void;
     title?: string;
     children: ReactNode;
-    size?: "sm" | "md" | "lg" | "xl" | "full";
+    size?: "sm" | "md" | "lg" | "xl" | "full" | "auto"; // added 'auto'
 }
 
-export default function Modal({ isOpen, onClose, title, children, size = "md" }: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, size = "auto" }: ModalProps) {
     if (!isOpen) return null;
 
     // width + max-height mapping for sizes
-    const sizeClasses = {
+    const sizeClasses: Record<string, string> = {
         sm: "max-w-sm max-h-[40vh]",
         md: "max-w-md max-h-[60vh]",
         lg: "max-w-lg max-h-[70vh]",
         xl: "max-w-xl max-h-[80vh]",
         full: "w-full h-full max-h-screen max-w-screen",
+        auto: "max-w-sm max-h-[90vh]", // auto size: grow with content but max out
     };
 
     return (

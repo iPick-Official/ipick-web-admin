@@ -18,7 +18,6 @@ export const Sidebar = () => {
 
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Detect screen size
   useEffect(() => {
@@ -56,7 +55,7 @@ export const Sidebar = () => {
 
   if (loading) return <Loading />;
   if (!admin) return <p>Not authorized</p>;
-  const fullName = `${admin.firstName} ${admin.middleName + " "}${admin?.lastName}`.trim();
+  const fullName = `${admin.firstName} ${admin?.lastName}`.trim();
 
   return (
     <>
@@ -125,18 +124,18 @@ export const Sidebar = () => {
           ))}
         </div>
 
-        {/* Profile Dropdown */}
+        {/* Profile */}
         <div className="relative m-2 border-t border-green-700/20 rounded-lg ">
           <button
             onClick={() => router.push("/admin/profile")}
-            className="flex items-center gap-3 w-full p-3 rounded-lg text-slate-100 hover:bg-slate-200 hover:text-gray-900 transition-all duration-200"
+            className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-green-800 hover:text-gray-200 transition-all duration-200"
           >
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 border border-gray-300">
               <User className="w-6 h-6 text-gray-900" />
             </div>
             <div className="text-left">
               <p className="font-medium">{fullName}</p>
-              <p className="text-sm text-gray-600">{admin?.email}</p>
+              <p className="text-sm">{admin?.email}</p>
             </div>
           </button>
         </div>
@@ -149,16 +148,6 @@ export const Sidebar = () => {
           onClick={() => setCollapsed(true)}
         />
       )}
-
-      {/* Logout Confirmation */}
-      <ConfirmDialog
-        open={showLogoutConfirm}
-        message="Are you sure you want to logout?"
-        onConfirm={handleLogout}
-        onCancel={() => setShowLogoutConfirm(false)}
-        confirmText="Yes, Logout"
-        cancelText="Cancel"
-      />
     </>
   );
 };

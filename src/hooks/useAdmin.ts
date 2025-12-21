@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Cookies from "js-cookie";
 import { Admin } from "@/types/admin";
 
@@ -8,7 +8,8 @@ export function useAdmin() {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadAdmin = useCallback(() => {
+    setLoading(true);
     const adminCookie = Cookies.get("admin");
 
     if (adminCookie) {
@@ -18,10 +19,27 @@ export function useAdmin() {
         console.error("Invalid admin cookie", error);
         setAdmin(null);
       }
+    } else {
+      setAdmin(null);
     }
 
     setLoading(false);
   }, []);
 
-  return { admin, loading };
+  useEffect(() => {
+    loadAdmin();
+  }, [loadAdmin]);
+
+  // Update admin state and cookie
+  const updateAdmin = (updatedAdmin: Admin) => {
+    setAdmin(updatedAdmin);
+    Cookies.set("admin", JSON.stringify(updatedAdmin), { expires: 7 }); // cookie expires in 7 days
+  };
+
+  // Function to refresh admin info from cookie
+  const refetch = () => {
+    loadAdmin();
+  };
+
+  return { admin, loading, updateAdmin, refetch };
 }

@@ -112,6 +112,7 @@ export interface Driver {
     lat: number;
     lng: number;
   };
+  updatedBy: string;
 }
 
 // Wallet Data

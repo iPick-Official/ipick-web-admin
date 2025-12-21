@@ -137,21 +137,24 @@ export default function RidersPage() {
                     ].map((item) => (
                         <div
                             key={item.label}
-                            className="relative bg-orange-50 border-l-4 border-orange-500 shadow-sm rounded-lg px-4 py-6"
+                            className="relative bg-orange-50 dark:bg-zinc-800 border-l-4 border-orange-500 dark:border-green-800 shadow-sm rounded-lg px-4 py-6"
                         >
-                            <p className="absolute top-2 left-4 text-gray-900 text-sm">{item.label}</p>
+                            {/* Label in top-left */}
+                            <p className="absolute top-2 left-4 text-sm">{item.label}</p>
+
+                            {/* Value centered */}
                             <div className="flex items-center justify-center h-full">
-                                <p className="text-orange-700 font-bold text-2xl">{item.value}</p>
+                                <p className="text-orange-700 dark:text-orange-300 font-bold text-2xl">{item.value}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
                     <div className="overflow-y-auto max-h-[75vh]">
                         <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 text-gray-900 uppercase text-xs border-b border-gray-200 sticky top-0 z-10">
+                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
                                 <tr>
                                     {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged'].map((col) => (
                                         <th key={col} className="px-6 py-3 font-medium text-left">
@@ -185,16 +188,16 @@ export default function RidersPage() {
                                     </tr>
                                 ) : (
                                     paginatedRiders.map((r) => (
-                                        <tr key={r._id} className="border-b hover:bg-gray-50 transition">
-                                            <td className="px-6 py-3 text-gray-500">{r.id}</td>
-                                            <td className="px-6 py-3 text-gray-500">{r.name.toUpperCase() || '-'}</td>
-                                            <td className="px-6 py-3 text-gray-500">{r.email || '-'}</td>
-                                            <td className="px-6 py-3 text-gray-500">{r.mobnum || '-'}</td>
-                                            <td className="px-6 py-3 text-gray-500">{r.address || '-'}</td>
+                                        <tr key={r._id} className="border-b hover:bg-gray-800 hover:text-white transition">
+                                            <td className="px-6 py-3">{r.id}</td>
+                                            <td className="px-6 py-3">{r.name.toUpperCase() || '-'}</td>
+                                            <td className="px-6 py-3">{r.email || '-'}</td>
+                                            <td className="px-6 py-3">{r.mobnum || '-'}</td>
+                                            <td className="px-6 py-3">{r.address || '-'}</td>
                                             <td className={`px-6 py-3 font-semibold ${r.isLogged ? 'text-green-600' : 'text-gray-500'}`}>
                                                 {r.isLogged ? 'Yes' : 'No'}
                                             </td>
-                                            <td className="px-6 py-3 text-gray-500">
+                                            <td className="px-6 py-3">
                                                 {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
                                             </td>
                                             <td className="px-6 py-3 text-green-700 flex justify-end">

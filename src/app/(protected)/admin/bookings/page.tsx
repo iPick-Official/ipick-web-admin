@@ -208,7 +208,7 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Table */}
-                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-gray-200 dark:bg-zinc-800">
+                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
                     <div className="overflow-y-auto max-h-[75vh]">
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
@@ -252,17 +252,17 @@ export default function BookingsPage() {
                                         return (
                                             <tr
                                                 key={b._id}
-                                                className={`border-b ${isToday ? "bg-orange-50" : "bg-white"} hover:bg-gray-200 dark:hover:bg-zinc-500 transition`}
+                                                className={`border-b ${isToday ? "bg-orange-50 dark:bg-zinc-800" : "bg-white dark:bg-zinc-900"} hover:bg-gray-800 hover:text-white transition`}
                                             >
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{b._id}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.riderId}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.driverId || "Unassigned"}</td>
-                                                <td className={`px-6 py-3 font-semibold dark:bg-zinc-800 ${getStatusColor(b.status)}`}>{b.status.toUpperCase()}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">₱{b.travelFare?.toFixed(2)}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.origin?.name}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{b.destination?.name}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">{new Date(b.updatedAt).toLocaleString()}</td>
-                                                <td className="px-6 py-3 dark:bg-zinc-800">
+                                                <td className="px-6 py-3">{b._id}</td>
+                                                <td className="px-6 py-3">{b.riderId}</td>
+                                                <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
+                                                <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status.toUpperCase()}</td>
+                                                <td className="px-6 py-3">₱{b.travelFare?.toFixed(2)}</td>
+                                                <td className="px-6 py-3">{b.origin?.name}</td>
+                                                <td className="px-6 py-3">{b.destination?.name}</td>
+                                                <td className="px-6 py-3">{new Date(b.updatedAt).toLocaleString()}</td>
+                                                <td className="px-6 py-3">
                                                     <div className="flex items-center text-green-700 justify-center">
                                                         <Eye />
                                                     </div>
