@@ -59,7 +59,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-2xl shadow-2xl p-6 w-[350px] max-w-[90%] text-center"
+              className="bg-white rounded-2xl shadow-2xl p-6 w-[350px] max-w-[90%] text-center dark:bg-zinc-800"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -69,7 +69,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 <h2 className="text-lg font-semibold text-gray-800">
                   {title}
                 </h2>
-                <p className="text-gray-600 text-sm">{message}</p>
+                <p className="text-sm">{message}</p>
                 <div className="flex justify-center gap-3 mt-4 w-full">
                   {/* Hide cancel button when type is "success" */}
                   {type !== "success" && type !== "danger" && (
@@ -86,10 +86,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                       close();
                     }}
                     className={`flex-1 px-4 py-2 rounded-lg text-white transition ${type === "danger"
-                        ? "bg-red-600 hover:bg-red-700"
-                        : type === "success"
-                          ? "bg-green-600 hover:bg-green-700"
-                          : "bg-red-500 hover:bg-red-600"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : type === "success"
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-red-500 hover:bg-red-600"
                       }`}
                   >
                     {confirmText}

@@ -126,7 +126,7 @@ export default function BookingsPage() {
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
-            <div className="flex-1 p-8 overflow-auto space-y-6 bg-white dark:bg-zinc-900">
+            <div className="flex-1 p-8 overflow-auto space-y-6">
 
                 {/* Header + Filters */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

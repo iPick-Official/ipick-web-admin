@@ -8,6 +8,9 @@ import Image from "next/image";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Modal from "@/components/Modal";
 import { capitalize } from "@/app/utils/capitalized";
+import { ProfileForm } from "@/components/ProfileUpdate";
+import { PasswordForm } from "@/components/ProfileChangePass";
+import { Info } from "@/components/ProfileInfo";
 
 export default function ProfilePage() {
     const { admin, loading, updateAdmin } = useAdmin();
@@ -55,6 +58,10 @@ export default function ProfilePage() {
     }
 
     async function submitProfile() {
+        if (!profileForm.username?.trim() || !profileForm.email?.trim() || !profileForm.mobnum?.trim() || !profileForm.address?.trim()) {
+            alert("All fields are required");
+            return;
+        }
         try {
             const res = await fetch(`/api/admin/${admin?._id}`, {
                 method: "PATCH",
@@ -78,6 +85,10 @@ export default function ProfilePage() {
     }
 
     async function submitPassword() {
+        if (!passwordForm.oldPassword?.trim() || !passwordForm.newPassword?.trim()) {
+            alert("Both old and new passwords are required");
+            return;
+        }
         try {
             const res = await fetch(`/api/admin/${admin?._id}`, {
                 method: "PATCH",
@@ -193,91 +204,3 @@ export default function ProfilePage() {
     );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="flex justify-between border-b pb-2">
-            <span className="text-muted-foreground">{label}</span>
-            <span className="font-medium">{value}</span>
-        </div>
-    );
-}
-
-// Profile form
-function ProfileForm({ form, setForm, onSubmit }: any) {
-    return (
-        <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-3 text-sm">
-            {Object.keys(form).map((key) => (
-                <div key={key}>
-                    <label className="block text-xs mb-1 capitalize">{key}</label>
-                    <input
-                        type="text"
-                        className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white"
-                        value={form[key]}
-                        onChange={(e) => setForm({ ...form, [key]: (e.target.value) })}
-                    />
-                </div>
-            ))}
-            <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition mt-2"
-            >
-                Save Changes
-            </button>
-        </form>
-    );
-}
-
-function PasswordForm({ form, setForm, onSubmit }: any) {
-    const [showOld, setShowOld] = useState(false);
-    const [showNew, setShowNew] = useState(false);
-
-    return (
-        <form
-            onSubmit={(e) => { e.preventDefault(); onSubmit(); }}
-            className="space-y-3 text-sm"
-        >
-            {/* Old Password */}
-            <div className="relative">
-                <label className="block text-xs mb-1">Old Password</label>
-                <input
-                    type={showOld ? "text" : "password"}
-                    className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white pr-10"
-                    value={form.oldPassword}
-                    onChange={(e) => setForm({ ...form, oldPassword: e.target.value })}
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowOld(!showOld)}
-                    className="absolute right-2 top-7 text-sm text-gray-500"
-                >
-                    {showOld ? "Hide" : "Show"}
-                </button>
-            </div>
-
-            {/* New Password */}
-            <div className="relative">
-                <label className="block text-xs mb-1">New Password</label>
-                <input
-                    type={showNew ? "text" : "password"}
-                    className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white pr-10"
-                    value={form.newPassword}
-                    onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowNew(!showNew)}
-                    className="absolute right-2 top-7 text-sm text-gray-500"
-                >
-                    {showNew ? "Hide" : "Show"}
-                </button>
-            </div>
-
-            <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition mt-2"
-            >
-                Change Password
-            </button>
-        </form>
-    );
-}

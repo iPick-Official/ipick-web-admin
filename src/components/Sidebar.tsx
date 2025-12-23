@@ -53,7 +53,7 @@ export const Sidebar = () => {
     }
   }
 
-  if (loading) return <Loading />;
+  if (loading) return <div />;
   if (!admin) return <p>Not authorized</p>;
   const fullName = `${admin.firstName} ${admin?.lastName}`.trim();
 
