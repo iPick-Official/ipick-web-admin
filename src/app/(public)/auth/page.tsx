@@ -25,14 +25,14 @@ export default function AuthPage() {
             });
 
             const data = await res.json();
-
+            console.log("Data", data);
             if (!res.ok) {
                 alert(data.message || "Login failed");
                 return;
             }
 
             if (password === "iPick_2023") {
-                alert("Please change your password immediately");
+                alert("Please change your password immediately!");
                 router.push("/admin/profile");
                 return;
             }
@@ -59,7 +59,6 @@ export default function AuthPage() {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6">
-
                     <div>
                         <input
                             type="text"
@@ -100,7 +99,7 @@ export default function AuthPage() {
                     </button>
                 </form>
 
-                {/* Create Account */}
+                {/* Forgot Password */}
                 <p className="mt-6 text-center text-sm">
                     <button
                         // onClick={() => setShowRegister(true)}

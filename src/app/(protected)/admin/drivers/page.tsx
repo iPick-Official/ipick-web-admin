@@ -12,9 +12,11 @@ import { DriverDataResponse, Message } from '@/types/history';
 import { Eye } from 'lucide-react';
 import { Loading } from '@/components/Loading';
 import { useSort } from '@/hooks/useSort';
+import { useAdmin } from '@/hooks/useAdmin';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
+    const { admin } = useAdmin();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [rideHistory, setRideHistory] = useState<DriverDataResponse | null>(null);
@@ -165,7 +167,7 @@ export default function DriversPage() {
                             </div>
                         )}
 
-                        {selectedDriver.status === "pending" && (
+                        {selectedDriver.status === "pending" && admin?.department === "Admin" && (
                             <div className="flex flex-col space-y-3">
                                 <button
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"

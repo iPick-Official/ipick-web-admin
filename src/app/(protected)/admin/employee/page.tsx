@@ -103,7 +103,7 @@ export default function EmployeePage() {
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
                                 <tr>
-                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Created At'].map(col => (
+                                    {['ID', 'Full Name', 'Email', 'Mobile', 'Department', 'Created At'].map(col => (
                                         <th key={col} className="px-6 py-3 font-medium">
                                             {col}
                                         </th>
@@ -134,10 +134,10 @@ export default function EmployeePage() {
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
                                             <td className="px-6 py-3">{emp.employeeId || '-'}</td>
-                                            <td className="px-6 py-3">{emp.username || '-'}</td>
+                                            <td className="px-6 py-3">{`${emp.firstName} ${emp.lastName}`|| '-'}</td>
                                             <td className="px-6 py-3">{emp.email || '-'}</td>
                                             <td className="px-6 py-3">{emp.mobnum || '-'}</td>
-                                            <td className="px-6 py-3">{emp.address || '-'}</td>
+                                            <td className="px-6 py-3">{emp.department || '-'}</td>
                                             <td className="px-6 py-3">
                                                 {emp.createdAt
                                                     ? new Date(emp.createdAt).toLocaleDateString()

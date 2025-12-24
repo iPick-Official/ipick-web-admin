@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import ConfirmDialog from "./ConfirmDialog";
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, User } from "lucide-react";
 import { navSections } from "./SidebarSec";
 import { useAdmin } from "@/hooks/useAdmin";
-import { Loading } from "./Loading";
+import { ADMIN_PERMISSIONS } from "@/config/adminPermissions";
 
 export const Sidebar = () => {
   const router = useRouter();
@@ -18,6 +17,8 @@ export const Sidebar = () => {
 
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  const permissions = ADMIN_PERMISSIONS[admin?.department as keyof typeof ADMIN_PERMISSIONS];
 
   // Detect screen size
   useEffect(() => {
@@ -38,20 +39,15 @@ export const Sidebar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function handleLogout() {
-    try {
-      const res = await fetch("/api/auth/logout", { method: "POST" });
-      if (res.ok) {
-        window.location.href = "/auth";
-      } else {
-        const data = await res.json();
-        alert(data.message || "Logout failed");
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-      alert("Something went wrong during logout.");
-    }
-  }
+  const filteredNavSections =
+    permissions?.sections === "ALL"
+      ? navSections
+      : navSections.filter((section) => {
+        return (
+          Array.isArray(permissions?.sections) &&
+          permissions.sections.includes(section.title)
+        );
+      });
 
   if (loading) return <div />;
   if (!admin) return <p>Not authorized</p>;
@@ -95,7 +91,7 @@ export const Sidebar = () => {
 
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto p-2 scrollbar-hide">
-          {navSections.map((section) => (
+          {filteredNavSections.map((section) => (
             <div key={section.title} className="mb-4">
               <h3 className="text-green-900 dark:text-green-500 text-xs font-semibold uppercase px-2 mb-2">
                 {section.title}
@@ -128,7 +124,7 @@ export const Sidebar = () => {
         <div className="relative m-2 border-t border-green-700/20 rounded-lg ">
           <button
             onClick={() => router.push("/admin/profile")}
-            className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-green-800 hover:text-gray-200 transition-all duration-200"
+            className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-slate-800 hover:text-gray-200 transition-all duration-200"
           >
             <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 border border-gray-300">
               <User className="w-6 h-6 text-gray-900" />
