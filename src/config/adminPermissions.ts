@@ -1,6 +1,11 @@
 // src/config/adminPermissions.ts
 export const ADMIN_PERMISSIONS = {
-  Operations: {
+  executive_leadership: {
+    sections: "ALL",
+    paths: "ALL",
+  },
+
+  operations: {
     sections: ["Driver Management", "CRM"],
     paths: [
       "/admin/bookings",
@@ -13,12 +18,7 @@ export const ADMIN_PERMISSIONS = {
     ],
   },
 
-  Admin: {
-    sections: "ALL",
-    paths: "ALL",
-  },
-
-  Finance: {
+  finance_legal: {
     sections: ["Finance"],
     paths: ["/admin/finance"],
   },

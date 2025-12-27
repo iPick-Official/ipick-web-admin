@@ -6,15 +6,18 @@ import { BsPersonAdd } from "react-icons/bs";
 import { Loading } from '@/components/Loading';
 import { Eye } from 'lucide-react';
 import { Admin } from '@/types/admin';
-import Modal from '@/components/Modal';
 import { RegisterForm } from '@/components/registrationForm';
+import { RegisterFormType } from '@/types/registration';
+import Modal from '@/components/Modal';
+import { departments } from '@/app/utils/department';
 
 export default function EmployeePage() {
+    const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
     const [loading, setLoading] = useState(false);
     const [employees, setEmployees] = useState<Admin[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [addEmployee, setAddEmployee] = useState(false);
-    const [registerForm, setRegisterForm] = useState({
+    const [registerForm, setRegisterForm] = useState<RegisterFormType>({
         username: "",
         firstName: "",
         middleName: "",
@@ -24,7 +27,7 @@ export default function EmployeePage() {
         address: "",
         password: "iPick_2023",
         position: "",
-        department: ""
+        department: "",
     });
 
     useEffect(() => {
@@ -46,27 +49,42 @@ export default function EmployeePage() {
         fetchEmployees();
     }, []);
 
-    async function submitRegistration() {
-        if (!registerForm.username?.trim() || !registerForm.email?.trim() || !registerForm.mobnum?.trim() || !registerForm.address?.trim() || !registerForm.password?.trim()) {
-            alert("All fields are required");
+    async function submitEmployee() {
+        if (
+            !registerForm.username?.trim() ||
+            !registerForm.email?.trim() ||
+            !registerForm.mobnum?.trim() ||
+            !registerForm.address?.trim()
+        ) {
+            alert("All required fields must be filled");
             return;
         }
+
         try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(registerForm),
-            });
+            const isEdit = Boolean(editingEmployee?._id);
+
+            const res = await fetch(
+                isEdit
+                    ? `/api/admin/${editingEmployee!._id}`
+                    : "/api/auth/register",
+                {
+                    method: isEdit ? "PATCH" : "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(registerForm),
+                }
+            );
 
             const data = await res.json();
 
             if (!res.ok) {
-                alert(data.message || "Registration failed");
+                alert(data.message || "Operation failed");
                 return;
             }
 
-            alert("Account created successfully");
+            alert(isEdit ? "Employee updated successfully" : "Employee created successfully");
+
             setAddEmployee(false);
+            setEditingEmployee(null);
             window.location.reload();
         } catch (err) {
             console.error(err);
@@ -90,9 +108,26 @@ export default function EmployeePage() {
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
 
-                        <button className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={() => setAddEmployee(true)}>
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            onClick={() => {
+                                setEditingEmployee(null);
+                                setRegisterForm({
+                                    username: "",
+                                    firstName: "",
+                                    middleName: "",
+                                    lastName: "",
+                                    email: "",
+                                    mobnum: "",
+                                    address: "",
+                                    password: "iPick_2023",
+                                    position: "",
+                                    department: "",
+                                });
+                                setAddEmployee(true);
+                            }}
+                        >
                             <BsPersonAdd />
-                            Add
                         </button>
                     </div>
                 </div>
@@ -133,26 +168,49 @@ export default function EmployeePage() {
                                             key={emp._id}
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
-                                            <td className="px-6 py-3">{emp.employeeId || '-'}</td>
-                                            <td className="px-6 py-3">{`${emp.firstName} ${emp.lastName}`|| '-'}</td>
-                                            <td className="px-6 py-3">{emp.email || '-'}</td>
-                                            <td className="px-6 py-3">{emp.mobnum || '-'}</td>
-                                            <td className="px-6 py-3">{emp.department || '-'}</td>
+                                            <td className="px-6 py-3">{emp.employeeId}</td>
+                                            <td className="px-6 py-3">{`${emp.firstName} ${emp.lastName}`}</td>
+                                            <td className="px-6 py-3">{emp.email}</td>
+                                            <td className="px-6 py-3">{emp.mobnum}</td>
                                             <td className="px-6 py-3">
-                                                {emp.createdAt
-                                                    ? new Date(emp.createdAt).toLocaleDateString()
-                                                    : '-'}
+                                                {
+                                                    departments.find((dept: { id: string; }) => dept.id === emp.department)?.name || emp.department
+                                                }
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {new Date(emp.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
-                                                <Eye className="cursor-pointer" />
+                                                <Eye
+                                                    className="cursor-pointer"
+                                                    onClick={() => {
+                                                        setEditingEmployee(emp);
+                                                        setRegisterForm({
+                                                            username: emp.username || "",
+                                                            firstName: emp.firstName || "",
+                                                            middleName: emp.middleName || "",
+                                                            lastName: emp.lastName || "",
+                                                            email: emp.email || "",
+                                                            mobnum: emp.mobnum || "",
+                                                            address: emp.address || "",
+                                                            position: emp.position || "",
+                                                            department: emp.department || "",
+                                                        });
+                                                        setAddEmployee(true);
+                                                    }}
+                                                />
                                             </td>
                                         </tr>
                                     ))
                                 )}
                             </tbody>
                         </table>
-                        <Modal isOpen={addEmployee} onClose={() => setAddEmployee(false)} title="Employee" size="xl">
-                            <RegisterForm form={registerForm} setForm={setRegisterForm} onSubmit={submitRegistration} />
+                        <Modal isOpen={addEmployee} onClose={() => setAddEmployee(false)} title={editingEmployee ? "Edit Information" : "Add Employee"} size="xl">
+                            <RegisterForm
+                                form={registerForm}
+                                setForm={setRegisterForm}
+                                onSubmit={submitEmployee}
+                            />
                         </Modal>
                     </div>
                 </div>

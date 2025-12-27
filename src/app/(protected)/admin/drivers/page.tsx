@@ -3,13 +3,13 @@
 import Modal from '@/components/Modal';
 import Image from "next/image";
 import SortButton from '@/components/SortButton';
+import { Eye } from 'lucide-react';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo, Key } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
 import { DriverDataResponse, Message } from '@/types/history';
-import { Eye } from 'lucide-react';
 import { Loading } from '@/components/Loading';
 import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -115,7 +115,7 @@ export default function DriversPage() {
         switch (activeTab) {
             case "Details":
                 return (
-                    <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0 flex justify-center md:justify-start">
                             <Image
@@ -128,7 +128,7 @@ export default function DriversPage() {
                         </div>
 
                         {/* Driver Details */}
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-gray-700 text-sm md:text-base">
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm md:text-base">
                             {[
                                 ["ID", selectedDriver.id],
                                 ["Name", selectedDriver.name],
@@ -142,7 +142,7 @@ export default function DriversPage() {
                                 ["Updated By", selectedDriver.updatedBy],
                             ].map(([label, value]) => (
                                 <p key={label}>
-                                    <span className="font-semibold text-gray-900">{label}:</span> {value}
+                                    <span className="font-semibold">{label}:</span> {value}
                                 </p>
                             ))}
                         </div>
@@ -190,7 +190,7 @@ export default function DriversPage() {
                 const pr = selectedDriver.personalRequirements;
 
                 return (
-                    <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
+                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base ">
                         {[
                             { label: "Nationality", value: pr.nationality },
                             { label: "PWD", value: pr.pwd ? "Yes" : "No" },
@@ -199,7 +199,7 @@ export default function DriversPage() {
                             { label: "License Expiry", value: pr.driverLicenseExpDate },
                         ].map(({ label, value }) => (
                             <p key={label}>
-                                <span className="font-semibold text-gray-900">{label}:</span> {value || "-"}
+                                <span className="font-semibold">{label}:</span> {value || "-"}
                             </p>
                         ))}
 
@@ -213,7 +213,7 @@ export default function DriversPage() {
                             ({ label, signedUrl }) =>
                                 signedUrl && (
                                     <p key={label}>
-                                        <span className="font-semibold text-gray-900">{label}:</span>{" "}
+                                        <span className="font-semibold">{label}:</span>{" "}
                                         <a
                                             href={signedUrl}
                                             target="_blank"
@@ -232,13 +232,13 @@ export default function DriversPage() {
             case "Transport":
                 const tr = selectedDriver.transportRequirements;
                 return (
-                    <div className="bg-white rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base text-gray-700">
+                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base">
                         {/* Basic vehicle info */}
-                        <p><span className="font-semibold text-gray-900">Plate Number:</span> {tr.plateNumber || "-"}</p>
-                        <p><span className="font-semibold text-gray-900">OR Number:</span> {tr.orNumber || "-"}</p>
-                        <p><span className="font-semibold text-gray-900">CR Number:</span> {tr.crNumber || "-"}</p>
-                        <p><span className="font-semibold text-gray-900">Vehicle:</span> {`${tr.carBrand || "-"} ${tr.carModel || ""}`}</p>
-                        <p><span className="font-semibold text-gray-900">Color:</span> {tr.carColor || "-"}</p>
+                        <p><span className="font-semibold">Plate Number:</span> {tr.plateNumber || "-"}</p>
+                        <p><span className="font-semibold">OR Number:</span> {tr.orNumber || "-"}</p>
+                        <p><span className="font-semibold">CR Number:</span> {tr.crNumber || "-"}</p>
+                        <p><span className="font-semibold">Vehicle:</span> {`${tr.carBrand || "-"} ${tr.carModel || ""}`}</p>
+                        <p><span className="font-semibold">Color:</span> {tr.carColor || "-"}</p>
 
                         {/* Transport document links */}
                         {[
@@ -263,7 +263,7 @@ export default function DriversPage() {
                             ({ label, signedUrl }) =>
                                 signedUrl && (
                                     <p key={label}>
-                                        <span className="font-semibold text-gray-900">{label}:</span>{" "}
+                                        <span className="font-semibold">{label}:</span>{" "}
                                         <a
                                             href={signedUrl}
                                             target="_blank"
@@ -285,7 +285,7 @@ export default function DriversPage() {
                 const totalFinished = rides.filter((ride: { status: string; }) => ride.status === "finished").length;
                 const totalCancelled = rides.filter((ride: { status: string; }) => ride.status === "cancelled").length;
                 return (
-                    <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-6">
                         {/* Ride Summary */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
                             {[
@@ -293,7 +293,7 @@ export default function DriversPage() {
                                 { label: "Cancelled Rides", value: totalCancelled },
                             ].map((item) => (
                                 <div key={item.label} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <p className="text-gray-700 text-xs font-medium">{item.label}</p>
+                                    <p className=" text-xs font-medium">{item.label}</p>
                                     <p className="text-lg font-semibold text-blue-600">{item.value}</p>
                                 </div>
                             ))}
@@ -301,7 +301,7 @@ export default function DriversPage() {
 
                         {/* Ride History Table */}
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                            <h3 className="text-lg font-semibold mb-3">
                                 Ride History ({rides.length})
                             </h3>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -350,7 +350,7 @@ export default function DriversPage() {
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
                 return messages.length ? (
-                    <div className="bg-white rounded-xl shadow-md p-6 h-[500px] overflow-y-auto space-y-6">
+                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 h-[500px] overflow-y-auto space-y-6">
                         {messages.map((m: Message, idx: number) => {
                             const isDriver = m.sender === "driver";
 
@@ -420,7 +420,7 @@ export default function DriversPage() {
                     .reduce((sum, log) => sum + log.amount, 0);
 
                 return (
-                    <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-6">
                         {/* Wallet Summary */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                             {[
@@ -429,7 +429,7 @@ export default function DriversPage() {
                                 { label: "Deductions", value: Math.abs(totalDebits) },
                             ].map((item) => (
                                 <div key={item.label} className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                    <p className="text-gray-700 text-xs font-medium">{item.label}</p>
+                                    <p className=" text-xs font-medium">{item.label}</p>
                                     <p className="text-lg font-semibold text-orange-600">₱{item.value.toFixed(2)}</p>
                                 </div>
                             ))}
@@ -437,7 +437,7 @@ export default function DriversPage() {
 
                         {/* Transaction History */}
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                            <h3 className="text-lg font-semibold mb-3">
                                 Transaction History ({walletLogs.length})
                             </h3>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -468,7 +468,7 @@ export default function DriversPage() {
                                                     className="border-b last:border-0 hover:bg-gray-50 transition-colors"
                                                 >
                                                     <td className="px-6 py-4 text-gray-600">{log.bookingId}</td>
-                                                    <td className="px-6 py-4 text-gray-700">{log.description}</td>
+                                                    <td className="px-6 py-4 ">{log.description}</td>
                                                     <td
                                                         className={`px-6 py-4 text-right font-semibold ${log.amount >= 0 ? "text-green-600" : "text-red-500"
                                                             }`}
@@ -697,7 +697,7 @@ export default function DriversPage() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white shadow-md rounded-lg overflow-hidden max-h-[75vh]">
+                <div className="bg-white dark:bg-zinc-800 shadow-md rounded-lg overflow-hidden max-h-[75vh]">
                     <div className="overflow-y-auto max-h-[75vh] bg-white dark:bg-zinc-800">
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
@@ -791,7 +791,7 @@ export default function DriversPage() {
                                     </div>
 
                                     {/* Tab Content */}
-                                    <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 rounded-b-lg shadow-inner">
+                                    <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 shadow-inner dark:bg-zinc-700">
                                         {renderTabContent()}
                                     </div>
                                 </div>

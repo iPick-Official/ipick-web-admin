@@ -11,6 +11,7 @@ import { capitalize } from "@/app/utils/capitalized";
 import { ProfileForm } from "@/components/ProfileUpdate";
 import { PasswordForm } from "@/components/ProfileChangePass";
 import { Info } from "@/components/ProfileInfo";
+import { departments } from "@/app/utils/department";
 
 export default function ProfilePage() {
     const { admin, loading, updateAdmin } = useAdmin();
@@ -128,7 +129,11 @@ export default function ProfilePage() {
                     <h1 className="text-2xl font-semibold">{admin.firstName} {admin.middleName} {admin.lastName}</h1>
                     <p className="text-sm text-muted-foreground">Username: {admin.username}</p>
                     <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                        {admin?.position}
+                        {
+                            departments
+                                .find(dept => dept.id === admin.department)
+                                ?.roles.find(role => role.id === admin.position)?.name || admin.position
+                        }
                     </span>
                 </div>
             </div>
@@ -140,7 +145,9 @@ export default function ProfilePage() {
                         <Info label="Address" value={admin.address} />
                         <Info label="Email Address" value={admin.email} />
                         <Info label="Mobile Number" value={`+63${admin.mobnum}`} />
-                        <Info label="Department" value={admin.department} />
+                        <Info label="Department" value={
+                            departments.find((dept: { id: string; }) => dept.id === admin.department)?.name || admin.department
+                        } />
                         <Info label="Status" value="Active" />
                     </div>
                 </div>

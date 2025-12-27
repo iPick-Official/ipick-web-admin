@@ -86,7 +86,6 @@ export const Sidebar = () => {
           >
             Central Hub
           </span>
-
         </div>
 
         {/* Navigation Sections */}

@@ -1,47 +1,58 @@
 export const departments = [
   {
+    id: "executive_leadership",
     name: "Executive / Leadership",
-    roles: ["CEO / Founder", "COO", "CTO"],
+    roles: [
+      { id: "ceo_founder", name: "CEO / Founder" },
+      { id: "coo", name: "COO" },
+      { id: "cto", name: "CTO" },
+    ],
   },
   {
+    id: "operations",
     name: "Operations",
     roles: [
-      "Operations Manager",
-      "Driver Coordinator",
-      "Customer Support Agent",
+      { id: "operations_manager", name: "Operations Manager" },
+      { id: "driver_coordinator", name: "Driver Coordinator" },
+      { id: "customer_support_agent", name: "Customer Support Agent" },
     ],
   },
   {
+    id: "technology_product",
     name: "Technology / Product",
     roles: [
-      "Mobile App Developer",
-      "Backend Developer / API Engineer",
-      "UI/UX Designer",
-      "DevOps / Infrastructure Engineer",
+      { id: "mobile_app_developer", name: "Mobile App Developer" },
+      { id: "backend_developer", name: "Backend Developer / API Engineer" },
+      { id: "ui_ux_designer", name: "UI/UX Designer" },
+      { id: "devops_engineer", name: "DevOps / Infrastructure Engineer" },
     ],
   },
   {
+    id: "marketing_growth",
     name: "Marketing / Growth",
     roles: [
-      "Marketing Manager",
-      "Social Media / Community Manager",
-      "Growth Hacker",
+      { id: "marketing_manager", name: "Marketing Manager" },
+      { id: "social_media_manager", name: "Social Media / Community Manager" },
+      { id: "growth_hacker", name: "Growth Hacker" },
     ],
   },
   {
+    id: "finance_legal",
     name: "Finance / Legal",
     roles: [
-      "Accountant / Bookkeeper",
-      "Financial Analyst",
-      "Legal Advisor / Consultant",
+      { id: "accountant", name: "Accountant / Bookkeeper" },
+      { id: "financial_analyst", name: "Financial Analyst" },
+      { id: "legal_advisor", name: "Legal Advisor / Consultant" },
     ],
   },
   {
+    id: "hr_people",
     name: "HR / People",
-    roles: ["HR Manager"],
+    roles: [{ id: "hr_manager", name: "HR Manager" }],
   },
   {
+    id: "data_analytics",
     name: "Data & Analytics",
-    roles: ["Data Analyst / Scientist"],
+    roles: [{ id: "data_analyst", name: "Data Analyst / Scientist" }],
   },
 ];

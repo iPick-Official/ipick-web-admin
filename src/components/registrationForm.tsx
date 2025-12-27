@@ -1,18 +1,6 @@
 import { capitalize } from "@/app/utils/capitalized";
 import { departments } from "@/app/utils/department";
-
-type RegisterFormType = {
-    username: string;
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    email: string;
-    mobnum: string;
-    address: string;
-    password: string;
-    position: string;
-    department: string;
-};
+import { RegisterFormType } from "@/types/registration";
 
 interface RegisterFormProps {
     form: RegisterFormType;
@@ -28,7 +16,6 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
         "mobnum",
         "email",
         "address",
-        "password",
     ];
 
     const fieldsOrder: (keyof RegisterFormType)[] = [
@@ -70,32 +57,34 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
                         <option value="">Select {key}</option>
                         {key === "department"
                             ? departments.map((dept) => (
-                                <option key={dept.name} value={dept.name}>
+                                <option key={dept.id} value={dept.id}>
                                     {dept.name}
                                 </option>
                             ))
                             : departments
-                                .find((d) => d.name === form.department)
+                                .find((d) => d.id === form.department)
                                 ?.roles.map((role) => (
-                                    <option key={role} value={role}>
-                                        {role}
+                                    <option key={role.id} value={role.id}>
+                                        {role.name}
                                     </option>
                                 ))}
                     </select>
                 ) : (
                     <input
                         type={key === "password" ? "password" : "text"}
-                        placeholder={placeholderText}
+                        placeholder={
+                            key === "password"
+                                ? "Leave blank to keep current password"
+                                : placeholderText
+                        }
                         className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white"
-                        value={form[key]}
+                        value={form[key] ?? ""}
                         onChange={(e) => {
                             let value = e.target.value;
 
                             if (key === "mobnum") {
-                                // digits only
                                 value = value.replace(/\D/g, "");
-                            }
-                            else if (
+                            } else if (
                                 key !== "username" &&
                                 key !== "email" &&
                                 key !== "password"
@@ -106,8 +95,7 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
                             setForm((prev) => ({ ...prev, [key]: value }));
                         }}
                         maxLength={key === "mobnum" ? 10 : undefined}
-                        required={isRequired}
-                        readOnly={key === "password"}
+                        required={false}
                     />
                 )}
             </div>
