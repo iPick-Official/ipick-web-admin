@@ -1,5 +1,6 @@
 'use client';
 
+import Modal from '@/components/Modal';
 import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
@@ -7,8 +8,7 @@ import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { Admin } from '@/types/admin';
 import { RegisterFormType } from '@/types/registration';
 import { departments } from '@/app/utils/department';
-import { RegisterForm } from '@/components/RegistrationForm';
-import Modal from '@/components/Modal';
+import { RegisterForm } from '@/components/Registration';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
