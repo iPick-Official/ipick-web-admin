@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
-import { BsPersonAdd } from "react-icons/bs";
 import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { Admin } from '@/types/admin';
