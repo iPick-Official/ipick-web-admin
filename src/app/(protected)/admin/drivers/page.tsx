@@ -167,7 +167,7 @@ export default function DriversPage() {
                             </div>
                         )}
 
-                        {selectedDriver.status === "pending" && admin?.department === "Admin" && (
+                        {selectedDriver.status === "pending" && admin?.department === "executive_leadership" && (
                             <div className="flex flex-col space-y-3">
                                 <button
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"
