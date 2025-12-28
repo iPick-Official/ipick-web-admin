@@ -7,7 +7,7 @@ export interface Discounts {
   idNumber: string;
   status: string;
   idType: string;
-  reason: string;
+  reason?: string;
   expirationDate: string;
   createdAt: string | null;
   updatedAt: string | null;

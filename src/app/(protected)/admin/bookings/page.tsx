@@ -189,7 +189,7 @@ export default function BookingsPage() {
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
                         <button
-                            className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={fetchAllBookings}
                         >
                             <RefreshCcw />

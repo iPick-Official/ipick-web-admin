@@ -423,7 +423,7 @@ export default function DriversPage() {
                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-6">
                         {/* Wallet Summary */}
                         <div className="grid gap-4 text-center">
-                        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center"> */}
+                            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center"> */}
                             {[
                                 { label: "Balance", value: selectedDriver.wallet?.walletBalance || 0 },
                                 // { label: "Credits", value: totalCredits },

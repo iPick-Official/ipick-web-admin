@@ -10,15 +10,12 @@ import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
 import SortButton from '@/components/SortButton';
 import Modal from '@/components/Modal';
-
-interface DetailProps {
-    label: string;
-    value?: string | number | null;
-}
+import { Detail } from '@/components/Details';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDiscount, setSelectedDiscount] = useState<Discounts | null>(null);
+    const [rejectReason, setRejectReason] = useState('');
     const { sortOrder, toggleSort } = useSort("desc");
     const [riders, setRiders] = useState<Riders[]>([]);
     const [discounts, setDiscounts] = useState<Discounts[]>([]);
@@ -118,21 +115,29 @@ export default function RidersPage() {
         return { loggedIn, notLoggedIn };
     }, [displayedRiders]);
 
-    const Detail: React.FC<DetailProps> = ({ label, value }) => (
-        <div className="flex flex-col border rounded p-3">
-            <span className="text-xs text-gray-500">{label}</span>
-            <span className="font-medium">{value ?? '-'}</span>
-        </div>
-    );
-
-    const updateDiscountStatus = async (id: string, newStatus: 'approved' | 'rejected') => {
+    const updateDiscountStatus = async (id: string, newStatus: 'approved' | 'rejected', reason?: string) => {
         try {
+            const getAdminFromCookie = () => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; admin=`);
+                if (parts.length === 2) {
+                    const cookieValue = parts.pop()?.split(";").shift();
+                    if (cookieValue) return JSON.parse(decodeURIComponent(cookieValue));
+                }
+                return null;
+            };
+
+            const admin = getAdminFromCookie();
+            const updatedBy = admin?.firstName && admin?.lastName
+                ? `${admin.firstName} ${admin.lastName}`
+                : "unknown";
+
             const res = await fetch(`/api/discount/${id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({ status: newStatus, reviewedBy: updatedBy }),
             });
 
             if (!res.ok) throw new Error('Failed to update status');
@@ -146,7 +151,7 @@ export default function RidersPage() {
 
             // Update selectedDiscount if currently viewing
             if (selectedDiscount?._id === id) {
-                setSelectedDiscount({ ...selectedDiscount, status: newStatus });
+                setSelectedDiscount({ ...selectedDiscount, status: newStatus, reviewedBy: updatedBy, reason: reason });
             }
 
             console.log(`Discount ${newStatus}`);
@@ -188,7 +193,7 @@ export default function RidersPage() {
                             placeholder="Search name, email, or mobile"
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
-                        <button className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={fetchDiscounts}>
+                        <button className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={fetchDiscounts}>
                             <Percent />
                         </button>
                         <button className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition">
@@ -357,33 +362,52 @@ export default function RidersPage() {
                                     <Detail label="Name" value={selectedDiscount.name} />
                                     <Detail label="ID Number" value={selectedDiscount.idNumber} />
                                     <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
-                                    <Detail label="Status" value={selectedDiscount.status} />
+                                    <Detail label="Status" value={selectedDiscount.status?.toUpperCase()} />
+                                    <Detail label="Reason for rejected" value={selectedDiscount.reason} />
                                     <Detail
                                         label="Expiration Date"
-                                        value={
-                                            selectedDiscount.expirationDate
-                                                ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
-                                                : '-'
-                                        }
+                                        value={new Date(selectedDiscount.expirationDate).toLocaleDateString()}
                                     />
+                                    <Detail label="Reviewed By" value={selectedDiscount.reviewedBy} />
                                 </div>
 
                                 {/* Approve / Reject buttons if status is pending */}
                                 {selectedDiscount.status === 'pending' && (
-                                    <div className="flex justify-end gap-4 mt-4">
-                                        <button
-                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                                            onClick={() => updateDiscountStatus(selectedDiscount._id, 'approved')}
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                                            onClick={() => updateDiscountStatus(selectedDiscount._id, 'rejected')}
-                                        >
-                                            Reject
-                                        </button>
-                                    </div>
+                                    <>
+                                        <div className="mt-4 space-y-2">
+                                            <label className="text-sm font-medium">
+                                                Rejection Reason <span className="text-red-500">*</span>
+                                            </label>
+                                            <textarea
+                                                className="w-full border rounded p-2 text-sm"
+                                                rows={3}
+                                                placeholder="Enter reason for rejection"
+                                                value={rejectReason}
+                                                onChange={(e) => setRejectReason(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-4 mt-4">
+                                            <button
+                                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                                                onClick={() => updateDiscountStatus(selectedDiscount._id, 'approved')}
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                                disabled={!rejectReason.trim()}
+                                                onClick={() =>
+                                                    updateDiscountStatus(
+                                                        selectedDiscount._id,
+                                                        'rejected',
+                                                        rejectReason
+                                                    )
+                                                }
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         )}
