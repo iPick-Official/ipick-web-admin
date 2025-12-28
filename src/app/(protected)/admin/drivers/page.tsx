@@ -3,7 +3,7 @@
 import Modal from '@/components/Modal';
 import Image from "next/image";
 import SortButton from '@/components/SortButton';
-import { Eye } from 'lucide-react';
+import { Download, Eye } from 'lucide-react';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
@@ -292,9 +292,9 @@ export default function DriversPage() {
                                 { label: "Finished Rides", value: totalFinished },
                                 { label: "Cancelled Rides", value: totalCancelled },
                             ].map((item) => (
-                                <div key={item.label} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <p className=" text-xs font-medium">{item.label}</p>
-                                    <p className="text-lg font-semibold text-blue-600">{item.value}</p>
+                                <div key={item.label} className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                    <p className=" text-xs font-medium text-black">{item.label}</p>
+                                    <p className="text-lg font-semibold text-orange-600">{item.value}</p>
                                 </div>
                             ))}
                         </div>
@@ -327,7 +327,7 @@ export default function DriversPage() {
                                                 </tr>
                                             ) : (
                                                 rides.map((ride: { timestamp: string | number | Date; origin: { name: string; }; destination: { name: string; }; travelFare: number; status: string; }, idx: Key | null | undefined) => (
-                                                    <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                                                    <tr key={idx} className="border-b last:border-0 hover:bg-slate-800 transition-colors">
                                                         <td className="px-6 py-4">{new Date(ride.timestamp).toLocaleDateString()}</td>
                                                         <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
                                                         <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
@@ -422,14 +422,15 @@ export default function DriversPage() {
                 return (
                     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-6">
                         {/* Wallet Summary */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div className="grid gap-4 text-center">
+                        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center"> */}
                             {[
                                 { label: "Balance", value: selectedDriver.wallet?.walletBalance || 0 },
-                                { label: "Credits", value: totalCredits },
-                                { label: "Deductions", value: Math.abs(totalDebits) },
+                                // { label: "Credits", value: totalCredits },
+                                // { label: "Deductions", value: Math.abs(totalDebits) },
                             ].map((item) => (
                                 <div key={item.label} className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                    <p className=" text-xs font-medium">{item.label}</p>
+                                    <p className=" text-xs font-medium text-black">{item.label}</p>
                                     <p className="text-lg font-semibold text-orange-600">₱{item.value.toFixed(2)}</p>
                                 </div>
                             ))}
@@ -441,49 +442,52 @@ export default function DriversPage() {
                                 Transaction History ({walletLogs.length})
                             </h3>
                             <div className="overflow-x-auto rounded-lg border border-gray-200">
-                                <table className="min-w-full text-sm text-left border-collapse">
-                                    <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
-                                        <tr>
-                                            <th className="px-6 py-3">Booking ID</th>
-                                            <th className="px-6 py-3">Description</th>
-                                            <th className="px-6 py-3 text-right">Amount</th>
-                                            <th className="px-6 py-3">Date</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {walletLogs.length === 0 ? (
+                                {/* Scrollable body */}
+                                <div className="max-h-64 overflow-y-auto">
+                                    <table className="min-w-full text-sm text-left border-collapse">
+                                        <thead className="bg-gray-100 text-gray-800 uppercase text-xs font-semibold border-b border-gray-200">
                                             <tr>
-                                                <td
-                                                    colSpan={4}
-                                                    className="px-6 py-6 text-center text-gray-500 italic"
-                                                >
-                                                    No wallet transactions found.
-                                                </td>
+                                                <th className="px-6 py-3">Booking ID</th>
+                                                <th className="px-6 py-3">Description</th>
+                                                <th className="px-6 py-3 text-right">Amount</th>
+                                                <th className="px-6 py-3">Date</th>
                                             </tr>
-                                        ) : (
-                                            walletLogs.map((log, idx) => (
-                                                <tr
-                                                    key={idx}
-                                                    className="border-b last:border-0 hover:bg-gray-50 transition-colors"
-                                                >
-                                                    <td className="px-6 py-4 text-gray-600">{log.bookingId}</td>
-                                                    <td className="px-6 py-4 ">{log.description}</td>
+                                        </thead>
+
+                                        <tbody>
+                                            {walletLogs.length === 0 ? (
+                                                <tr>
                                                     <td
-                                                        className={`px-6 py-4 text-right font-semibold ${log.amount >= 0 ? "text-green-600" : "text-red-500"
-                                                            }`}
+                                                        colSpan={4}
+                                                        className="px-6 py-6 text-center text-gray-500 italic"
                                                     >
-                                                        {log.amount >= 0 ? "+" : ""}
-                                                        ₱{log.amount.toFixed(2)}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-gray-500">
-                                                        {new Date(log.createdAt).toLocaleString()}
+                                                        No wallet transactions found.
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ) : (
+                                                walletLogs.map((log, idx) => (
+                                                    <tr
+                                                        key={idx}
+                                                        className="border-b last:border-0 hover:bg-slate-800 transition-colors"
+                                                    >
+                                                        <td className="px-6 py-4">{log.bookingId}</td>
+                                                        <td className="px-6 py-4">{log.description}</td>
+                                                        <td
+                                                            className={`px-6 py-4 text-right font-semibold ${log.amount >= 0 ? "text-green-600" : "text-red-500"
+                                                                }`}
+                                                        >
+                                                            {log.amount >= 0 ? "+" : ""}
+                                                            ₱{log.amount.toFixed(2)}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {new Date(log.createdAt).toLocaleString()}
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -669,7 +673,7 @@ export default function DriversPage() {
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={() => alert('Export feature not yet implemented')}
                         >
-                            Export
+                            <Download />
                         </button>
                     </div>
                 </div>
@@ -751,7 +755,7 @@ export default function DriversPage() {
                                             <td className="px-6 py-3">
                                                 {d.createdAt ? new Date(d.createdAt).toLocaleString() : "-"}
                                             </td>
-                                            <td className="px-6 py-3 justify-end" onClick={() => fetchDetailHistory(d._id)}>
+                                            <td className="px-6 py-3" onClick={() => fetchDetailHistory(d._id)}>
                                                 <div className="flex items-center text-green-700 justify-center">
                                                     <Eye />
                                                 </div>

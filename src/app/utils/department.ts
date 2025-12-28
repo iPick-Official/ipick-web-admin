@@ -56,3 +56,10 @@ export const departments = [
     roles: [{ id: "data_analyst", name: "Data Analyst / Scientist" }],
   },
 ];
+
+export const statusOptions = [
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+  { value: "suspended", label: "Suspended" },
+  { value: "resigned", label: "Resigned" },
+];

@@ -11,6 +11,7 @@ export interface Admin {
   position: string;
   roleId: string;
   type: string;
+  status: string;
   department: string;
   disabled: boolean;
   isLogged: boolean;

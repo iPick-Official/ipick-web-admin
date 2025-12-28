@@ -1,6 +1,7 @@
 import { capitalize } from "@/app/utils/capitalized";
-import { departments } from "@/app/utils/department";
+import { departments, statusOptions } from "@/app/utils/department";
 import { RegisterFormType } from "@/types/registration";
+import { useMemo, useRef } from "react";
 
 interface RegisterFormProps {
     form: RegisterFormType;
@@ -9,6 +10,7 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
+    const initialFormRef = useRef<RegisterFormType>(form);
     const requiredFields: (keyof RegisterFormType)[] = [
         "username",
         "firstName",
@@ -26,25 +28,34 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
         "email",
         "mobnum",
         "address",
-        "department", // Department first
-        "position",   // Position after department
-        "password",
+        "department",
+        "position",
+        "status",
     ];
 
-    const renderInput = (key: keyof RegisterFormType) => {
-        const isSelect = key === "position" || key === "department";
-        const isRequired = requiredFields.includes(key);
+    const hasChanges = useMemo(() => {
+        return Object.keys(form).some(
+            (key) =>
+                form[key as keyof RegisterFormType] !==
+                initialFormRef.current[key as keyof RegisterFormType]
+        );
+    }, [form]);
 
-        const placeholderText = isRequired ? `(Required)` : `(Optional)`;
+
+    const renderInput = (key: keyof RegisterFormType) => {
+        const isDepartmentOrPosition = key === "department" || key === "position";
+        const isStatus = key === "status";
+        const isRequired = requiredFields.includes(key);
 
         return (
             <div key={key}>
                 <label className="block text-xs mb-1 capitalize">{key}</label>
 
-                {isSelect ? (
+                {/* Department & Position dropdown */}
+                {isDepartmentOrPosition && (
                     <select
                         className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white"
-                        value={form[key]}
+                        value={form[key] || ""}
                         onChange={(e) =>
                             setForm((prev) => ({
                                 ...prev,
@@ -52,9 +63,9 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
                                 ...(key === "department" ? { position: "" } : {}),
                             }))
                         }
-                        required={isRequired}
                     >
                         <option value="">Select {key}</option>
+
                         {key === "department"
                             ? departments.map((dept) => (
                                 <option key={dept.id} value={dept.id}>
@@ -69,13 +80,39 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
                                     </option>
                                 ))}
                     </select>
-                ) : (
+                )}
+
+                {/* ✅ Status dropdown */}
+                {isStatus && (
+                    <select
+                        className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white"
+                        value={form.status || ""}
+                        onChange={(e) =>
+                            setForm((prev) => ({
+                                ...prev,
+                                status: e.target.value,
+                            }))
+                        }
+                    >
+                        <option value="">Select status</option>
+                        {statusOptions.map((status) => (
+                            <option key={status.value} value={status.value}>
+                                {status.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+
+                {/* Text inputs */}
+                {!isDepartmentOrPosition && !isStatus && (
                     <input
-                        type={key === "password" ? "password" : "text"}
+                        type="text"
                         placeholder={
                             key === "password"
                                 ? "Leave blank to keep current password"
-                                : placeholderText
+                                : isRequired
+                                    ? "(Required)"
+                                    : "(Optional)"
                         }
                         className="w-full border rounded-md p-2 dark:bg-zinc-800 dark:text-white"
                         value={form[key] ?? ""}
@@ -95,7 +132,6 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
                             setForm((prev) => ({ ...prev, [key]: value }));
                         }}
                         maxLength={key === "mobnum" ? 10 : undefined}
-                        required={false}
                     />
                 )}
             </div>
@@ -110,13 +146,13 @@ export function RegisterForm({ form, setForm, onSubmit }: RegisterFormProps) {
             }}
             className="space-y-4 text-sm"
         >
-            {/* 2-column grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {fieldsOrder.map(renderInput)}
             </div>
 
             <button
                 type="submit"
+                disabled={!hasChanges}
                 className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
             >
                 Save Changes

@@ -14,7 +14,7 @@ export async function GET() {
     }
 
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getLimitedBookings`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/getAllBookings`,
       {
         method: "GET",
         cache: "no-store",

@@ -9,4 +9,5 @@ export type RegisterFormType = {
   password?: string;
   position: string;
   department: string;
+  status?: string;
 };

@@ -1,27 +1,34 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET() {
+export async function PATCH(
+  req: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
+) {
   try {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("access_token")?.value;
+    // Resolve params if it's a Promise
+    const resolvedParams = await context.params;
+    const { id } = resolvedParams;
 
+    // Parse JSON body
+    const statusDto = await req.json();
+
+    // Get token from cookies
+    const token = (await cookies()).get("access_token")?.value;
     if (!token) {
-      return NextResponse.json(
-        { message: "Unauthorized: No token found" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Call NestJS backend
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getLimitedBookings`,
+      `${process.env.NEXT_PUBLIC_API_URL}/discounts/${id}/status`,
       {
-        method: "GET",
-        cache: "no-store",
+        method: "PATCH",
         headers: {
           "x-api-key": token,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(statusDto),
       }
     );
 
@@ -32,7 +39,6 @@ export async function GET() {
       });
     }
 
-    // Stream the backend response directly to the client
     const stream = backendRes.body;
     if (!stream) {
       return NextResponse.json(
@@ -45,9 +51,9 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Error updating driver status:", error);
     return NextResponse.json(
-      { message: "Failed to fetch bookings" },
+      { message: "Failed to update driver status" },
       { status: 500 }
     );
   }

@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 
 export async function GET() {
   try {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("access_token")?.value;
+    // Get token from secure HTTP-only cookie
+    const token = (await cookies()).get("access_token")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -13,11 +13,11 @@ export async function GET() {
       );
     }
 
+    // Call your NestJS backend using streaming
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getLimitedBookings`,
+      `${process.env.NEXT_PUBLIC_API_URL}/discounts`,
       {
         method: "GET",
-        cache: "no-store",
         headers: {
           "x-api-key": token,
           "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function GET() {
       });
     }
 
-    // Stream the backend response directly to the client
+    // Stream the response directly to the client
     const stream = backendRes.body;
     if (!stream) {
       return NextResponse.json(
@@ -45,9 +45,9 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Error fetching riders:", error);
     return NextResponse.json(
-      { message: "Failed to fetch bookings" },
+      { message: "Failed to fetch riders" },
       { status: 500 }
     );
   }

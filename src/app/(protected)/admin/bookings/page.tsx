@@ -6,7 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import SortButton from '@/components/SortButton';
 import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
-import { Eye } from 'lucide-react';
+import { Download, Eye, RefreshCcw } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 
 export default function BookingsPage() {
@@ -39,6 +39,20 @@ export default function BookingsPage() {
 
         fetchBookings();
     }, []);
+
+    async function fetchAllBookings() {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/bookings/all');
+            if (!res.ok) throw new Error('Failed to fetch bookings');
+            const data = await res.json();
+            setBookings(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -175,9 +189,15 @@ export default function BookingsPage() {
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
                         <button
+                            className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            onClick={fetchAllBookings}
+                        >
+                            <RefreshCcw />
+                        </button>
+                        <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                         >
-                            Export
+                            <Download />
                         </button>
                     </div>
                 </div>
@@ -221,7 +241,7 @@ export default function BookingsPage() {
                                     {/* Timestamp column with sort button */}
                                     <th className="px-6 py-3 font-medium text-left">
                                         <SortButton
-                                            label="Created At"
+                                            label="Timestamp"
                                             sortOrder={sortOrder}
                                             onToggle={toggleSort}
                                         />

@@ -18,8 +18,23 @@ export const ADMIN_PERMISSIONS = {
     ],
   },
 
+  technology_product: {
+    sections: ["Fare Matrix Management"],
+    paths: ["/admin/profile"],
+  },
+
+  marketing_growth: {
+    sections: ["Finance"],
+    paths: ["/admin/profile"],
+  },
+
   finance_legal: {
     sections: ["Finance"],
-    paths: ["/admin/finance"],
+    paths: ["/admin/profile"],
+  },
+
+  hr_people: {
+    sections: ["Finance"],
+    paths: ["/admin/profile"],
   },
 } as const;

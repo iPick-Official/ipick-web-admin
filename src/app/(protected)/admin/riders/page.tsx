@@ -5,19 +5,33 @@ import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Loading } from '@/components/Loading';
-import { Eye } from 'lucide-react';
+import { Download, Edit, Eye, Percent } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
+import { Discounts } from '@/types/discount';
 import SortButton from '@/components/SortButton';
+import Modal from '@/components/Modal';
+
+interface DetailProps {
+    label: string;
+    value?: string | number | null;
+}
 
 export default function RidersPage() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedDiscount, setSelectedDiscount] = useState<Discounts | null>(null);
     const { sortOrder, toggleSort } = useSort("desc");
     const [riders, setRiders] = useState<Riders[]>([]);
+    const [discounts, setDiscounts] = useState<Discounts[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
+
+    const handleDiscountDetails = (discount: Discounts) => {
+        setSelectedDiscount(discount);
+    };
 
     useEffect(() => {
         async function fetchRiders() {
@@ -36,6 +50,21 @@ export default function RidersPage() {
 
         fetchRiders();
     }, []);
+
+    async function fetchDiscounts() {
+        setIsOpen(true);
+        setLoading(true);
+        try {
+            const res = await fetch('/api/discount');
+            if (!res.ok) throw new Error('Failed to fetch riders');
+            const data = await res.json();
+            setDiscounts(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     // Filtered and sorted riders
     const displayedRiders = useMemo(() => {
@@ -89,6 +118,44 @@ export default function RidersPage() {
         return { loggedIn, notLoggedIn };
     }, [displayedRiders]);
 
+    const Detail: React.FC<DetailProps> = ({ label, value }) => (
+        <div className="flex flex-col border rounded p-3">
+            <span className="text-xs text-gray-500">{label}</span>
+            <span className="font-medium">{value ?? '-'}</span>
+        </div>
+    );
+
+    const updateDiscountStatus = async (id: string, newStatus: 'approved' | 'rejected') => {
+        try {
+            const res = await fetch(`/api/discount/${id}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (!res.ok) throw new Error('Failed to update status');
+
+            // Update local discounts state
+            setDiscounts((prev) =>
+                prev.map((d) =>
+                    d._id === id ? { ...d, status: newStatus } : d
+                )
+            );
+
+            // Update selectedDiscount if currently viewing
+            if (selectedDiscount?._id === id) {
+                setSelectedDiscount({ ...selectedDiscount, status: newStatus });
+            }
+
+            console.log(`Discount ${newStatus}`);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update discount status');
+        }
+    };
+
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
@@ -121,9 +188,11 @@ export default function RidersPage() {
                             placeholder="Search name, email, or mobile"
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
-
+                        <button className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={fetchDiscounts}>
+                            <Percent />
+                        </button>
                         <button className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition">
-                            Export
+                            <Download />
                         </button>
                     </div>
                 </div>
@@ -174,7 +243,7 @@ export default function RidersPage() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={9} className="py-6">
+                                        <td colSpan={8} className="py-6">
                                             <div className="flex items-center justify-center w-full h-full">
                                                 <Loading />
                                             </div>
@@ -182,7 +251,7 @@ export default function RidersPage() {
                                     </tr>
                                 ) : paginatedRiders.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-6 text-gray-500 italic">
+                                        <td colSpan={8} className="text-center py-6 text-gray-500 italic">
                                             No riders found for selected filters.
                                         </td>
                                     </tr>
@@ -200,8 +269,10 @@ export default function RidersPage() {
                                             <td className="px-6 py-3">
                                                 {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
                                             </td>
-                                            <td className="px-6 py-3 text-green-700 flex justify-end">
-                                                <Eye />
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center text-green-700 justify-center">
+                                                    <Eye />
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
@@ -220,6 +291,105 @@ export default function RidersPage() {
                     />
                 )}
             </div>
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title='Discount Details' size="full">
+                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
+                    <div className="overflow-y-auto max-h-[75vh]">
+                        {!selectedDiscount ? (
+                            <table className="min-w-full text-sm text-left border-collapse">
+                                <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
+                                    <tr>
+                                        {['ID', 'Name', 'ID Number', 'Type', 'Status', 'Expiration Date'].map((col) => (
+                                            <th key={col} className="px-6 py-3 font-medium text-left">
+                                                {col}
+                                            </th>
+                                        ))}
+                                        <th className="px-6 py-3 font-medium text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={8} className="py-6">
+                                                <div className="flex items-center justify-center w-full h-full">
+                                                    <Loading />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : discounts.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={8} className="text-center py-6 text-gray-500 italic">
+                                                No riders found for selected filters.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        discounts.map((d) => (
+                                            <tr key={d._id} className="border-b hover:bg-gray-800 hover:text-white transition">
+                                                <td className="px-6 py-3">{d.riderId}</td>
+                                                <td className="px-6 py-3">{d.name}</td>
+                                                <td className="px-6 py-3">{d.idNumber}</td>
+                                                <td className="px-6 py-3 uppercase">{d.idType}</td>
+                                                <td className="px-6 py-3 uppercase">{d.status}</td>
+                                                <td className="px-6 py-3">{d.expirationDate ? new Date(d.expirationDate).toLocaleDateString() : '-'}</td>
+                                                <td className="px-6 py-3 text-green-700 text-right">
+                                                    <button onClick={() => handleDiscountDetails(d)}>
+                                                        <Edit />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        ) : (
+                            /* ================= DETAILS VIEW ================= */
+                            <div className="p-6 space-y-4">
+                                {/* Back button */}
+                                <button
+                                    onClick={() => setSelectedDiscount(null)}
+                                    className="text-sm hover:underline"
+                                >
+                                    ← Back to list
+                                </button>
+
+                                {/* Details grid */}
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <Detail label="Rider ID" value={selectedDiscount.riderId} />
+                                    <Detail label="Name" value={selectedDiscount.name} />
+                                    <Detail label="ID Number" value={selectedDiscount.idNumber} />
+                                    <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
+                                    <Detail label="Status" value={selectedDiscount.status} />
+                                    <Detail
+                                        label="Expiration Date"
+                                        value={
+                                            selectedDiscount.expirationDate
+                                                ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
+                                                : '-'
+                                        }
+                                    />
+                                </div>
+
+                                {/* Approve / Reject buttons if status is pending */}
+                                {selectedDiscount.status === 'pending' && (
+                                    <div className="flex justify-end gap-4 mt-4">
+                                        <button
+                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                                            onClick={() => updateDiscountStatus(selectedDiscount._id, 'approved')}
+                                        >
+                                            Approve
+                                        </button>
+                                        <button
+                                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                            onClick={() => updateDiscountStatus(selectedDiscount._id, 'rejected')}
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

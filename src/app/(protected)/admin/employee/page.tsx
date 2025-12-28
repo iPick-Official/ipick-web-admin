@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { BsPersonAdd } from "react-icons/bs";
 import { Loading } from '@/components/Loading';
-import { Eye } from 'lucide-react';
+import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { Admin } from '@/types/admin';
-import { RegisterForm } from '@/components/registrationForm';
 import { RegisterFormType } from '@/types/registration';
-import Modal from '@/components/Modal';
 import { departments } from '@/app/utils/department';
+import { RegisterForm } from '@/components/RegistrationForm';
+import Modal from '@/components/Modal';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
@@ -28,6 +28,7 @@ export default function EmployeePage() {
         password: "iPick_2023",
         position: "",
         department: "",
+        status: "",
     });
 
     useEffect(() => {
@@ -109,7 +110,7 @@ export default function EmployeePage() {
                         />
 
                         <button
-                            className="flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={() => {
                                 setEditingEmployee(null);
                                 setRegisterForm({
@@ -127,7 +128,12 @@ export default function EmployeePage() {
                                 setAddEmployee(true);
                             }}
                         >
-                            <BsPersonAdd />
+                            <PlusIcon />
+                        </button>
+                        <button
+                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                        >
+                            <Download />
                         </button>
                     </div>
                 </div>
@@ -138,7 +144,7 @@ export default function EmployeePage() {
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
                                 <tr>
-                                    {['ID', 'Full Name', 'Email', 'Mobile', 'Department', 'Created At'].map(col => (
+                                    {['ID', 'Full Name', 'Email', 'Mobile', 'Department', 'Status', 'Created At'].map(col => (
                                         <th key={col} className="px-6 py-3 font-medium">
                                             {col}
                                         </th>
@@ -177,11 +183,12 @@ export default function EmployeePage() {
                                                     departments.find((dept: { id: string; }) => dept.id === emp.department)?.name || emp.department
                                                 }
                                             </td>
+                                            <td className="px-6 py-3 uppercase">{emp.status}</td>
                                             <td className="px-6 py-3">
                                                 {new Date(emp.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
-                                                <Eye
+                                                <PenBox
                                                     className="cursor-pointer"
                                                     onClick={() => {
                                                         setEditingEmployee(emp);
@@ -195,6 +202,7 @@ export default function EmployeePage() {
                                                             address: emp.address || "",
                                                             position: emp.position || "",
                                                             department: emp.department || "",
+                                                            status: emp.status || "",
                                                         });
                                                         setAddEmployee(true);
                                                     }}

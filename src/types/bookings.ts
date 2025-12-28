@@ -2,6 +2,7 @@ export interface Booking {
   _id: string;
   riderId: string;
   driverId: string;
+  timestamp: string;
   createdAt: string;
   updatedAt: string;
   status: string;
