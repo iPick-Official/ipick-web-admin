@@ -13,6 +13,7 @@ import { DriverDataResponse, Message } from '@/types/history';
 import { Loading } from '@/components/Loading';
 import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
+import { Detail } from '@/components/Details';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -118,13 +119,35 @@ export default function DriversPage() {
                     <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0 flex justify-center md:justify-start">
-                            <Image
-                                src={signedUrls.profile || "/logo.png"}
-                                alt={`${selectedDriver.name} Profile`}
-                                width="240"
-                                height="240"
-                                className="w-60 h-60 border-2 border-gray-200 shadow-md object-cover"
-                            />
+                            <div className="flex flex-col items-center space-y-4">
+                                <Image
+                                    src={signedUrls.profile || "/logo.png"}
+                                    alt={`${selectedDriver.name} Profile`}
+                                    width={240}
+                                    height={240}
+                                    className="w-60 h-60 border-2 border-gray-200 shadow-md object-cover"
+                                />
+
+                                {selectedDriver.status === "approved" && (
+                                    <div className="flex flex-col space-y-3 w-full">
+                                        {/* Deactivate button */}
+                                        <button
+                                            className="px-4 py-2 border border-gray-500 text-gray-600 hover:bg-gray-50 font-medium rounded-lg transition-colors w-full"
+                                            onClick={() => updateDriverStatus(selectedDriver.id, "inactive")}
+                                        >
+                                            Deactivate
+                                        </button>
+
+                                        {/* Disapprove button */}
+                                        <button
+                                            className="px-4 py-2 border border-red-500 text-red-600 hover:bg-red-50 font-medium rounded-lg transition-colors w-full"
+                                            onClick={() => updateDriverStatus(selectedDriver._id, "pending")}
+                                        >
+                                            Disapprove
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Driver Details */}
@@ -141,31 +164,13 @@ export default function DriversPage() {
                                 ["Created At", selectedDriver.createdAt ? new Date(selectedDriver.createdAt).toLocaleString() : "-"],
                                 ["Updated By", selectedDriver.updatedBy],
                             ].map(([label, value]) => (
-                                <p key={label}>
-                                    <span className="font-semibold">{label}:</span> {value}
-                                </p>
+                                <Detail
+                                    key={label}
+                                    label={label}
+                                    value={value}
+                                />
                             ))}
                         </div>
-                        {selectedDriver.status === "approved" && (
-                            <div className="flex flex-col space-y-3">
-
-                                {/* Deactivate button */}
-                                <button
-                                    className="px-4 py-2 border border-red-500 text-red-600 hover:bg-red-50 font-medium rounded-lg transition-colors"
-                                    onClick={() => updateDriverStatus(selectedDriver.id, "inactive")}
-                                >
-                                    Deactivate
-                                </button>
-
-                                {/* Disapprove button */}
-                                <button
-                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-all"
-                                    onClick={() => updateDriverStatus(selectedDriver._id, "pending")}
-                                >
-                                    Disapprove
-                                </button>
-                            </div>
-                        )}
 
                         {selectedDriver.status === "pending" && admin?.department === "executive_leadership" && (
                             <div className="flex flex-col space-y-3">
@@ -190,41 +195,48 @@ export default function DriversPage() {
                 const pr = selectedDriver.personalRequirements;
 
                 return (
-                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base ">
-                        {[
-                            { label: "Nationality", value: pr.nationality },
-                            { label: "PWD", value: pr.pwd ? "Yes" : "No" },
-                            { label: "Emergency Contact", value: pr.emergencyContactName },
-                            { label: "License Number", value: pr.driverLicenseNumber },
-                            { label: "License Expiry", value: pr.driverLicenseExpDate },
-                        ].map(({ label, value }) => (
-                            <p key={label}>
-                                <span className="font-semibold">{label}:</span> {value || "-"}
-                            </p>
-                        ))}
+                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm md:text-base">
+                            {[
+                                { label: "Nationality", value: pr.nationality },
+                                { label: "PWD", value: pr.pwd ? "Yes" : "No" },
+                                { label: "Emergency Contact", value: pr.emergencyContactName },
+                                { label: "License Number", value: pr.driverLicenseNumber },
+                                { label: "License Expiry", value: pr.driverLicenseExpDate },
+                            ].map(({ label, value }) => (
+                                <Detail
+                                    key={label}
+                                    label={label}
+                                    value={value}
+                                />
+                            ))}
 
-                        {[
-                            { label: "PWD File", signedUrl: signedUrls.pwdFile },
-                            { label: "Vaccination Certificate", signedUrl: signedUrls.vaccinationCert },
-                            { label: "Driver License Front", signedUrl: signedUrls.driverLicenseFront },
-                            { label: "Driver License Back", signedUrl: signedUrls.driverLicenseBack },
-                            { label: "Other Document", signedUrl: signedUrls.otherDoc },
-                        ].map(
-                            ({ label, signedUrl }) =>
-                                signedUrl && (
-                                    <p key={label}>
-                                        <span className="font-semibold">{label}:</span>{" "}
-                                        <a
-                                            href={signedUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            View
-                                        </a>
-                                    </p>
-                                )
-                        )}
+                            {[
+                                { label: "PWD File", signedUrl: signedUrls.pwdFile },
+                                { label: "Vaccination Certificate", signedUrl: signedUrls.vaccinationCert },
+                                { label: "Driver License Front", signedUrl: signedUrls.driverLicenseFront },
+                                { label: "Driver License Back", signedUrl: signedUrls.driverLicenseBack },
+                                { label: "Other Document", signedUrl: signedUrls.otherDoc },
+                            ].map(
+                                ({ label, signedUrl }) =>
+                                    signedUrl && (
+                                        <Detail
+                                            key={label}
+                                            label={label}
+                                            value={
+                                                <a
+                                                    href={signedUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    View
+                                                </a>
+                                            }
+                                        />
+                                    )
+                            )}
+                        </div>
                     </div>
                 );
 
@@ -232,49 +244,62 @@ export default function DriversPage() {
             case "Transport":
                 const tr = selectedDriver.transportRequirements;
                 return (
-                    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-3 text-sm md:text-base">
-                        {/* Basic vehicle info */}
-                        <p><span className="font-semibold">Plate Number:</span> {tr.plateNumber || "-"}</p>
-                        <p><span className="font-semibold">OR Number:</span> {tr.orNumber || "-"}</p>
-                        <p><span className="font-semibold">CR Number:</span> {tr.crNumber || "-"}</p>
-                        <p><span className="font-semibold">Vehicle:</span> {`${tr.carBrand || "-"} ${tr.carModel || ""}`}</p>
-                        <p><span className="font-semibold">Color:</span> {tr.carColor || "-"}</p>
+                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm md:text-base">
+                            {/* Basic vehicle info */}
+                            {[
+                                { label: "Plate Number", value: tr.plateNumber },
+                                { label: "OR Number", value: tr.orNumber },
+                                { label: "CR Number", value: `${tr.carBrand || "-"} ${tr.carModel || ""}` },
+                                { label: "Vehicle", value: tr.carBrand },
+                                { label: "Color", value: tr.carColor },
+                            ].map(({ label, value }) => (
+                                <Detail
+                                    key={label}
+                                    label={label}
+                                    value={value}
+                                />
+                            ))}
 
-                        {/* Transport document links */}
-                        {[
-                            { label: "Operator Documents", signedUrl: signedUrls.operatorDocs },
-                            { label: "Owner Documents", signedUrl: signedUrls.ownerDocs },
-                            { label: "Operators Document", signedUrl: signedUrls.operatorsDoc },
-                            { label: "Vehicle OR", signedUrl: signedUrls.vehicleOR },
-                            { label: "Vehicle CR", signedUrl: signedUrls.vehicleCR },
-                            { label: "Vehicle Sales Invoice", signedUrl: signedUrls.vehicleSalesInvoice },
-                            { label: "Authorization Letter Page 1", signedUrl: signedUrls.authorizationLetterPageOne },
-                            { label: "Authorization Letter Page 2", signedUrl: signedUrls.authorizationLetterPageTwo },
-                            { label: "SPA Page 1", signedUrl: signedUrls.sPAPageOne },
-                            { label: "SPA Page 2", signedUrl: signedUrls.sPAPageTwo },
-                            { label: "PA Page 1", signedUrl: signedUrls.pAPageOne },
-                            { label: "PA Page 2", signedUrl: signedUrls.pAPageTwo },
-                            { label: "CPC Page 1", signedUrl: signedUrls.cPCPageOne },
-                            { label: "CPC Page 2", signedUrl: signedUrls.cPCPageTwo },
-                            { label: "MEPA Page 1", signedUrl: signedUrls.mEPAPageOne },
-                            { label: "MEPA Page 2", signedUrl: signedUrls.mEPAPageTwo },
-                            { label: "PAMI", signedUrl: signedUrls.pAMI },
-                        ].map(
-                            ({ label, signedUrl }) =>
-                                signedUrl && (
-                                    <p key={label}>
-                                        <span className="font-semibold">{label}:</span>{" "}
-                                        <a
-                                            href={signedUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            View
-                                        </a>
-                                    </p>
-                                )
-                        )}
+                            {/* Transport document links */}
+                            {[
+                                { label: "Operator Documents", signedUrl: signedUrls.operatorDocs },
+                                { label: "Owner Documents", signedUrl: signedUrls.ownerDocs },
+                                { label: "Operators Document", signedUrl: signedUrls.operatorsDoc },
+                                { label: "Vehicle OR", signedUrl: signedUrls.vehicleOR },
+                                { label: "Vehicle CR", signedUrl: signedUrls.vehicleCR },
+                                { label: "Vehicle Sales Invoice", signedUrl: signedUrls.vehicleSalesInvoice },
+                                { label: "Authorization Letter Page 1", signedUrl: signedUrls.authorizationLetterPageOne },
+                                { label: "Authorization Letter Page 2", signedUrl: signedUrls.authorizationLetterPageTwo },
+                                { label: "SPA Page 1", signedUrl: signedUrls.sPAPageOne },
+                                { label: "SPA Page 2", signedUrl: signedUrls.sPAPageTwo },
+                                { label: "PA Page 1", signedUrl: signedUrls.pAPageOne },
+                                { label: "PA Page 2", signedUrl: signedUrls.pAPageTwo },
+                                { label: "CPC Page 1", signedUrl: signedUrls.cPCPageOne },
+                                { label: "CPC Page 2", signedUrl: signedUrls.cPCPageTwo },
+                                { label: "MEPA Page 1", signedUrl: signedUrls.mEPAPageOne },
+                                { label: "MEPA Page 2", signedUrl: signedUrls.mEPAPageTwo },
+                                { label: "PAMI", signedUrl: signedUrls.pAMI },
+                            ].map(
+                                ({ label, signedUrl }) =>
+                                    signedUrl && (
+                                        <Detail
+                                            key={label}
+                                            label={label}
+                                            value={
+                                                <a
+                                                    href={signedUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    View
+                                                </a>
+                                            }
+                                        />
+                                    )
+                            )}
+                        </div>
                     </div>
                 );
 
@@ -327,7 +352,7 @@ export default function DriversPage() {
                                                 </tr>
                                             ) : (
                                                 rides.map((ride: { timestamp: string | number | Date; origin: { name: string; }; destination: { name: string; }; travelFare: number; status: string; }, idx: Key | null | undefined) => (
-                                                    <tr key={idx} className="border-b last:border-0 hover:bg-slate-800 transition-colors">
+                                                    <tr key={idx} className="border-b last:border-0 hover:bg-slate-800 hover:text-white transition-colors">
                                                         <td className="px-6 py-4">{new Date(ride.timestamp).toLocaleDateString()}</td>
                                                         <td className="px-6 py-4">{ride.origin?.name || "-"}</td>
                                                         <td className="px-6 py-4">{ride.destination?.name || "-"}</td>
@@ -468,7 +493,7 @@ export default function DriversPage() {
                                                 walletLogs.map((log, idx) => (
                                                     <tr
                                                         key={idx}
-                                                        className="border-b last:border-0 hover:bg-slate-800 transition-colors"
+                                                        className="border-b last:border-0 hover:bg-slate-800 hover:text-white transition-colors"
                                                     >
                                                         <td className="px-6 py-4">{log.bookingId}</td>
                                                         <td className="px-6 py-4">{log.description}</td>

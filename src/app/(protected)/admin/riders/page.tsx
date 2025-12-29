@@ -296,7 +296,7 @@ export default function RidersPage() {
                     />
                 )}
             </div>
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title='Discount Details' size="full">
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title='Discount Details' size="xxl">
                 <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
                     <div className="overflow-y-auto max-h-[75vh]">
                         {!selectedDiscount ? (
@@ -351,7 +351,7 @@ export default function RidersPage() {
                                 {/* Back button */}
                                 <button
                                     onClick={() => setSelectedDiscount(null)}
-                                    className="text-sm hover:underline"
+                                    className="text-sm text-blue-600 hover:underline"
                                 >
                                     ← Back to list
                                 </button>
@@ -364,11 +364,34 @@ export default function RidersPage() {
                                     <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
                                     <Detail label="Status" value={selectedDiscount.status?.toUpperCase()} />
                                     <Detail label="Reason for rejected" value={selectedDiscount.reason} />
+                                    <Detail label="Expiration Date" value={
+                                        selectedDiscount.expirationDate
+                                            ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
+                                            : '—'
+                                    } />
                                     <Detail
-                                        label="Expiration Date"
-                                        value={new Date(selectedDiscount.expirationDate).toLocaleDateString()}
+                                        label="Photo"
+                                        value={
+                                            selectedDiscount.photoUrl ? (
+                                                <a
+                                                    href={selectedDiscount.photoUrl.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline"
+                                                >
+                                                    {selectedDiscount.photoUrl.name || 'View Photo'}
+                                                </a>
+                                            ) : (
+                                                '—'
+                                            )
+                                        }
                                     />
                                     <Detail label="Reviewed By" value={selectedDiscount.reviewedBy} />
+                                    <Detail label="Reviewed At" value={
+                                        selectedDiscount.updatedAt
+                                            ? new Date(selectedDiscount.updatedAt).toLocaleString()
+                                            : '—'
+                                    } />
                                 </div>
 
                                 {/* Approve / Reject buttons if status is pending */}
@@ -379,7 +402,7 @@ export default function RidersPage() {
                                                 Rejection Reason <span className="text-red-500">*</span>
                                             </label>
                                             <textarea
-                                                className="w-full border rounded p-2 text-sm"
+                                                className="w-full border rounded p-2 text-sm bg-gray-100 dark:bg-zinc-900"
                                                 rows={3}
                                                 placeholder="Enter reason for rejection"
                                                 value={rejectReason}
@@ -394,15 +417,20 @@ export default function RidersPage() {
                                                 Approve
                                             </button>
                                             <button
-                                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                                                disabled={!rejectReason.trim()}
-                                                onClick={() =>
+                                                className={`px-4 py-2 rounded text-white transition ${rejectReason?.trim()
+                                                        ? 'bg-red-600 hover:bg-red-700'
+                                                        : 'bg-red-400 cursor-not-allowed'
+                                                    }`}
+                                                disabled={!rejectReason?.trim() || !selectedDiscount}
+                                                onClick={() => {
+                                                    if (!selectedDiscount) return;
+
                                                     updateDiscountStatus(
                                                         selectedDiscount._id,
                                                         'rejected',
                                                         rejectReason
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                             >
                                                 Reject
                                             </button>

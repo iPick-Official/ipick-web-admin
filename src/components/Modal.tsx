@@ -6,7 +6,7 @@ interface ModalProps {
     onClose: () => void;
     title?: string;
     children: ReactNode;
-    size?: "sm" | "md" | "lg" | "xl" | "full" | "auto"; // added 'auto'
+    size?: "sm" | "md" | "lg" | "xl" | "xxl" | "full" | "auto"; // added 'auto'
 }
 
 export default function Modal({ isOpen, onClose, title, children, size = "auto" }: ModalProps) {
@@ -18,6 +18,7 @@ export default function Modal({ isOpen, onClose, title, children, size = "auto" 
         md: "max-w-md max-h-[60vh]",
         lg: "max-w-lg max-h-[70vh]",
         xl: "max-w-xl max-h-[80vh]",
+        xxl: "max-w-xxl max-h-[90vh]",
         full: "w-full h-full max-h-screen max-w-screen",
         auto: "max-w-sm max-h-[90vh]", // auto size: grow with content but max out
     };

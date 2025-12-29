@@ -117,7 +117,12 @@ export default function ProfilePage() {
     return (
         <div className="max-w-5xl mx-auto px-6 py-20">
             <Sidebar />
-            <div className="flex items-center gap-6 bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-lg border">
+            <div className="relative flex items-center gap-6 bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-lg border">
+                {/* Version */}
+                <span className="absolute top-3 right-3 text-xs text-muted-foreground">
+                    v1.0.0
+                </span>
+
                 <Image
                     src="/logo.png"
                     alt="Admin Avatar"
@@ -125,14 +130,21 @@ export default function ProfilePage() {
                     height={96}
                     className="rounded-full border"
                 />
+
                 <div>
-                    <h1 className="text-2xl font-semibold">{admin.firstName} {admin.middleName} {admin.lastName}</h1>
-                    <p className="text-sm text-muted-foreground">Username: {admin.username}</p>
+                    <h1 className="text-2xl font-semibold">
+                        {admin.firstName} {admin.middleName} {admin.lastName}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Username: {admin.username}
+                    </p>
+
                     <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
                         {
                             departments
                                 .find(dept => dept.id === admin.department)
-                                ?.roles.find(role => role.id === admin.position)?.name || admin.position
+                                ?.roles.find(role => role.id === admin.position)?.name
+                            || admin.position
                         }
                     </span>
                 </div>
