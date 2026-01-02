@@ -5,12 +5,13 @@ import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Loading } from '@/components/Loading';
-import { Download, Edit, Eye, Percent } from 'lucide-react';
+import { Download, Edit, Eye, Percent, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
 import SortButton from '@/components/SortButton';
 import Modal from '@/components/Modal';
 import { Detail } from '@/components/Details';
+import { XMarkIcon } from '@heroicons/react/20/solid';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,11 +25,36 @@ export default function RidersPage() {
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [zoom, setZoom] = useState(1);
+
     const itemsPerPage = 100;
 
     const handleDiscountDetails = (discount: Discounts) => {
         setSelectedDiscount(discount);
     };
+
+    useEffect(() => {
+        const fetchPhotoUrl = async () => {
+            if (!selectedDiscount?.photoUrl?.name) return;
+
+            try {
+                const res = await fetch(
+                    `/api/photo-url?filename=${encodeURIComponent(
+                        selectedDiscount.photoUrl.name
+                    )}`
+                );
+                const data = await res.json();
+                setPhotoUrl(data.url);
+            } catch (err) {
+                console.error('Failed to fetch photo URL:', err);
+                setPhotoUrl(null);
+            }
+        };
+
+        fetchPhotoUrl();
+    }, [selectedDiscount]);
 
     useEffect(() => {
         async function fetchRiders() {
@@ -364,34 +390,85 @@ export default function RidersPage() {
                                     <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
                                     <Detail label="Status" value={selectedDiscount.status?.toUpperCase()} />
                                     <Detail label="Reason for rejected" value={selectedDiscount.reason} />
-                                    <Detail label="Expiration Date" value={
-                                        selectedDiscount.expirationDate
-                                            ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
-                                            : '—'
-                                    } />
+                                    <Detail
+                                        label="Expiration Date"
+                                        value={
+                                            selectedDiscount.expirationDate
+                                                ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
+                                                : '—'
+                                        }
+                                    />
                                     <Detail
                                         label="Photo"
                                         value={
-                                            selectedDiscount.photoUrl ? (
-                                                <a
-                                                    href={selectedDiscount.photoUrl.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                            photoUrl ? (
+                                                <button
+                                                    onClick={() => setIsModalOpen(true)}
                                                     className="text-blue-600 hover:underline"
                                                 >
-                                                    {selectedDiscount.photoUrl.name || 'View Photo'}
-                                                </a>
+                                                    {selectedDiscount.photoUrl?.name || 'View Photo'}
+                                                </button>
                                             ) : (
                                                 '—'
                                             )
                                         }
                                     />
+
+                                    {isModalOpen && (
+                                        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+                                            {/* Buttons always on top */}
+                                            <div className="absolute top-4 right-4 flex gap-2">
+                                                <button
+                                                    className="p-2 bg-gray-700 bg-opacity-70 rounded hover:bg-opacity-90"
+                                                    onClick={() => setZoom((prev) => prev + 0.1)}
+                                                    title="Zoom In"
+                                                >
+                                                    <ZoomInIcon className="w-6 h-6 text-white" />
+                                                </button>
+                                                <button
+                                                    className="p-2 bg-gray-700 bg-opacity-70 rounded hover:bg-opacity-90"
+                                                    onClick={() => setZoom((prev) => Math.max(0.1, prev - 0.1))}
+                                                    title="Zoom Out"
+                                                >
+                                                    <ZoomOutIcon className="w-6 h-6 text-white" />
+                                                </button>
+                                                <button
+                                                    className="p-2 bg-red-600 bg-opacity-80 rounded hover:bg-opacity-100"
+                                                    onClick={() => {
+                                                        setIsModalOpen(false);
+                                                        setZoom(1);
+                                                    }}
+                                                    title="Close"
+                                                >
+                                                    <XMarkIcon className="w-6 h-6 text-white" />
+                                                </button>
+                                            </div>
+
+                                            {/* Image */}
+                                            <div className="flex items-center justify-center w-full h-full">
+                                                {photoUrl && (
+                                                    <img
+                                                        src={photoUrl}
+                                                        alt={selectedDiscount.photoUrl?.name}
+                                                        style={{
+                                                            transform: `scale(${zoom})`,
+                                                            transition: 'transform 0.2s ease-in-out',
+                                                            maxHeight: '90vh',
+                                                            maxWidth: '90vw',
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <Detail label="Reviewed By" value={selectedDiscount.reviewedBy} />
-                                    <Detail label="Reviewed At" value={
-                                        selectedDiscount.updatedAt
-                                            ? new Date(selectedDiscount.updatedAt).toLocaleString()
-                                            : '—'
-                                    } />
+                                    <Detail
+                                        label="Reviewed At"
+                                        value={
+                                            selectedDiscount.updatedAt && new Date(selectedDiscount.updatedAt).toLocaleString()
+                                        }
+                                    />
                                 </div>
 
                                 {/* Approve / Reject buttons if status is pending */}
@@ -412,19 +489,20 @@ export default function RidersPage() {
                                         <div className="flex justify-end gap-4 mt-4">
                                             <button
                                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                                                onClick={() => updateDiscountStatus(selectedDiscount._id, 'approved')}
+                                                onClick={() =>
+                                                    updateDiscountStatus(selectedDiscount._id, 'approved')
+                                                }
                                             >
                                                 Approve
                                             </button>
                                             <button
                                                 className={`px-4 py-2 rounded text-white transition ${rejectReason?.trim()
-                                                        ? 'bg-red-600 hover:bg-red-700'
-                                                        : 'bg-red-400 cursor-not-allowed'
+                                                    ? 'bg-red-600 hover:bg-red-700'
+                                                    : 'bg-red-400 cursor-not-allowed'
                                                     }`}
                                                 disabled={!rejectReason?.trim() || !selectedDiscount}
                                                 onClick={() => {
                                                     if (!selectedDiscount) return;
-
                                                     updateDiscountStatus(
                                                         selectedDiscount._id,
                                                         'rejected',
