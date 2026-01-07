@@ -8,15 +8,16 @@ import { Loading } from '@/components/Loading';
 import { Download, Edit, Eye, Percent } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
+import { Detail } from '@/components/Details';
+
+import ImageView from '@/components/ImageView';
 import SortButton from '@/components/SortButton';
 import Modal from '@/components/Modal';
-import { Detail } from '@/components/Details';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDiscount, setSelectedDiscount] = useState<Discounts | null>(null);
     const [rejectReason, setRejectReason] = useState('');
-    const { sortOrder, toggleSort } = useSort("desc");
     const [riders, setRiders] = useState<Riders[]>([]);
     const [discounts, setDiscounts] = useState<Discounts[]>([]);
     const [loading, setLoading] = useState(false);
@@ -24,11 +25,35 @@ export default function RidersPage() {
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const { sortOrder, toggleSort } = useSort("desc");
     const itemsPerPage = 100;
 
     const handleDiscountDetails = (discount: Discounts) => {
         setSelectedDiscount(discount);
     };
+
+    useEffect(() => {
+        const fetchPhotoUrl = async () => {
+            if (!selectedDiscount?.photoUrl?.name) return;
+
+            try {
+                const res = await fetch(
+                    `/api/photo-url?filename=${encodeURIComponent(
+                        selectedDiscount.photoUrl.name
+                    )}`
+                );
+                const data = await res.json();
+                setPhotoUrl(data.url);
+            } catch (err) {
+                console.error('Failed to fetch photo URL:', err);
+                setPhotoUrl(null);
+            }
+        };
+
+        fetchPhotoUrl();
+    }, [selectedDiscount]);
 
     useEffect(() => {
         async function fetchRiders() {
@@ -44,7 +69,6 @@ export default function RidersPage() {
                 setLoading(false);
             }
         }
-
         fetchRiders();
     }, []);
 
@@ -137,7 +161,7 @@ export default function RidersPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ status: newStatus, reviewedBy: updatedBy, reason: rejectReason }),
+                body: JSON.stringify({ status: newStatus, reviewedBy: updatedBy }),
             });
 
             if (!res.ok) throw new Error('Failed to update status');
@@ -361,37 +385,47 @@ export default function RidersPage() {
                                     <Detail label="Rider ID" value={selectedDiscount.riderId} />
                                     <Detail label="Name" value={selectedDiscount.name} />
                                     <Detail label="ID Number" value={selectedDiscount.idNumber} />
-                                    <Detail label="ID Type" value={selectedDiscount.idType.toUpperCase()} />
-                                    <Detail label="Status" value={selectedDiscount.status.toUpperCase()} />
+                                    <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
+                                    <Detail label="Status" value={selectedDiscount.status?.toUpperCase()} />
                                     <Detail label="Reason for rejected" value={selectedDiscount.reason} />
-                                    <Detail label="Expiration Date" value={
-                                        selectedDiscount.expirationDate
-                                            ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
-                                            : '—'
-                                    } />
+                                    <Detail
+                                        label="Expiration Date"
+                                        value={
+                                            selectedDiscount.expirationDate
+                                                ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
+                                                : '—'
+                                        }
+                                    />
                                     <Detail
                                         label="Photo"
                                         value={
-                                            selectedDiscount.photoUrl ? (
-                                                <a
-                                                    href={selectedDiscount.photoUrl.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                            photoUrl ? (
+                                                <button
+                                                    onClick={() => setIsImageOpen(true)}
                                                     className="text-blue-600 hover:underline"
                                                 >
-                                                    {selectedDiscount.photoUrl.name || 'View Photo'}
-                                                </a>
+                                                    {selectedDiscount.photoUrl?.name || 'View Photo'}
+                                                </button>
                                             ) : (
                                                 '—'
                                             )
                                         }
                                     />
+
+                                    <ImageView
+                                        isOpen={isImageOpen}
+                                        imageUrl={photoUrl}
+                                        alt={selectedDiscount?.photoUrl?.name}
+                                        onClose={() => setIsImageOpen(false)}
+                                    />
+
                                     <Detail label="Reviewed By" value={selectedDiscount.reviewedBy} />
-                                    <Detail label="Reviewed At" value={
-                                        selectedDiscount.updatedAt
-                                            ? new Date(selectedDiscount.updatedAt).toLocaleString()
-                                            : '—'
-                                    } />
+                                    <Detail
+                                        label="Reviewed At"
+                                        value={
+                                            selectedDiscount.updatedAt && new Date(selectedDiscount.updatedAt).toLocaleString()
+                                        }
+                                    />
                                 </div>
 
                                 {/* Approve / Reject buttons if status is pending */}
@@ -412,7 +446,9 @@ export default function RidersPage() {
                                         <div className="flex justify-end gap-4 mt-4">
                                             <button
                                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                                                onClick={() => updateDiscountStatus(selectedDiscount._id, 'approved')}
+                                                onClick={() =>
+                                                    updateDiscountStatus(selectedDiscount._id, 'approved')
+                                                }
                                             >
                                                 Approve
                                             </button>
@@ -424,7 +460,6 @@ export default function RidersPage() {
                                                 disabled={!rejectReason?.trim() || !selectedDiscount}
                                                 onClick={() => {
                                                     if (!selectedDiscount) return;
-
                                                     updateDiscountStatus(
                                                         selectedDiscount._id,
                                                         'rejected',
