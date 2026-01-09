@@ -33,7 +33,7 @@ export function useAdmin() {
   // Update admin state and cookie
   const updateAdmin = (updatedAdmin: Admin) => {
     setAdmin(updatedAdmin);
-    Cookies.set("admin", JSON.stringify(updatedAdmin), { expires: 7 }); // cookie expires in 7 days
+    Cookies.set("admin", JSON.stringify(updatedAdmin), { expires: 7 });
   };
 
   // Function to refresh admin info from cookie

@@ -14,6 +14,7 @@ import { Loading } from '@/components/Loading';
 import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Detail } from '@/components/Details';
+import ImageView from '@/components/ImageView';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -29,6 +30,8 @@ export default function DriversPage() {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [activeImage, setActiveImage] = useState<string | null>(null);
     const itemsPerPage = 100;
 
     const [activeTab, setActiveTab] = useState("Details");
@@ -193,22 +196,18 @@ export default function DriversPage() {
 
             case "Personal":
                 const pr = selectedDriver.personalRequirements;
-
+                if (!pr) return null;
                 return (
-                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center space-y-6 md:space-y-0 md:space-x-10">
                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm md:text-base">
                             {[
-                                { label: "Nationality", value: pr.nationality },
+                                { label: "Nationality", value: pr.nationality || "-" },
                                 { label: "PWD", value: pr.pwd ? "Yes" : "No" },
-                                { label: "Emergency Contact", value: pr.emergencyContactName },
-                                { label: "License Number", value: pr.driverLicenseNumber },
-                                { label: "License Expiry", value: pr.driverLicenseExpDate },
+                                { label: "Emergency Contact", value: pr.emergencyContactName || "-" },
+                                { label: "License Number", value: pr.driverLicenseNumber || "-" },
+                                { label: "License Expiry", value: pr.driverLicenseExpDate || "-" },
                             ].map(({ label, value }) => (
-                                <Detail
-                                    key={label}
-                                    label={label}
-                                    value={value}
-                                />
+                                <Detail key={label} label={label} value={value} />
                             ))}
 
                             {[
@@ -224,41 +223,55 @@ export default function DriversPage() {
                                             key={label}
                                             label={label}
                                             value={
-                                                <a
-                                                    href={signedUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                                <button
+                                                    onClick={() => {
+                                                        setActiveImage(signedUrl);
+                                                        setIsImageOpen(true);
+                                                    }}
                                                     className="text-blue-600 hover:underline"
                                                 >
                                                     View
-                                                </a>
+                                                </button>
                                             }
                                         />
                                     )
                             )}
                         </div>
+
+                        {/* SINGLE Image Viewer */}
+                        {activeImage && (
+                            <ImageView
+                                isOpen={isImageOpen}
+                                imageUrl={activeImage}
+                                alt="Driver document"
+                                onClose={() => {
+                                    setIsImageOpen(false);
+                                    setActiveImage(null);
+                                }}
+                            />
+                        )}
                     </div>
                 );
 
             /** ─────────────────────────────── TRANSPORT TAB ─────────────────────────────── **/
             case "Transport":
                 const tr = selectedDriver.transportRequirements;
+                if (!tr) return null;
                 return (
-                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center md:items-center space-y-6 md:space-y-0 md:space-x-10">
+                    <div className="flex flex-col md:flex-row bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 md:p-8 items-center space-y-6 md:space-y-0 md:space-x-10">
                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm md:text-base">
                             {/* Basic vehicle info */}
                             {[
-                                { label: "Plate Number", value: tr.plateNumber },
-                                { label: "OR Number", value: tr.orNumber },
-                                { label: "CR Number", value: `${tr.carBrand || "-"} ${tr.carModel || ""}` },
-                                { label: "Vehicle", value: tr.carBrand },
-                                { label: "Color", value: tr.carColor },
+                                { label: "Plate Number", value: tr.plateNumber || "-" },
+                                { label: "OR Number", value: tr.orNumber || "-" },
+                                {
+                                    label: "Vehicle Model",
+                                    value: `${tr.carBrand || "-"} ${tr.carModel || ""}`,
+                                },
+                                { label: "Vehicle", value: tr.carBrand || "-" },
+                                { label: "Color", value: tr.carColor || "-" },
                             ].map(({ label, value }) => (
-                                <Detail
-                                    key={label}
-                                    label={label}
-                                    value={value}
-                                />
+                                <Detail key={label} label={label} value={value} />
                             ))}
 
                             {/* Transport document links */}
@@ -287,19 +300,33 @@ export default function DriversPage() {
                                             key={label}
                                             label={label}
                                             value={
-                                                <a
-                                                    href={signedUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                                <button
+                                                    onClick={() => {
+                                                        setActiveImage(signedUrl);
+                                                        setIsImageOpen(true);
+                                                    }}
                                                     className="text-blue-600 hover:underline"
                                                 >
                                                     View
-                                                </a>
+                                                </button>
                                             }
                                         />
                                     )
                             )}
                         </div>
+
+                        {/* SINGLE document viewer */}
+                        {activeImage && (
+                            <ImageView
+                                isOpen={isImageOpen}
+                                imageUrl={activeImage}
+                                alt="Transport document"
+                                onClose={() => {
+                                    setIsImageOpen(false);
+                                    setActiveImage(null);
+                                }}
+                            />
+                        )}
                     </div>
                 );
 
