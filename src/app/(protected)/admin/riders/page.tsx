@@ -161,7 +161,7 @@ export default function RidersPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ status: newStatus, reviewedBy: updatedBy }),
+                body: JSON.stringify({ status: newStatus, reviewedBy: updatedBy, reason: rejectReason }),
             });
 
             if (!res.ok) throw new Error('Failed to update status');
@@ -385,8 +385,8 @@ export default function RidersPage() {
                                     <Detail label="Rider ID" value={selectedDiscount.riderId} />
                                     <Detail label="Name" value={selectedDiscount.name} />
                                     <Detail label="ID Number" value={selectedDiscount.idNumber} />
-                                    <Detail label="ID Type" value={selectedDiscount.idType?.toUpperCase()} />
-                                    <Detail label="Status" value={selectedDiscount.status?.toUpperCase()} />
+                                    <Detail label="ID Type" value={selectedDiscount.idType.toUpperCase()} />
+                                    <Detail label="Status" value={selectedDiscount.status.toUpperCase()} />
                                     <Detail label="Reason for rejected" value={selectedDiscount.reason} />
                                     <Detail
                                         label="Expiration Date"
