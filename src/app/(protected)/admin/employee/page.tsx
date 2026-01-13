@@ -65,7 +65,7 @@ export default function EmployeePage() {
 
             const res = await fetch(
                 isEdit
-                    ? `/api/admin/${editingEmployee!._id}`
+                    ? `/api/employees/${editingEmployee!._id}`
                     : "/api/auth/register",
                 {
                     method: isEdit ? "PATCH" : "POST",

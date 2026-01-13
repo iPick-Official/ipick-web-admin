@@ -22,11 +22,11 @@ export const navSections = [
     {
         title: "Fare Matrix Management",
         items: [
-            { label: "Peak Hour Time", icon: <Clock10Icon size={20} />, path: "/admin/peak" },
-            { label: "Rainy Day Surge", icon: <CloudDrizzle size={20} />, path: "/admin/rainy" },
-            { label: "Traffic Intentsity Surge", icon: <FaTrafficLight size={20} />, path: "/admin/traffic" },
-            { label: "Time Matrix", icon: <FolderClock size={20} />, path: "/admin/matrix" },
-            { label: "TNVS Configuration", icon: <Cog size={20} />, path: "/admin/config" },
+            { label: "Peak Hour Time", icon: <Clock10Icon size={20} />, path: "/admin/peak-hour" },
+            { label: "Rainy Day Surge", icon: <CloudDrizzle size={20} />, path: "/admin/rainy-day" },
+            { label: "Traffic Intentsity Surge", icon: <FaTrafficLight size={20} />, path: "/admin/traffic-intensity" },
+            { label: "Time Matrix", icon: <FolderClock size={20} />, path: "/admin/time-matrix" },
+            { label: "TNVS Configuration", icon: <Cog size={20} />, path: "/admin/tnvs-config" },
         ],
     },
     {
