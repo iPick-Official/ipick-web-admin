@@ -3,10 +3,26 @@
 import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
-import { Download, PenBox, PlusIcon } from 'lucide-react';
+import { Download, PenBox, PlusIcon, GripVertical } from 'lucide-react';
 import { TnvsConfigItem } from '@/types/tnvs-config';
 import Modal from '@/components/Modal';
 
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+
+import {
+    arrayMove,
+    SortableContext,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { DraggableCard } from '@/components/DraggableCard';
+
+/* ---------- Main Page ---------- */
 export default function TnvsConfig() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<TnvsConfigItem[]>([]);
@@ -14,16 +30,17 @@ export default function TnvsConfig() {
     const [editingItem, setEditingItem] = useState<TnvsConfigItem | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    );
+
     useEffect(() => {
         async function fetchTnvsConfig() {
             setLoading(true);
             try {
                 const res = await fetch('/api/tnvs-config');
-                if (!res.ok) throw new Error('Failed to fetch TNVS configuration');
-
                 const json = await res.json();
-                const items = Array.isArray(json) ? json : json.data ?? [];
-                setData(items);
+                setData(Array.isArray(json) ? json : json.data ?? []);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -34,11 +51,25 @@ export default function TnvsConfig() {
         fetchTnvsConfig();
     }, []);
 
-    /** Search by ID or Seater Capacity */
     const filteredData = data.filter(item =>
-        item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.seaterCapacity.toString().includes(searchTerm)
     );
+
+    function handleDragEnd(event: any) {
+        const { active, over } = event;
+
+        if (!over || active.id === over.id) return;
+
+        setData((items) => {
+            const oldIndex = items.findIndex(i => i._id === active.id);
+            const newIndex = items.findIndex(i => i._id === over.id);
+            return arrayMove(items, oldIndex, newIndex);
+        });
+
+        // 🔥 Optional: Persist order to backend here
+        // fetch('/api/tnvs-config/reorder', { method: 'POST', body: ... })
+    }
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -59,96 +90,51 @@ export default function TnvsConfig() {
                             placeholder="Search ID or Seater"
                             className="px-3 py-2 border rounded-md text-sm w-64"
                         />
-
                         <button
                             onClick={() => {
                                 setEditingItem(null);
                                 setOpenModal(true);
                             }}
-                            className="px-3 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md"
+                            className="px-3 py-2 bg-blue-700 text-white rounded-md"
                         >
                             <PlusIcon />
                         </button>
-
-                        <button className="px-3 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md">
+                        <button className="px-3 py-2 bg-green-700 text-white rounded-md">
                             <Download />
                         </button>
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="shadow-md rounded-lg overflow-hidden bg-white dark:bg-zinc-800">
-                    <div className="overflow-y-auto max-h-[75vh]">
-                        <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
-                                <tr>
-                                    {[
-                                        'ID',
-                                        'Seater',
-                                        'Base Fare',
-                                        'Per KM',
-                                        'Per Minute',
-                                        'Add Stop Fare',
-                                        'Max Surge',
-                                        'Status',
-                                        'Timestamp',
-                                    ].map(col => (
-                                        <th key={col} className="px-6 py-3 font-medium">
-                                            {col}
-                                        </th>
-                                    ))}
-                                    <th className="px-6 py-3 text-right">Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={10} className="py-6 text-center">
-                                            <Loading />
-                                        </td>
-                                    </tr>
-                                ) : filteredData.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={10} className="py-6 text-center text-gray-500 italic">
-                                            No TNVS configuration records found.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredData.map(item => (
-                                        <tr
-                                            key={item._id}
-                                            className="border-b hover:bg-gray-800 hover:text-white transition"
-                                        >
-                                            <td className="px-6 py-3">{item.id}</td>
-                                            <td className="px-6 py-3">{item.seaterCapacity}</td>
-                                            <td className="px-6 py-3">₱{item.baseFare}</td>
-                                            <td className="px-6 py-3">₱{item.perKilometer}</td>
-                                            <td className="px-6 py-3">₱{item.perMinute}</td>
-                                            <td className="px-6 py-3">₱{item.addStopBaseFare}</td>
-                                            <td className="px-6 py-3">{item.maxSurge}x</td>
-                                            <td className="px-6 py-3">
-                                                {item.status === 1 ? 'Active' : 'Inactive'}
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                {item.timestamp}
-                                            </td>
-                                            <td className="px-6 py-3 flex justify-end text-green-700">
-                                                <PenBox
-                                                    className="cursor-pointer"
-                                                    onClick={() => {
-                                                        setEditingItem(item);
-                                                        setOpenModal(true);
-                                                    }}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                {/* Grid */}
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loading />
                     </div>
-                </div>
+                ) : (
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={filteredData.map(i => i._id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {filteredData.map(item => (
+                                    <DraggableCard
+                                        key={item._id}
+                                        item={item}
+                                        onEdit={(item) => {
+                                            setEditingItem(item);
+                                            setOpenModal(true);
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+                )}
 
                 {/* Modal */}
                 <Modal

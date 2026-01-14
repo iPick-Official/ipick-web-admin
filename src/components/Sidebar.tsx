@@ -125,12 +125,13 @@ export const Sidebar = () => {
             onClick={() => router.push("/admin/profile")}
             className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-slate-800 hover:text-gray-200 transition-all duration-200"
           >
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 border border-gray-300">
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 border border-gray-300">
               <User className="w-6 h-6 text-gray-900" />
             </div>
-            <div className="text-left">
-              <p className="font-medium">{fullName}</p>
-              <p className="text-sm">{admin?.email}</p>
+
+            <div className="flex-1 min-w-0 text-left">
+              <p className="font-medium truncate">{fullName}</p>
+              <p className="text-sm truncate">{admin?.email}</p>
             </div>
           </button>
         </div>
