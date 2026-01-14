@@ -55,6 +55,15 @@ export const departments = [
     name: "Data & Analytics",
     roles: [{ id: "data_analyst", name: "Data Analyst / Scientist" }],
   },
+  {
+    id: "interns",
+    name: "Internship",
+    roles: [
+      { id: "information_technology", name: "IT" },
+      { id: "business", name: "Business" },
+      { id: "marketing", name: "Marketing" },
+    ],
+  },
 ];
 
 export const statusOptions = [
