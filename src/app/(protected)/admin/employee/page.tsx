@@ -184,7 +184,7 @@ export default function EmployeePage() {
                                             </td>
                                             <td className="px-6 py-3 uppercase">{emp.status}</td>
                                             <td className="px-6 py-3">
-                                                {new Date(emp.createdAt).toLocaleDateString()}
+                                                {new Date(emp.createdAt).toLocaleString()}
                                             </td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox

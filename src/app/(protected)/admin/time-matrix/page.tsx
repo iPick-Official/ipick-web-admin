@@ -5,21 +5,21 @@ import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
 import Modal from '@/components/Modal';
-import { RainyDaySurgeItem } from '@/types/rainy-day';
+import { TimeMatrixItem } from '@/types/time-matrix';
 
-export default function RainyDaySurge() {
+export default function TnvsConfig() {
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<RainyDaySurgeItem[]>([]);
+    const [data, setData] = useState<TimeMatrixItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [editingItem, setEditingItem] = useState<RainyDaySurgeItem | null>(null);
+    const [editingItem, setEditingItem] = useState<TimeMatrixItem | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
-        async function fetchRainyDaySurge() {
+        async function fetchTimeMatrix() {
             setLoading(true);
             try {
-                const res = await fetch('/api/rainy-day');
-                if (!res.ok) throw new Error('Failed to fetch rainy day surge data');
+                const res = await fetch('/api/time-matrix');
+                if (!res.ok) throw new Error('Failed to fetch time matrix');
 
                 const json = await res.json();
                 const items = Array.isArray(json) ? json : json.data ?? [];
@@ -31,13 +31,14 @@ export default function RainyDaySurge() {
             }
         }
 
-        fetchRainyDaySurge();
+        fetchTimeMatrix();
     }, []);
 
-    /** Search by ID or Weather Condition */
+    /** Search by ID or Time Range */
     const filteredData = data.filter(item =>
         item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.weatherCondition?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.rangeTimeFrom?.includes(searchTerm) ||
+        item.rangeTimeTo?.includes(searchTerm)
     );
 
     return (
@@ -48,7 +49,7 @@ export default function RainyDaySurge() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <h2 className="text-2xl font-semibold ml-20">
-                        Rainy Day Surge
+                        Time Matrix
                     </h2>
 
                     <div className="flex items-center gap-3 border border-gray-300 rounded-lg p-4">
@@ -56,7 +57,7 @@ export default function RainyDaySurge() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search ID or Weather"
+                            placeholder="Search ID or Time Range"
                             className="px-3 py-2 border rounded-md text-sm w-64"
                         />
 
@@ -84,12 +85,11 @@ export default function RainyDaySurge() {
                                 <tr>
                                     {[
                                         'ID',
-                                        'Weather',
-                                        'Intensity',
-                                        'Base Surcharge',
-                                        'Rainy Day Rate',
+                                        'From (Min)',
+                                        'To (Min)',
+                                        'Total Time',
                                         'Status',
-                                        'Timestamp',
+                                        'Created On',
                                     ].map(col => (
                                         <th key={col} className="px-6 py-3 font-medium">
                                             {col}
@@ -102,14 +102,14 @@ export default function RainyDaySurge() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center">
+                                        <td colSpan={7} className="py-6 text-center">
                                             <Loading />
                                         </td>
                                     </tr>
                                 ) : filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center text-gray-500 italic">
-                                            No rainy day surge records found.
+                                        <td colSpan={7} className="py-6 text-center text-gray-500 italic">
+                                            No time matrix records found.
                                         </td>
                                     </tr>
                                 ) : (
@@ -119,20 +119,15 @@ export default function RainyDaySurge() {
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
                                             <td className="px-6 py-3">{item.id}</td>
-                                            <td className="px-6 py-3">{item.weatherCondition}</td>
+                                            <td className="px-6 py-3">{item.rangeTimeFrom}</td>
+                                            <td className="px-6 py-3">{item.rangeTimeTo}</td>
+                                            <td className="px-6 py-3">{item.tTime} mins</td>
                                             <td className="px-6 py-3">
-                                                {(item.intensityFactor * 100).toFixed(0)}%
+                                                {item.status === 1 ? 'Active' : 'Inactive'}
                                             </td>
                                             <td className="px-6 py-3">
-                                                {(item.baseSurcharge * 100).toFixed(0)}%
+                                                {item.createdOn}
                                             </td>
-                                            <td className="px-6 py-3">
-                                                {(item.rainyDaySurchargerate * 100).toFixed(0)}%
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                {item.status === "1" ? "Active" : "Inactive"}
-                                            </td>
-                                            <td className="px-6 py-3">{item.timestamp}</td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox
                                                     className="cursor-pointer"
@@ -154,11 +149,11 @@ export default function RainyDaySurge() {
                 <Modal
                     isOpen={openModal}
                     onClose={() => setOpenModal(false)}
-                    title={editingItem ? "Edit Rainy Day Surge" : "Add Rainy Day Surge"}
+                    title={editingItem ? "Edit Time Matrix" : "Add Time Matrix"}
                     size="lg"
                 >
                     <div className="text-center text-gray-500 py-10">
-                        Rainy Day Surge form goes here
+                        Time Matrix form goes here
                     </div>
                 </Modal>
             </div>

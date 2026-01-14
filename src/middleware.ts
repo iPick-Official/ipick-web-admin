@@ -2,12 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADMIN_PERMISSIONS } from "./config/adminPermissions";
 
-const OPERATION_ALLOWED_PATHS = [
-  "/admin/bookings",
-  "/admin/drivers",
-  "/admin/dashboard",
-];
-
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
   const department = req.cookies.get("admin_department")?.value;
@@ -30,13 +24,18 @@ export function middleware(req: NextRequest) {
   const permissions =
     ADMIN_PERMISSIONS[department as keyof typeof ADMIN_PERMISSIONS];
 
-  if (
-    isAdminPage &&
-    permissions &&
-    permissions.paths !== "ALL" &&
-    !permissions.paths.some((allowed) => pathname.startsWith(allowed))
-  ) {
-    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  if (isAdminPage && permissions && permissions.paths !== "ALL") {
+    const allowedPaths = Array.isArray(permissions.paths)
+      ? permissions.paths
+      : [permissions.paths];
+
+    const hasAccess = allowedPaths.some((allowed) =>
+      pathname.startsWith(allowed)
+    );
+
+    if (!hasAccess) {
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+    }
   }
 
   return NextResponse.next();

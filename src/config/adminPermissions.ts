@@ -18,6 +18,11 @@ export const ADMIN_PERMISSIONS = {
     ],
   },
 
+  interns: {
+    sections: ["Driver Management", "CRM"],
+    paths: ["/admin/bookings", "/admin/dashboard", "/admin/profile"],
+  },
+
   technology_product: {
     sections: ["Fare Matrix Management"],
     paths: ["/admin/profile"],
@@ -37,4 +42,4 @@ export const ADMIN_PERMISSIONS = {
     sections: ["Finance"],
     paths: ["/admin/profile"],
   },
-} as const;
+} 

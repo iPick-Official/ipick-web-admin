@@ -4,22 +4,22 @@ import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
+import { TrafficIntensityItem } from '@/types/traffic-intensity';
 import Modal from '@/components/Modal';
-import { RainyDaySurgeItem } from '@/types/rainy-day';
 
-export default function RainyDaySurge() {
+export default function TrafficIntensity() {
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<RainyDaySurgeItem[]>([]);
+    const [data, setData] = useState<TrafficIntensityItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [editingItem, setEditingItem] = useState<RainyDaySurgeItem | null>(null);
+    const [editingItem, setEditingItem] = useState<TrafficIntensityItem | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
-        async function fetchRainyDaySurge() {
+        async function fetchTrafficIntensity() {
             setLoading(true);
             try {
-                const res = await fetch('/api/rainy-day');
-                if (!res.ok) throw new Error('Failed to fetch rainy day surge data');
+                const res = await fetch('/api/traffic-intensity');
+                if (!res.ok) throw new Error('Failed to fetch traffic intensity');
 
                 const json = await res.json();
                 const items = Array.isArray(json) ? json : json.data ?? [];
@@ -30,14 +30,13 @@ export default function RainyDaySurge() {
                 setLoading(false);
             }
         }
-
-        fetchRainyDaySurge();
+        fetchTrafficIntensity();
     }, []);
 
-    /** Search by ID or Weather Condition */
+    /** Search by ID or Intensity Level */
     const filteredData = data.filter(item =>
         item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.weatherCondition?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.intensityLevel?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -48,7 +47,7 @@ export default function RainyDaySurge() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <h2 className="text-2xl font-semibold ml-20">
-                        Rainy Day Surge
+                        Traffic Intensity
                     </h2>
 
                     <div className="flex items-center gap-3 border border-gray-300 rounded-lg p-4">
@@ -56,7 +55,7 @@ export default function RainyDaySurge() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search ID or Weather"
+                            placeholder="Search ID or Intensity"
                             className="px-3 py-2 border rounded-md text-sm w-64"
                         />
 
@@ -84,10 +83,9 @@ export default function RainyDaySurge() {
                                 <tr>
                                     {[
                                         'ID',
-                                        'Weather',
-                                        'Intensity',
-                                        'Base Surcharge',
-                                        'Rainy Day Rate',
+                                        'Intensity Level',
+                                        'Peak Hour',
+                                        'Surcharge Rate',
                                         'Status',
                                         'Timestamp',
                                     ].map(col => (
@@ -102,14 +100,14 @@ export default function RainyDaySurge() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center">
+                                        <td colSpan={7} className="py-6 text-center">
                                             <Loading />
                                         </td>
                                     </tr>
                                 ) : filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center text-gray-500 italic">
-                                            No rainy day surge records found.
+                                        <td colSpan={7} className="py-6 text-center text-gray-500 italic">
+                                            No traffic intensity records found.
                                         </td>
                                     </tr>
                                 ) : (
@@ -119,20 +117,17 @@ export default function RainyDaySurge() {
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
                                             <td className="px-6 py-3">{item.id}</td>
-                                            <td className="px-6 py-3">{item.weatherCondition}</td>
+                                            <td className="px-6 py-3">{item.intensityLevel}</td>
+                                            <td className="px-6 py-3">{item.isPeakHour}</td>
                                             <td className="px-6 py-3">
-                                                {(item.intensityFactor * 100).toFixed(0)}%
+                                                {(Number(item.surchargeRate) * 100).toFixed(0)}%
                                             </td>
                                             <td className="px-6 py-3">
-                                                {(item.baseSurcharge * 100).toFixed(0)}%
+                                                {item.status === '1' ? 'Active' : 'Inactive'}
                                             </td>
                                             <td className="px-6 py-3">
-                                                {(item.rainyDaySurchargerate * 100).toFixed(0)}%
+                                                {item.timestamp}
                                             </td>
-                                            <td className="px-6 py-3">
-                                                {item.status === "1" ? "Active" : "Inactive"}
-                                            </td>
-                                            <td className="px-6 py-3">{item.timestamp}</td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox
                                                     className="cursor-pointer"
@@ -154,11 +149,11 @@ export default function RainyDaySurge() {
                 <Modal
                     isOpen={openModal}
                     onClose={() => setOpenModal(false)}
-                    title={editingItem ? "Edit Rainy Day Surge" : "Add Rainy Day Surge"}
+                    title={editingItem ? "Edit Traffic Intensity" : "Add Traffic Intensity"}
                     size="lg"
                 >
                     <div className="text-center text-gray-500 py-10">
-                        Rainy Day Surge form goes here
+                        Traffic Intensity form goes here
                     </div>
                 </Modal>
             </div>

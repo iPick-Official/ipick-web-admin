@@ -4,22 +4,22 @@ import { useEffect, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
+import { TnvsConfigItem } from '@/types/tnvs-config';
 import Modal from '@/components/Modal';
-import { RainyDaySurgeItem } from '@/types/rainy-day';
 
-export default function RainyDaySurge() {
+export default function TnvsConfig() {
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<RainyDaySurgeItem[]>([]);
+    const [data, setData] = useState<TnvsConfigItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [editingItem, setEditingItem] = useState<RainyDaySurgeItem | null>(null);
+    const [editingItem, setEditingItem] = useState<TnvsConfigItem | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
-        async function fetchRainyDaySurge() {
+        async function fetchTnvsConfig() {
             setLoading(true);
             try {
-                const res = await fetch('/api/rainy-day');
-                if (!res.ok) throw new Error('Failed to fetch rainy day surge data');
+                const res = await fetch('/api/tnvs-config');
+                if (!res.ok) throw new Error('Failed to fetch TNVS configuration');
 
                 const json = await res.json();
                 const items = Array.isArray(json) ? json : json.data ?? [];
@@ -31,13 +31,13 @@ export default function RainyDaySurge() {
             }
         }
 
-        fetchRainyDaySurge();
+        fetchTnvsConfig();
     }, []);
 
-    /** Search by ID or Weather Condition */
+    /** Search by ID or Seater Capacity */
     const filteredData = data.filter(item =>
         item.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.weatherCondition?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.seaterCapacity.toString().includes(searchTerm)
     );
 
     return (
@@ -48,7 +48,7 @@ export default function RainyDaySurge() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <h2 className="text-2xl font-semibold ml-20">
-                        Rainy Day Surge
+                        TNVS Configuration
                     </h2>
 
                     <div className="flex items-center gap-3 border border-gray-300 rounded-lg p-4">
@@ -56,7 +56,7 @@ export default function RainyDaySurge() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search ID or Weather"
+                            placeholder="Search ID or Seater"
                             className="px-3 py-2 border rounded-md text-sm w-64"
                         />
 
@@ -84,10 +84,12 @@ export default function RainyDaySurge() {
                                 <tr>
                                     {[
                                         'ID',
-                                        'Weather',
-                                        'Intensity',
-                                        'Base Surcharge',
-                                        'Rainy Day Rate',
+                                        'Seater',
+                                        'Base Fare',
+                                        'Per KM',
+                                        'Per Minute',
+                                        'Add Stop Fare',
+                                        'Max Surge',
                                         'Status',
                                         'Timestamp',
                                     ].map(col => (
@@ -102,14 +104,14 @@ export default function RainyDaySurge() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center">
+                                        <td colSpan={10} className="py-6 text-center">
                                             <Loading />
                                         </td>
                                     </tr>
                                 ) : filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-6 text-center text-gray-500 italic">
-                                            No rainy day surge records found.
+                                        <td colSpan={10} className="py-6 text-center text-gray-500 italic">
+                                            No TNVS configuration records found.
                                         </td>
                                     </tr>
                                 ) : (
@@ -119,20 +121,18 @@ export default function RainyDaySurge() {
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
                                             <td className="px-6 py-3">{item.id}</td>
-                                            <td className="px-6 py-3">{item.weatherCondition}</td>
+                                            <td className="px-6 py-3">{item.seaterCapacity}</td>
+                                            <td className="px-6 py-3">₱{item.baseFare}</td>
+                                            <td className="px-6 py-3">₱{item.perKilometer}</td>
+                                            <td className="px-6 py-3">₱{item.perMinute}</td>
+                                            <td className="px-6 py-3">₱{item.addStopBaseFare}</td>
+                                            <td className="px-6 py-3">{item.maxSurge}x</td>
                                             <td className="px-6 py-3">
-                                                {(item.intensityFactor * 100).toFixed(0)}%
+                                                {item.status === 1 ? 'Active' : 'Inactive'}
                                             </td>
                                             <td className="px-6 py-3">
-                                                {(item.baseSurcharge * 100).toFixed(0)}%
+                                                {item.timestamp}
                                             </td>
-                                            <td className="px-6 py-3">
-                                                {(item.rainyDaySurchargerate * 100).toFixed(0)}%
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                {item.status === "1" ? "Active" : "Inactive"}
-                                            </td>
-                                            <td className="px-6 py-3">{item.timestamp}</td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox
                                                     className="cursor-pointer"
@@ -154,11 +154,11 @@ export default function RainyDaySurge() {
                 <Modal
                     isOpen={openModal}
                     onClose={() => setOpenModal(false)}
-                    title={editingItem ? "Edit Rainy Day Surge" : "Add Rainy Day Surge"}
+                    title={editingItem ? "Edit TNVS Configuration" : "Add TNVS Configuration"}
                     size="lg"
                 >
                     <div className="text-center text-gray-500 py-10">
-                        Rainy Day Surge form goes here
+                        TNVS configuration form goes here
                     </div>
                 </Modal>
             </div>
