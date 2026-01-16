@@ -215,12 +215,12 @@ export default function BookingsPage() {
                             placeholder="Search Booking ID"
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
-                        <button
+                        {/* <button
                             className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={fetchAllBookings}
                         >
                             <RefreshCcw />
-                        </button>
+                        </button> */}
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                         >
