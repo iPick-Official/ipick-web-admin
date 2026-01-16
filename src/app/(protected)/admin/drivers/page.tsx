@@ -724,8 +724,7 @@ export default function DriversPage() {
                         {/* Export (stubbed) */}
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => exportDriversToCSVWithPapa(sortedDrivers)}
-                        >
+                            onClick={() => exportDriversToCSVWithPapa(sortedDrivers)} disabled={loading}>
                             <Download />
                         </button>
                     </div>

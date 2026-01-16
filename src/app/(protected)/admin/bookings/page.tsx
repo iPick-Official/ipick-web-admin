@@ -45,7 +45,7 @@ export default function BookingsPage() {
         async function fetchBookings() {
             setLoading(true);
             try {
-                const res = await fetch('/api/bookings/all');
+                const res = await fetch('/api/bookings');
                 if (!res.ok) throw new Error('Failed to fetch bookings');
 
                 const data = await res.json();
@@ -54,11 +54,11 @@ export default function BookingsPage() {
                 const excludeEnd = new Date('2026-01-15');
 
                 const filteredBookings = data.filter(
-                    (booking: { timestamp: string | number | Date }) => {
-                        const bookingDate = new Date(booking.timestamp);
-
+                    (booking: { createdAt: string | number | Date, referenceNumber: string }) => {
+                        const bookingDate = new Date(booking.createdAt);
+                        const bookingId = booking.referenceNumber === "ETSJRURPXA"
                         // keep bookings NOT in the excluded range
-                        return bookingDate < excludeStart || bookingDate > excludeEnd;
+                        return bookingDate < excludeStart || bookingId;
                     }
                 );
 
@@ -229,7 +229,7 @@ export default function BookingsPage() {
                         </button> */}
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => exportBookingsToCSV(sortedBookings)}
+                            onClick={() => exportBookingsToCSV(sortedBookings)} disabled={loading}
                         >
                             <Download />
                         </button>

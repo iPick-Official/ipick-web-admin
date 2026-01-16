@@ -223,7 +223,7 @@ export default function RidersPage() {
                         </button>
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => exportRidersToCSV(sortedRiders)}>
+                            onClick={() => exportRidersToCSV(sortedRiders)} disabled={loading}>
                             <Download />
                         </button>
                     </div>
