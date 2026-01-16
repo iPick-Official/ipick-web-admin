@@ -149,6 +149,7 @@ export default function EmployeePage() {
             position: "",
             department: "",
             status: "",
+            password: "iPick_2023",
             photoUrl: { name: "", url: "" },
         });
         setAddEmployee(true);
