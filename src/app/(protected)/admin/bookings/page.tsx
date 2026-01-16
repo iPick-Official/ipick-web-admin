@@ -37,7 +37,6 @@ export default function BookingsPage() {
     //             setLoading(false);
     //         }
     //     }
-
     //     fetchBookings();
     // }, []);
 
@@ -45,7 +44,7 @@ export default function BookingsPage() {
         async function fetchBookings() {
             setLoading(true);
             try {
-                const res = await fetch('/api/bookings');
+                const res = await fetch('/api/bookings/all');
                 if (!res.ok) throw new Error('Failed to fetch bookings');
 
                 const data = await res.json();
