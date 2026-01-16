@@ -18,4 +18,8 @@ export interface Admin {
   createdAt: string;
   updatedAt: string;
   authToken: string;
+  photoUrl?: {
+    name: string;
+    url: string;
+  };
 }

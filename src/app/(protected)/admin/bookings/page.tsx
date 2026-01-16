@@ -22,14 +22,41 @@ export default function BookingsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
 
+    // useEffect(() => {
+    //     async function fetchBookings() {
+    //         setLoading(true);
+    //         try {
+    //             const res = await fetch('/api/bookings');
+    //             if (!res.ok) throw new Error('Failed to fetch bookings');
+    //             const data = await res.json();
+    //             setBookings(data);
+    //         } catch (error) {
+    //             console.error(error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
+
+    //     fetchBookings();
+    // }, []);
+
     useEffect(() => {
         async function fetchBookings() {
             setLoading(true);
             try {
-                const res = await fetch('/api/bookings');
+                const res = await fetch('/api/bookings/all');
                 if (!res.ok) throw new Error('Failed to fetch bookings');
+
                 const data = await res.json();
-                setBookings(data);
+
+                const cutoffDate = new Date('2025-12-18');
+
+                const filteredBookings = data.filter((booking: { timestamp: string | number | Date; }) => {
+                    const bookingDate = new Date(booking.timestamp);
+                    return bookingDate <= cutoffDate;
+                });
+
+                setBookings(filteredBookings);
             } catch (error) {
                 console.error(error);
             } finally {

@@ -10,4 +10,8 @@ export type RegisterFormType = {
   position: string;
   department: string;
   status?: string;
+  photoUrl?: {
+    name: string;
+    url: string;
+  };
 };

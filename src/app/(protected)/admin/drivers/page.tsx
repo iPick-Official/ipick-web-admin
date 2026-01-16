@@ -15,7 +15,6 @@ import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Detail } from '@/components/Details';
 import ImageView from '@/components/ImageView';
-import { useDrivers } from '@/hooks/useDrivers';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -25,6 +24,7 @@ export default function DriversPage() {
     const [rideHistory, setRideHistory] = useState<DriverDataResponse | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<DriverWithWallet | null>(null);
     const [walletLogs, setWalletLogs] = useState<WalletLog[]>([]);
+    const [drivers, setDrivers] = useState<Driver[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [fromDate, setFromDate] = useState('');
@@ -551,7 +551,24 @@ export default function DriversPage() {
         }
     };
 
-    const { data: drivers = [] } = useDrivers();
+    // Fetch drivers once on mount
+    useEffect(() => {
+        const fetchDrivers = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch('/api/driver');
+                if (!res.ok) throw new Error('Failed to fetch drivers');
+                const data = await res.json();
+                setDrivers(data);
+            } catch (error) {
+                console.error('Error fetching drivers:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDrivers();
+    }, []);
 
     async function fetchDetailHistory(id: string) {
         setLoading(true);

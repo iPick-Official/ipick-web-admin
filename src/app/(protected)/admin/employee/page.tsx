@@ -9,6 +9,7 @@ import { Admin } from '@/types/admin';
 import { RegisterFormType } from '@/types/registration';
 import { departments } from '@/app/utils/department';
 import { RegisterForm } from '@/components/Registration';
+import { compressAndRenameImage } from '@/app/utils/compressor';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
@@ -16,6 +17,9 @@ export default function EmployeePage() {
     const [employees, setEmployees] = useState<Admin[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [addEmployee, setAddEmployee] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [profileImage, setProfileImage] = useState<{ name: string; url: string } | null>(null);
+
     const [registerForm, setRegisterForm] = useState<RegisterFormType>({
         username: "",
         firstName: "",
@@ -28,6 +32,10 @@ export default function EmployeePage() {
         position: "",
         department: "",
         status: "",
+        photoUrl: {
+            name: "",
+            url: "",
+        }
     });
 
     useEffect(() => {
@@ -49,48 +57,135 @@ export default function EmployeePage() {
         fetchEmployees();
     }, []);
 
-    async function submitEmployee() {
-        if (
-            !registerForm.username?.trim() ||
-            !registerForm.email?.trim() ||
-            !registerForm.mobnum?.trim() ||
-            !registerForm.address?.trim()
-        ) {
-            alert("All required fields must be filled");
-            return;
+    const handleFileChange = (file: File) => {
+        setSelectedFile(file);
+        const previewUrl = URL.createObjectURL(file);
+        setProfileImage({ name: file.name, url: previewUrl });
+    };
+
+    async function uploadProfileImage(file: File) {
+        const compressedFile = await compressAndRenameImage(file);
+        const formData = new FormData();
+        formData.append("file", compressedFile);
+        const res = await fetch("/api/photo-upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || "Image upload failed");
         }
 
+        const data = await res.json();
+        return {
+            name: String(data.filename || data.fileName || compressedFile.name),
+            url: String(data.url || data.fileUrl),
+        };
+    }
+
+    // Fetch image and return a blob URL for preview
+    async function fetchImageFromApi(filename: string): Promise<string> {
+        const res = await fetch(`/api/photo-url?filename=${encodeURIComponent(filename)}`);
+
+        if (!res.ok) {
+            throw new Error("Failed to fetch existing image");
+        }
+
+        const blob = await res.blob();
+
+        // Create and return a blob URL directly for preview
+        return URL.createObjectURL(blob);
+    }
+
+    async function submitEmployee() {
         try {
+            let photoUrl = registerForm.photoUrl;
+
+            // upload only if user selected a new file
+            if (selectedFile) {
+                const uploaded = await uploadProfileImage(selectedFile);
+                photoUrl = { name: uploaded.name, url: uploaded.url };
+            }
+
+            const payload: RegisterFormType = {
+                ...registerForm,
+                photoUrl: { name: photoUrl?.name ?? "", url: photoUrl?.url ?? "" },
+            };
+
             const isEdit = Boolean(editingEmployee?._id);
 
             const res = await fetch(
-                isEdit
-                    ? `/api/employees/${editingEmployee!._id}`
-                    : "/api/auth/register",
+                isEdit ? `/api/employees/${editingEmployee!._id}` : "/api/auth/register",
                 {
                     method: isEdit ? "PATCH" : "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(registerForm),
+                    body: JSON.stringify(payload),
                 }
             );
 
             const data = await res.json();
-
-            if (!res.ok) {
-                alert(data.message || "Operation failed");
-                return;
-            }
+            if (!res.ok) throw new Error(data.message || "Operation failed");
 
             alert(isEdit ? "Employee updated successfully" : "Employee created successfully");
-
-            setAddEmployee(false);
-            setEditingEmployee(null);
             window.location.reload();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert("Server error");
+            alert(err.message || "Server error");
         }
     }
+
+    const openAddEmployeeModal = () => {
+        setEditingEmployee(null);
+        setProfileImage(null);
+        setRegisterForm({
+            username: "",
+            firstName: "",
+            middleName: "",
+            lastName: "",
+            email: "",
+            mobnum: "",
+            address: "",
+            position: "",
+            department: "",
+            status: "",
+            photoUrl: { name: "", url: "" },
+        });
+        setAddEmployee(true);
+    };
+
+    const openEditEmployeeModal = async (emp: Admin) => {
+        setEditingEmployee(emp);
+        setSelectedFile(null); // reset file selection
+
+        if (emp.photoUrl?.name) {
+            try {
+                const previewUrl = await fetchImageFromApi(emp.photoUrl.name);
+                setProfileImage({ name: emp.photoUrl.name, url: previewUrl });
+            } catch (err) {
+                console.error("Failed to fetch employee image:", err);
+                setProfileImage(null);
+            }
+        } else {
+            setProfileImage(null);
+        }
+
+        setRegisterForm({
+            username: emp.username || "",
+            firstName: emp.firstName || "",
+            middleName: emp.middleName || "",
+            lastName: emp.lastName || "",
+            email: emp.email || "",
+            mobnum: emp.mobnum || "",
+            address: emp.address || "",
+            position: emp.position || "",
+            department: emp.department || "",
+            status: emp.status || "",
+            photoUrl: emp.photoUrl || { name: "", url: "" },
+        });
+
+        setAddEmployee(true);
+    };
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -110,22 +205,7 @@ export default function EmployeePage() {
 
                         <button
                             className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => {
-                                setEditingEmployee(null);
-                                setRegisterForm({
-                                    username: "",
-                                    firstName: "",
-                                    middleName: "",
-                                    lastName: "",
-                                    email: "",
-                                    mobnum: "",
-                                    address: "",
-                                    password: "iPick_2023",
-                                    position: "",
-                                    department: "",
-                                });
-                                setAddEmployee(true);
-                            }}
+                            onClick={openAddEmployeeModal}
                         >
                             <PlusIcon />
                         </button>
@@ -184,27 +264,12 @@ export default function EmployeePage() {
                                             </td>
                                             <td className="px-6 py-3 uppercase">{emp.status}</td>
                                             <td className="px-6 py-3">
-                                                {new Date(emp.createdAt).toLocaleString()}
+                                                {new Date(emp.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox
                                                     className="cursor-pointer"
-                                                    onClick={() => {
-                                                        setEditingEmployee(emp);
-                                                        setRegisterForm({
-                                                            username: emp.username || "",
-                                                            firstName: emp.firstName || "",
-                                                            middleName: emp.middleName || "",
-                                                            lastName: emp.lastName || "",
-                                                            email: emp.email || "",
-                                                            mobnum: emp.mobnum || "",
-                                                            address: emp.address || "",
-                                                            position: emp.position || "",
-                                                            department: emp.department || "",
-                                                            status: emp.status || "",
-                                                        });
-                                                        setAddEmployee(true);
-                                                    }}
+                                                    onClick={() => openEditEmployeeModal(emp)}
                                                 />
                                             </td>
                                         </tr>
@@ -212,11 +277,19 @@ export default function EmployeePage() {
                                 )}
                             </tbody>
                         </table>
-                        <Modal isOpen={addEmployee} onClose={() => setAddEmployee(false)} title={editingEmployee ? "Edit Information" : "Add Employee"} size="xl">
+
+                        <Modal
+                            isOpen={addEmployee}
+                            onClose={() => setAddEmployee(false)}
+                            title={editingEmployee ? "Edit Information" : "Add Employee"}
+                            size="xl"
+                        >
                             <RegisterForm
                                 form={registerForm}
                                 setForm={setRegisterForm}
                                 onSubmit={submitEmployee}
+                                onFileChange={handleFileChange}
+                                profileImage={profileImage}
                             />
                         </Modal>
                     </div>
