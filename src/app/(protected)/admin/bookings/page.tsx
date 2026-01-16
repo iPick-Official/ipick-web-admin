@@ -1,5 +1,6 @@
 'use client';
 
+import { exportBookingsToCSV } from '@/app/utils/DownloadReports';
 import { Loading } from '@/components/Loading';
 import { Pagination } from '@/components/Pagination';
 import { Sidebar } from '@/components/Sidebar';
@@ -49,12 +50,17 @@ export default function BookingsPage() {
 
                 const data = await res.json();
 
-                const cutoffDate = new Date('2025-12-18');
+                const excludeStart = new Date('2025-12-18');
+                const excludeEnd = new Date('2026-01-15');
 
-                const filteredBookings = data.filter((booking: { timestamp: string | number | Date; }) => {
-                    const bookingDate = new Date(booking.timestamp);
-                    return bookingDate <= cutoffDate;
-                });
+                const filteredBookings = data.filter(
+                    (booking: { timestamp: string | number | Date }) => {
+                        const bookingDate = new Date(booking.timestamp);
+
+                        // keep bookings NOT in the excluded range
+                        return bookingDate < excludeStart || bookingDate > excludeEnd;
+                    }
+                );
 
                 setBookings(filteredBookings);
             } catch (error) {
@@ -223,6 +229,7 @@ export default function BookingsPage() {
                         </button> */}
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            onClick={() => exportBookingsToCSV(sortedBookings)}
                         >
                             <Download />
                         </button>

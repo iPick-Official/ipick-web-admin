@@ -18,6 +18,7 @@ export default function ProfilePage() {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showEditProfile, setShowEditProfile] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
     const [profileForm, setProfileForm] = useState({
         username: "",
@@ -30,6 +31,17 @@ export default function ProfilePage() {
         oldPassword: "",
         newPassword: "",
     });
+
+    useEffect(() => {
+        if (!admin?.photoUrl?.url) return;
+
+        fetch(`/api/photo-url?filename=${encodeURIComponent(admin.photoUrl.url)}`)
+            .then(res => res.json())
+            .then(data => {
+                setAvatarUrl(data.url);
+            })
+            .catch(() => setAvatarUrl(null));
+    }, [admin?.photoUrl?.url]);
 
     // Populate profile form once when admin loads
     useEffect(() => {
@@ -124,11 +136,11 @@ export default function ProfilePage() {
                 </span>
 
                 <Image
-                    src="/logo.png"
+                    src={avatarUrl || "/logo.png"}
                     alt="Admin Avatar"
                     width={96}
                     height={96}
-                    className="rounded-full border"
+                    className="rounded-full border object-cover"
                 />
 
                 <div>

@@ -86,7 +86,7 @@ export default function EmployeePage() {
 
     // Fetch image and return a blob URL for preview
     async function fetchImageFromApi(filename: string): Promise<string> {
-        const res = await fetch(`/api/photo-url?filename=${encodeURIComponent(filename)}`);
+        const res = await fetch(`/api/photo-url?filename=${(filename)}`);
 
         if (!res.ok) {
             throw new Error("Failed to fetch existing image");

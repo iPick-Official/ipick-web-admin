@@ -15,6 +15,7 @@ import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Detail } from '@/components/Details';
 import ImageView from '@/components/ImageView';
+import { exportDriversToCSVWithPapa } from '@/app/utils/DownloadReports';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -723,7 +724,7 @@ export default function DriversPage() {
                         {/* Export (stubbed) */}
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => alert('Export feature not yet implemented')}
+                            onClick={() => exportDriversToCSVWithPapa(sortedDrivers)}
                         >
                             <Download />
                         </button>

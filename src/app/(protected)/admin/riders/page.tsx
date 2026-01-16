@@ -13,6 +13,7 @@ import { Detail } from '@/components/Details';
 import ImageView from '@/components/ImageView';
 import SortButton from '@/components/SortButton';
 import Modal from '@/components/Modal';
+import { exportRidersToCSV } from '@/app/utils/DownloadReports';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -220,7 +221,9 @@ export default function RidersPage() {
                         <button className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={fetchDiscounts}>
                             <Percent />
                         </button>
-                        <button className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition">
+                        <button
+                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
+                            onClick={() => exportRidersToCSV(sortedRiders)}>
                             <Download />
                         </button>
                     </div>
