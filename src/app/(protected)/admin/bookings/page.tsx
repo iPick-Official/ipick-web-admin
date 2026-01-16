@@ -102,7 +102,7 @@ export default function BookingsPage() {
 
         // Filter by date range (defaults to today's date)
         filtered = filtered.filter((b) => {
-            const bookingDate = new Date(b.updatedAt).toISOString().split('T')[0];
+            const bookingDate = new Date(b.createdAt).toISOString().split('T')[0];
             return bookingDate >= fromDate && bookingDate <= toDate;
         });
 
@@ -133,8 +133,8 @@ export default function BookingsPage() {
     const sortedBookings = useMemo(() => {
         const sorted = [...displayedBookings];
         sorted.sort((a, b) => {
-            const dateA = new Date(a.updatedAt).getTime();
-            const dateB = new Date(b.updatedAt).getTime();
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
         return sorted;
@@ -293,7 +293,7 @@ export default function BookingsPage() {
                                     </tr>
                                 ) : (
                                     paginatedRiders.map((b) => {
-                                        const bookingDate = b.updatedAt.slice(0, 10);
+                                        const bookingDate = b.createdAt.slice(0, 10);
                                         const isToday = bookingDate === today;
 
                                         return (
@@ -308,7 +308,7 @@ export default function BookingsPage() {
                                                 <td className="px-6 py-3">₱{b.travelFare?.toFixed(2)}</td>
                                                 <td className="px-6 py-3">{b.origin?.name}</td>
                                                 <td className="px-6 py-3">{b.destination?.name}</td>
-                                                <td className="px-6 py-3">{new Date(b.updatedAt).toLocaleString()}</td>
+                                                <td className="px-6 py-3">{new Date(b.createdAt).toLocaleString()}</td>
                                                 <td className="px-6 py-3">
                                                     <div className="flex items-center text-green-700 justify-center">
                                                         <Eye />
