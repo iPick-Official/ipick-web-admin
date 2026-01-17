@@ -8,6 +8,7 @@ import { Menu, X, User } from "lucide-react";
 import { navSections } from "./SidebarSec";
 import { useAdmin } from "@/hooks/useAdmin";
 import { ADMIN_PERMISSIONS } from "@/config/adminPermissions";
+import { Avatar } from "./Avatar";
 
 export const Sidebar = () => {
   const router = useRouter();
@@ -125,10 +126,11 @@ export const Sidebar = () => {
             onClick={() => router.push("/admin/profile")}
             className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-slate-800 hover:text-gray-200 transition-all duration-200"
           >
-            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 border border-gray-300">
-              <User className="w-6 h-6 text-gray-900" />
-            </div>
-
+            <Avatar
+              photoUrl={admin?.photoUrl?.url}
+              size={48}
+              alt="Admin profile"
+            />
             <div className="flex-1 min-w-0 text-left">
               <p className="font-medium truncate">{fullName}</p>
               <p className="text-sm truncate">{admin?.email}</p>

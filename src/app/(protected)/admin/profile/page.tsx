@@ -12,13 +12,13 @@ import { ProfileForm } from "@/components/ProfileUpdate";
 import { PasswordForm } from "@/components/ProfileChangePass";
 import { Info } from "@/components/ProfileInfo";
 import { departments } from "@/app/utils/department";
+import { Avatar } from "@/components/Avatar";
 
 export default function ProfilePage() {
     const { admin, loading, updateAdmin } = useAdmin();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [showEditProfile, setShowEditProfile] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
     const [profileForm, setProfileForm] = useState({
         username: "",
@@ -31,17 +31,6 @@ export default function ProfilePage() {
         oldPassword: "",
         newPassword: "",
     });
-
-    useEffect(() => {
-        if (!admin?.photoUrl?.url) return;
-
-        fetch(`/api/photo-url?filename=${encodeURIComponent(admin.photoUrl.url)}`)
-            .then(res => res.json())
-            .then(data => {
-                setAvatarUrl(data.url);
-            })
-            .catch(() => setAvatarUrl(null));
-    }, [admin?.photoUrl?.url]);
 
     // Populate profile form once when admin loads
     useEffect(() => {
@@ -135,13 +124,9 @@ export default function ProfilePage() {
                     v1.0.0
                 </span>
 
-                <Image
-                    src={avatarUrl || "/logo.png"}
-                    alt="Admin Avatar"
-                    width={96}
-                    height={96}
-                    className="rounded-full border object-cover"
-                />
+                <div className="w-24 h-24 rounded-full overflow-hidden border">
+                    <Avatar photoUrl={admin?.photoUrl?.url} />
+                </div>
 
                 <div>
                     <h1 className="text-2xl font-semibold">

@@ -23,54 +23,54 @@ export default function BookingsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
 
-    // useEffect(() => {
-    //     async function fetchBookings() {
-    //         setLoading(true);
-    //         try {
-    //             const res = await fetch('/api/bookings');
-    //             if (!res.ok) throw new Error('Failed to fetch bookings');
-    //             const data = await res.json();
-    //             setBookings(data);
-    //         } catch (error) {
-    //             console.error(error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
-    //     fetchBookings();
-    // }, []);
-
     useEffect(() => {
         async function fetchBookings() {
             setLoading(true);
             try {
-                const res = await fetch('/api/bookings/all');
+                const res = await fetch('/api/bookings');
                 if (!res.ok) throw new Error('Failed to fetch bookings');
-
                 const data = await res.json();
-
-                const excludeStart = new Date('2025-12-18');
-                const excludeEnd = new Date('2026-01-15');
-
-                const filteredBookings = data.filter(
-                    (booking: { createdAt: string | number | Date, referenceNumber: string }) => {
-                        const bookingDate = new Date(booking.createdAt);
-                        const bookingId = booking.referenceNumber === "ETSJRURPXA"
-                        // keep bookings NOT in the excluded range
-                        return bookingDate < excludeStart || bookingId;
-                    }
-                );
-
-                setBookings(filteredBookings);
+                setBookings(data);
             } catch (error) {
                 console.error(error);
             } finally {
                 setLoading(false);
             }
         }
-
         fetchBookings();
     }, []);
+
+    // useEffect(() => {
+    //     async function fetchBookings() {
+    //         setLoading(true);
+    //         try {
+    //             const res = await fetch('/api/bookings/all');
+    //             if (!res.ok) throw new Error('Failed to fetch bookings');
+
+    //             const data = await res.json();
+
+    //             const excludeStart = new Date('2025-12-18');
+    //             const excludeEnd = new Date('2026-01-15');
+
+    //             const filteredBookings = data.filter(
+    //                 (booking: { createdAt: string | number | Date, referenceNumber: string }) => {
+    //                     const bookingDate = new Date(booking.createdAt);
+    //                     const bookingId = booking.referenceNumber === "ETSJRURPXA"
+    //                     // keep bookings NOT in the excluded range
+    //                     return bookingDate < excludeStart || bookingId;
+    //                 }
+    //             );
+
+    //             setBookings(filteredBookings);
+    //         } catch (error) {
+    //             console.error(error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
+
+    //     fetchBookings();
+    // }, []);
 
     async function fetchAllBookings() {
         setLoading(true);
@@ -220,12 +220,12 @@ export default function BookingsPage() {
                             placeholder="Search Booking ID"
                             className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
                         />
-                        {/* <button
+                        <button
                             className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={fetchAllBookings}
                         >
                             <RefreshCcw />
-                        </button> */}
+                        </button>
                         <button
                             className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
                             onClick={() => exportBookingsToCSV(sortedBookings)} disabled={loading}

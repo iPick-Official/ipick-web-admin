@@ -2,10 +2,15 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const filename = searchParams.get("filename");
+  let filename = searchParams.get("filename");
 
   if (!filename) {
     return NextResponse.json({ message: "Missing filename" }, { status: 400 });
+  }
+
+  // Strip S3 URL if accidentally passed
+  if (filename.startsWith("http")) {
+    filename = filename.split(".amazonaws.com/")[1];
   }
 
   try {

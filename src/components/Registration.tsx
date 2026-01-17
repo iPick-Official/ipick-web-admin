@@ -3,6 +3,7 @@ import { departments, statusOptions } from "@/app/utils/department";
 import { RegisterFormType } from "@/types/registration";
 import { useMemo, useRef } from "react";
 import Image from "next/image";
+import { Avatar } from "./Avatar";
 
 interface RegisterFormProps {
     form: RegisterFormType;
@@ -144,20 +145,18 @@ export function RegisterForm({ form, setForm, onSubmit, onFileChange, profileIma
             {onFileChange && (
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <div className="w-28 h-28 rounded-full overflow-hidden border border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800">
-                            {profileImage ? (
-                                <img
-                                    src={profileImage.url}
-                                    alt={profileImage.name || "Profile Preview"}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center w-full h-full text-gray-400 text-xs">
-                                    No Image
-                                </div>
-                            )}
-                        </div>
-
+                        {profileImage ? (
+                            <Avatar
+                                photoUrl={profileImage.url}
+                                size={112}
+                                alt="Profile preview"
+                                directUrl
+                            />
+                        ) : (
+                            <div className="w-28 h-28 rounded-full flex items-center justify-center border border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-gray-400 text-xs">
+                                No Image
+                            </div>
+                        )}
                         <label className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
                             <span className="text-white text-xs font-medium">Change</span>
                             <input
