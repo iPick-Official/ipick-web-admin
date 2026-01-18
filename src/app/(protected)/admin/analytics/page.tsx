@@ -24,7 +24,7 @@ export default function Analytics() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 p-8 bg-gray-50 overflow-auto">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Analytics Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-6">Analytics Dashboard</h1>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

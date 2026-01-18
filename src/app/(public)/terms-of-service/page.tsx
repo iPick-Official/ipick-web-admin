@@ -1,7 +1,7 @@
 'use client';
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Footer from "@/components/LandingPageFooter";
+import Navbar from "@/components/LandingPageNavbar";
 import { useEffect, useRef, useState } from "react";
 
 const sections = [
@@ -47,7 +47,7 @@ export default function TermsService() {
 
     return (
         <>
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white dark:bg-zinc-900 py-24 sm:py-32">
                 <Navbar />
                 <div className="relative isolate px-6 pt-14 lg:px-8">
                     {/* Background Gradient Shape - Top */}
@@ -62,7 +62,7 @@ export default function TermsService() {
                             }} />
                     </div>
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <h1 className="text-4xl font-bold text-gray-900 text-center mb-16">Terms of Service</h1>
+                        <h1 className="text-4xl font-bold text-center mb-16">Terms of Service</h1>
                         <div className="lg:hidden mb-4 flex justify-between items-center">
                             <button
                                 onClick={() => setTocOpen(!tocOpen)}
@@ -77,7 +77,7 @@ export default function TermsService() {
                             {(tocOpen || isDesktop) && (
                                 <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
-                                        <p className="text-sm font-semibold text-gray-700 capitalize">Contents</p>
+                                        <p className="text-sm font-semibold capitalize">Contents</p>
                                         <ul className="space-y-2">
                                             {sections.map(({ id, title }) => (
                                                 <li key={id}>
@@ -85,7 +85,7 @@ export default function TermsService() {
                                                         href={`#${id}`}
                                                         className={`block transition-colors capitalize ${activeId === id
                                                                 ? 'text-green-600 font-semibold'
-                                                                : 'text-gray-600 hover:text-green-600'
+                                                                : 'hover:text-green-600'
                                                             }`}
                                                     >
                                                         {title}
@@ -98,13 +98,13 @@ export default function TermsService() {
                             )}
 
                             {/* RIGHT COLUMN - Content */}
-                            <main className="lg:col-span-3 space-y-16 text-gray-700 leading-relaxed text-base">
+                            <main className="lg:col-span-3 space-y-16 leading-relaxed text-base">
                                 <section id="amendment">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 uppercase">
+                                    <h2 className="text-xl font-semibold mb-4 uppercase">
                                         Amendment to Terms of Service Agreement
                                     </h2>
 
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <div className="space-y-4 text-base">
                                         <p>
                                             This Amendment to the Terms of Service Agreement (the “Amendment”) is effective as of <strong>December 14, 2023</strong>, by and between <strong>iPick Booking Services (“iPick”)</strong>, and its users, including Passengers and TNVS Operators.
                                         </p>
@@ -142,7 +142,7 @@ export default function TermsService() {
                                             </li>
                                         </ul>
 
-                                        <h3 className="text-lg font-semibold text-gray-800 mt-6">General Provisions:</h3>
+                                        <h3 className="text-lg font-semibold mt-6">General Provisions:</h3>
 
                                         <ul className="list-disc list-inside space-y-2">
                                             <li>
@@ -174,11 +174,11 @@ export default function TermsService() {
                                 </section>
 
                                 <section id="standard">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 uppercase">
+                                    <h2 className="text-xl font-semibold mb-4 uppercase">
                                         Standard Operating Procedure
                                     </h2>
 
-                                    <div className="space-y-6 text-base text-gray-700">
+                                    <div className="space-y-6 text-base">
                                         <div>
                                             <h3 className="font-semibold text-lg">1. Digital Booking and Dispatch</h3>
                                             <ul className="list-disc list-inside space-y-1 mt-2">
@@ -270,10 +270,10 @@ export default function TermsService() {
                                     </div>
                                 </section>
                                 <section id="tos-passengers" className="mb-12">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 uppercase">
+                                    <h2 className="text-xl font-semibold mb-4 uppercase">
                                         Terms of Service Agreement for Passengers
                                     </h2>
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <div className="space-y-4 text-base">
                                         <p><strong>1. Acceptance of Terms</strong><br />
                                             Welcome to iPick! By using our mobile application (the “App”) and our ride-hailing services (the “Services”), you agree to follow and be bound by these Terms of Service (“ToS”). If you disagree with these terms, please refrain from using our App or Services.</p>
 
@@ -346,10 +346,10 @@ export default function TermsService() {
                                 </section>
 
                                 <section id="terms">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 uppercase">
+                                    <h2 className="text-xl font-semibold mb-4 uppercase">
                                         Terms of Service Agreement for TNVS Operators
                                     </h2>
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <div className="space-y-4 text-base">
                                         <p><strong>1. Acceptance of Terms</strong><br />
                                             Welcome to iPick! By accessing or using our platform and services as a TNVS operator, you agree to comply with and be bound by the following Terms of Service (“ToS”). If you do not agree to these terms, please refrain from using our platform or services.</p>
 

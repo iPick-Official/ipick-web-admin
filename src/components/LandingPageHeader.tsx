@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
-import DownloadModal from '@/components/DownloadModal';
+import DownloadModal from '@/components/LandingPageDownload';
+import Image from "next/image";
 
 export default function HeroHeader() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,7 @@ export default function HeroHeader() {
     ];
 
     return (
-        <div className="bg-white overflow-x-hidden md:overflow-x-visible">
+        <div className="bg-white dark:bg-zinc-900 overflow-x-hidden md:overflow-x-visible">
             <div className="relative isolate px-6 pt-14 lg:px-8 flex-grow">
                 <div
                     aria-hidden="true"
@@ -38,20 +38,23 @@ export default function HeroHeader() {
                 <div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                         <div className="text-center md:text-left">
-                            <h1 className="text-5xl font-semibold tracking-tight text-green-700 sm:text-7xl">
-                                iPick. <span className="text-orange-500">Bringing you to places</span>
+                            <Image
+                                src='/logo-word.png'
+                                width={500}
+                                height={500}
+                                alt='logo-word'
+                            />
+                            <h1 className="text-5xl font-semibold text-orange-400 sm:text-6xl font-cursive">
+                                Bringing you to places
                             </h1>
-                            <p className="mt-8 text-lg font-medium text-gray-500 sm:text-xl">
-                                Hatid ka namin saan mo man gustuhin, buong puso at may malasakit.
-                            </p>
                             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
                                 <button
                                     onClick={() => setIsModalOpen(true)}
-                                    className="rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
+                                    className="rounded-md bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-600"
                                 >
                                     Book Now
                                 </button>
-                                <a href="#learn-more" className="text-sm font-semibold text-gray-900">
+                                <a href="#learn-more" className="text-sm font-semibold">
                                     Learn more <span aria-hidden="true">→</span>
                                 </a>
                             </div>

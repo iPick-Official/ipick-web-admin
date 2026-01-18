@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 
-export function useAvatarUrl(photoUrl?: string | null) {
+export function useAvatarUrl(filename?: string | null) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!photoUrl) {
+    if (!filename) {
+      setAvatarUrl(null);
+      return;
+    }
+    if (filename.startsWith("blob:")) {
       setAvatarUrl(null);
       return;
     }
 
-    // Extract S3 key if a full URL is provided
-    const filename = photoUrl.startsWith("http")
-      ? photoUrl.split(".amazonaws.com/")[1]
-      : photoUrl;
+    let cancelled = false;
 
     const fetchAvatar = async () => {
       setLoading(true);
@@ -25,16 +26,21 @@ export function useAvatarUrl(photoUrl?: string | null) {
         if (!res.ok) throw new Error("Failed to fetch avatar");
 
         const data = await res.json();
-        setAvatarUrl(data.url);
+
+        if (!cancelled) setAvatarUrl(data.url);
       } catch {
-        setAvatarUrl(null);
+        if (!cancelled) setAvatarUrl(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchAvatar();
-  }, [photoUrl]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filename]);
 
   return { avatarUrl, loading };
 }

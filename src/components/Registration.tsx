@@ -145,18 +145,12 @@ export function RegisterForm({ form, setForm, onSubmit, onFileChange, profileIma
             {onFileChange && (
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        {profileImage ? (
-                            <Avatar
-                                photoUrl={profileImage.url}
-                                size={112}
-                                alt="Profile preview"
-                                directUrl
-                            />
-                        ) : (
-                            <div className="w-28 h-28 rounded-full flex items-center justify-center border border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-gray-400 text-xs">
-                                No Image
-                            </div>
-                        )}
+                        <Avatar
+                            photoUrl={profileImage?.url}
+                            size={112}
+                            alt="Profile preview"
+                            directUrl
+                        />
                         <label className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
                             <span className="text-white text-xs font-medium">Change</span>
                             <input

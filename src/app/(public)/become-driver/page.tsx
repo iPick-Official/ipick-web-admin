@@ -1,13 +1,13 @@
 'use client';
 
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
-import DownloadModal from '@/components/DownloadModal';
+import Footer from '@/components/LandingPageFooter';
+import Navbar from '@/components/LandingPageNavbar';
+import DownloadModal from '@/components/LandingPageDownload';
+import DriverOnboard from '@/components/LandingPageOnboard';
 import Image from 'next/image';
 import { useState } from 'react';
 import { CloudArrowDownIcon, IdentificationIcon, CurrencyDollarIcon } from '@heroicons/react/20/solid';
 import { ShieldCheckIcon, MapPinIcon, PowerCircleIcon } from 'lucide-react';
-import DriverOnboard from '@/components/DriverOnboard';
 
 const features = [
     {
@@ -62,7 +62,7 @@ export default function BecomeDriver() {
 
     return (
         <>
-            <div className="bg-white min-h-screen flex flex-col overflow-x-hidden md:overflow-x-visible">
+            <div className="bg-white dark:bg-zinc-900 min-h-screen flex flex-col overflow-x-hidden md:overflow-x-visible">
                 <Navbar />
 
                 {/* Hero Section */}
@@ -85,20 +85,26 @@ export default function BecomeDriver() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                             {/* Text Content */}
                             <div className="text-center md:text-left">
-                                <h1 className="text-5xl font-semibold tracking-tight text-green-700 sm:text-7xl">
-                                    iPick Driver. <span className="text-orange-500">Drive. Earn. Empower.</span>
+                                <Image
+                                    src='/logo-word.png'
+                                    width={500}
+                                    height={500}
+                                    alt='logo-word'
+                                />
+                                <h1 className="text-5xl font-semibold text-orange-400 sm:text-6xl font-cursive">
+                                    Driver
                                 </h1>
-                                <p className="mt-8 text-lg font-medium text-gray-500 sm:text-xl">
+                                <p className="mt-8 text-lg font-medium sm:text-xl">
                                     Be your own boss. Drive with iPick and enjoy flexible hours, steady income, and full support every step of the way.
                                 </p>
                                 <div className="mt-10 flex flex-col sm:flex-row items-center md:justify-start justify-center gap-4">
                                     <button
                                         onClick={() => setIsModalOpen(true)}
-                                        className="rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+                                        className="rounded-md bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-600"
                                     >
                                         Become a Driver
                                     </button>
-                                    <a href="#learn-more" className="text-sm font-semibold text-gray-900">
+                                    <a href="#learn-more" className="text-sm font-semibold">
                                         Learn more <span aria-hidden="true">→</span>
                                     </a>
                                 </div>
@@ -143,13 +149,13 @@ export default function BecomeDriver() {
                     </div>
                 </div>
                 <DriverOnboard />
-                <section id="learn-more" className="bg-white py-24 sm:py-32">
+                <section id="learn-more" className="bg-white dark:bg-zinc-900 py-24 sm:py-32">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
-                            <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                            <p className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
                                 How iPick Driver Works?
                             </p>
-                            <p className="mt-6 text-lg leading-8 text-gray-700">
+                            <p className="mt-6 text-lg leading-8">
                                 iPick Driver is built for partners who want flexibility, control over their time, and access to a growing passenger network. Here&apos;s how drivers thrive on the iPick platform.
                             </p>
                         </div>
@@ -158,13 +164,13 @@ export default function BecomeDriver() {
                             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
                                 {features.map((feature) => (
                                     <div key={feature.name} className="relative pl-16">
-                                        <dt className="text-base font-semibold leading-7 text-gray-900">
+                                        <dt className="text-base font-semibold leading-7">
                                             <div className="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-green-600">
                                                 <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                                             </div>
                                             {feature.name}
                                         </dt>
-                                        <dd className="mt-2 text-base leading-7 text-gray-600">{feature.description}</dd>
+                                        <dd className="mt-2 text-base leading-7">{feature.description}</dd>
                                     </div>
                                 ))}
                             </dl>

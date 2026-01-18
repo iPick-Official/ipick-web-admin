@@ -4,13 +4,13 @@ export default function NotFound() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-4 text-center">
             {/* Animated 404 text */}
-            <h1 className="text-9xl font-extrabold text-gray-800 animate-bounce">404</h1>
+            <h1 className="text-9xl font-extrabold animate-bounce">404</h1>
 
             {/* Message */}
-            <p className="mt-4 text-2xl text-gray-600 animate-fade-in">
+            <p className="mt-4 text-2xl animate-fade-in">
                 Oops! Page not found.
             </p>
-            <p className="mt-2 text-gray-500 animate-fade-in delay-150">
+            <p className="mt-2 animate-fade-in delay-150">
                 The page you are looking for might have been removed or is temporarily unavailable.
             </p>
 

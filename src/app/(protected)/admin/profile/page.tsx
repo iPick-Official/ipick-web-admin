@@ -4,7 +4,6 @@ import { Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { Loading } from "@/components/Loading";
-import Image from "next/image";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Modal from "@/components/Modal";
 import { capitalize } from "@/app/utils/capitalized";
@@ -65,7 +64,7 @@ export default function ProfilePage() {
             return;
         }
         try {
-            const res = await fetch(`/api/admin/${admin?._id}`, {
+            const res = await fetch(`/api/employees/${admin?._id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(profileForm),

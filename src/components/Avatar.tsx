@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useAvatarUrl } from "@/hooks/useAvatarUrl";
 
 type AvatarProps = {
-    photoUrl?: string | null;
+    photoUrl?: string | null; // filename OR blob URL
     size?: number;
     alt?: string;
     directUrl?: boolean;
@@ -14,7 +14,9 @@ export function Avatar({
     alt = "Avatar",
     directUrl = false,
 }: AvatarProps) {
-    const { avatarUrl } = useAvatarUrl(directUrl ? null : photoUrl);
+    const { avatarUrl, loading } = useAvatarUrl(
+        !directUrl && photoUrl ? photoUrl : null
+    );
 
     const src = directUrl ? photoUrl : avatarUrl;
 
@@ -40,6 +42,10 @@ export function Avatar({
                         unoptimized
                     />
                 )
+            ) : loading ? (
+                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                    Loading…
+                </div>
             ) : (
                 <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
                     No Image

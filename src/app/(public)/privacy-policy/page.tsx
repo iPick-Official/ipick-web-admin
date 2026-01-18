@@ -1,7 +1,7 @@
 'use client';
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Footer from "@/components/LandingPageFooter";
+import Navbar from "@/components/LandingPageNavbar";
 import { useEffect, useRef, useState } from "react";
 
 const sections = [
@@ -60,7 +60,7 @@ export default function PrivacyPolicy() {
 
     return (
         <>
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white dark:bg-zinc-900 py-24 sm:py-32">
                 <Navbar />
                 <div className="relative isolate px-6 pt-14 lg:px-8">
                     {/* Background Gradient Shape - Top */}
@@ -75,7 +75,7 @@ export default function PrivacyPolicy() {
                             }} />
                     </div>
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <h1 className="text-4xl font-bold text-gray-900 text-center mb-16">Privacy Policy</h1>
+                        <h1 className="text-4xl font-bold text-center mb-16">Privacy Policy</h1>
                         <div className="lg:hidden mb-4 flex justify-between items-center">
                             <button
                                 onClick={() => setTocOpen(!tocOpen)}
@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
                             {(tocOpen || isDesktop) && (
                                 <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
-                                        <p className="text-sm font-semibold text-gray-700">Contents</p>
+                                        <p className="text-sm font-semibold">Contents</p>
                                         <ul className="space-y-2">
                                             {sections.map((section) => (
                                                 <li key={section.id}>
@@ -98,7 +98,7 @@ export default function PrivacyPolicy() {
                                                         href={`#${section.id}`}
                                                         className={`block transition-colors ${activeId === section.id
                                                                 ? 'text-green-600 font-semibold'
-                                                                : 'text-gray-600 hover:text-green-600'
+                                                                : 'hover:text-green-600'
                                                             }`}
                                                     >
                                                         {section.title}
@@ -111,9 +111,9 @@ export default function PrivacyPolicy() {
                             )}
 
                             {/* RIGHT COLUMN - Content */}
-                            <main className="lg:col-span-3 space-y-16 text-gray-700 leading-relaxed text-base">
+                            <main className="lg:col-span-3 space-y-16 leading-relaxed text-base">
                                 <section id="introduction">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Introduction</h2>
+                                    <h2 className="text-xl font-semibold mb-2">1. Introduction</h2>
                                     <p>
                                         Thank you for trusting us with your personal information.
 
@@ -122,7 +122,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="personal-data">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">2. Personal Data</h2>
                                     <p>
                                         IPICK collects the following personal information (Personal Data) which is defined as any information which can be used to identify you or from which you are identifiable, from our consumers, agents, vendors, suppliers, partners (driver, delivery and merchant partners), contractors and service providers. This includes but is not limited to your:
                                     </p>
@@ -160,7 +160,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="personal-data-collection">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Personal Data Collection</h2>
+                                    <h2 className="text-xl font-semibold mb-2">3. Personal Data Collection</h2>
                                     <p>IPICK collects and may combine Personal Data about you through the following means:</p>
 
                                     <ol className="list-decimal list-inside mt-4 space-y-2">
@@ -211,7 +211,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="sensitive-personal-data">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Sensitive Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">4. Sensitive Personal Data</h2>
                                     <p>
                                         Some of the Personal Data that IPICK collects may be sensitive in nature. This may include Personal Data related to:
                                     </p>
@@ -231,19 +231,19 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="rights">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">5. When you provide Personal Data of other individuals to IPICK</h2>
+                                    <h2 className="text-xl font-semibold mb-2">5. When you provide Personal Data of other individuals to IPICK</h2>
                                     <p>In some situations, you may provide Personal Data of other individuals (such as your spouse, family members or friends) to us. For example, you may add them as your emergency contact, when you use the in-app chat or when you add them as recipients or beneficiaries of any use of our Services. If you provide us with their Personal Data, you represent and warrant that you have obtained their consent for their Personal Data to be collected, used and disclosed as set out in this Privacy Notice.</p>
                                 </section>
 
                                 <section id="minors">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Personal Data of Minors</h2>
+                                    <h2 className="text-xl font-semibold mb-2">6. Personal Data of Minors</h2>
                                     <p>
                                         It is the duty and responsibility of parents not to allow minors under their care to submit Personal Data to IPICK. In the event that such Personal Data of a minor is disclosed to IPICK, parent&apos;s hereby consent to the processing of the minor&apos;s Personal Data and accept and agree to be bound by this Notice and take responsibility for his or her actions.
                                     </p>
                                 </section>
 
                                 <section id="use-of">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Use of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">7. Use of Personal Data</h2>
                                     <p>
                                         IPICK may use your Personal Data for the following purposes set out in the list below.
                                     </p>
@@ -257,7 +257,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="disclosure">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Disclosure of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">8. Disclosure of Personal Data</h2>
                                     <p>
                                         IPICK may need to share your Personal Data with various parties in connection with the purposes outlined in this Privacy Policy. These parties include:
                                     </p>
@@ -275,14 +275,14 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="retention">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">9. Retention of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">9. Retention of Personal Data</h2>
                                     <p>
                                         IPICK retains your Personal Data for the period necessary to fulfill the Purposes outlined in this Privacy Notice unless a longer retention period is required or allowed by law. Once your Personal Data is no longer necessary for the Services or Purposes, or we no longer have a legal or business purpose for retaining your Personal Data, we take steps to erase, destroy, anonymize or prevent access or use of such Personal Data for any purpose other than compliance with this Privacy Notice, or for purposes of safety, security, fraud prevention and detection, in accordance with the requirements of applicable laws.
                                     </p>
                                 </section>
 
                                 <section id="cookies">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">10. Cookies and Tracking Technologies</h2>
+                                    <h2 className="text-xl font-semibold mb-2">10. Cookies and Tracking Technologies</h2>
                                     <p>
                                         IPICK and third parties we partner with may use cookies, web beacons, tags, scripts, local shared objects (such as HTML5), advertising identifiers, and similar technologies in connection with your use of our Websites and Apps. These technologies may be persistent or session-based and can be stored on your browsers or devices.
                                     </p>
@@ -318,7 +318,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="protection">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">11. Protection of Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">11. Protection of Personal Data</h2>
                                     <p>
                                         IPICK takes reasonable legal, organizational, and technical measures to protect your Personal Data. These measures are designed to prevent your data from being lost, misused, or accessed without authorization.
                                     </p>
@@ -333,7 +333,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="respect">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">12. Your Rights with Respect to Personal Data</h2>
+                                    <h2 className="text-xl font-semibold mb-2">12. Your Rights with Respect to Personal Data</h2>
                                     <p>
                                         In accordance with applicable laws and regulations, you may be entitled to exercise the following rights concerning your Personal Data:
                                     </p>
@@ -365,7 +365,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="amendments">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">13. Amendments and Updates</h2>
+                                    <h2 className="text-xl font-semibold mb-2">13. Amendments and Updates</h2>
                                     <p>
                                         IPICK may modify, update, or amend the terms in this Privacy Notice at any time. Any such amendments will be communicated to you through the Apps and/or other appropriate channels at least five (5) business days before the effective date.
                                     </p>
@@ -375,7 +375,7 @@ export default function PrivacyPolicy() {
                                 </section>
 
                                 <section id="contact">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">14. Contact Us</h2>
+                                    <h2 className="text-xl font-semibold mb-2">14. Contact Us</h2>
                                     <p>
                                         If you have any queries about this Privacy Notice or would like to exercise your rights as outlined herein, please fill out the provided form or directly contact our Data Protection Officer:
                                     </p>

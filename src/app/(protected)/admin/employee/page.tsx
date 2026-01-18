@@ -1,7 +1,7 @@
 'use client';
 
 import Modal from '@/components/Modal';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
@@ -10,12 +10,15 @@ import { RegisterFormType } from '@/types/registration';
 import { departments } from '@/app/utils/department';
 import { RegisterForm } from '@/components/Registration';
 import { compressAndRenameImage } from '@/app/utils/compressor';
+import { useSort } from '@/hooks/useSort';
+import SortButton from '@/components/SortButton';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
     const [loading, setLoading] = useState(false);
     const [employees, setEmployees] = useState<Admin[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const { sortOrder, toggleSort } = useSort("desc");
     const [addEmployee, setAddEmployee] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [profileImage, setProfileImage] = useState<{ name: string; url: string } | null>(null);
@@ -114,7 +117,6 @@ export default function EmployeePage() {
             };
 
             const isEdit = Boolean(editingEmployee?._id);
-
             const res = await fetch(
                 isEdit ? `/api/employees/${editingEmployee!._id}` : "/api/auth/register",
                 {
@@ -126,7 +128,6 @@ export default function EmployeePage() {
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Operation failed");
-
             alert(isEdit ? "Employee updated successfully" : "Employee created successfully");
             window.location.reload();
         } catch (err: any) {
@@ -188,6 +189,33 @@ export default function EmployeePage() {
         setAddEmployee(true);
     };
 
+    // Filtered and sorted riders
+    const displayedEmployee = useMemo(() => {
+        let filtered = [...employees];
+
+        if (searchTerm.trim() !== '') {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(
+                (e) =>
+                    e.department?.toLowerCase().includes(term) ||
+                    e.status?.toLowerCase().includes(term) ||
+                    e.username?.toLowerCase().includes(term) ||
+                    e.firstName?.toLowerCase().includes(term) ||
+                    e.lastName?.toLowerCase().includes(term) ||
+                    e.mobnum?.includes(term)
+            );
+        }
+        return filtered;
+    }, [employees, searchTerm]);
+
+    const sortedEmployee = useMemo(() => {
+        return [...displayedEmployee].sort((a, b) => {
+            const dateA = new Date(a.createdAt || '').getTime();
+            const dateB = new Date(b.createdAt || '').getTime();
+            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        });
+    }, [displayedEmployee, sortOrder]);
+
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
@@ -224,11 +252,18 @@ export default function EmployeePage() {
                         <table className="min-w-full text-sm text-left border-collapse">
                             <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
                                 <tr>
-                                    {['ID', 'Full Name', 'Email', 'Mobile', 'Department', 'Status', 'Created At'].map(col => (
+                                    {['ID', 'Full Name', 'Username', 'Mobile', 'Department', 'Status'].map(col => (
                                         <th key={col} className="px-6 py-3 font-medium">
                                             {col}
                                         </th>
                                     ))}
+                                    <th className="px-6 py-3 font-medium text-left">
+                                        <SortButton
+                                            label="Created At"
+                                            sortOrder={sortOrder}
+                                            onToggle={toggleSort}
+                                        />
+                                    </th>
                                     <th className="px-6 py-3 text-right">Action</th>
                                 </tr>
                             </thead>
@@ -242,21 +277,21 @@ export default function EmployeePage() {
                                             </div>
                                         </td>
                                     </tr>
-                                ) : employees.length === 0 ? (
+                                ) : sortedEmployee.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="text-center py-6 text-gray-500 italic">
                                             No employees found.
                                         </td>
                                     </tr>
                                 ) : (
-                                    employees.map(emp => (
+                                    sortedEmployee.map(emp => (
                                         <tr
                                             key={emp._id}
                                             className="border-b hover:bg-gray-800 hover:text-white transition"
                                         >
                                             <td className="px-6 py-3">{emp.employeeId}</td>
                                             <td className="px-6 py-3">{`${emp.firstName} ${emp.lastName}`}</td>
-                                            <td className="px-6 py-3">{emp.email}</td>
+                                            <td className="px-6 py-3">{emp.username}</td>
                                             <td className="px-6 py-3">{emp.mobnum}</td>
                                             <td className="px-6 py-3">
                                                 {
@@ -265,7 +300,7 @@ export default function EmployeePage() {
                                             </td>
                                             <td className="px-6 py-3 uppercase">{emp.status}</td>
                                             <td className="px-6 py-3">
-                                                {new Date(emp.createdAt).toLocaleDateString()}
+                                                {new Date(emp.createdAt).toLocaleString()}
                                             </td>
                                             <td className="px-6 py-3 flex justify-end text-green-700">
                                                 <PenBox

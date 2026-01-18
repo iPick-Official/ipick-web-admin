@@ -43,13 +43,13 @@ const features = [
 
 export default function FeaturesSection() {
     return (
-        <section id="learn-more" className="bg-white py-24 sm:py-32">
+        <section id="learn-more" className="bg-white dark:bg-zinc-900 py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl text-center">
-                    <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                    <p className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
                         How It Works?
                     </p>
-                    <p className="mt-6 text-lg leading-8 text-gray-700">
+                    <p className="mt-6 text-lg leading-8">
                         The iPick Mobile App is designed to provide a seamless and user-friendly experience for both passengers and drivers. It is divided into two key features: iPick Passenger and iPick Driver, each tailored to meet the specific needs of its users.
                     </p>
                 </div>
@@ -58,13 +58,13 @@ export default function FeaturesSection() {
                     <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
                         {features.map((feature) => (
                             <div key={feature.name} className="relative pl-16">
-                                <dt className="text-base font-semibold leading-7 text-gray-900">
+                                <dt className="text-base font-semibold leading-7">
                                     <div className="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-green-600">
                                         <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                                     </div>
                                     {feature.name}
                                 </dt>
-                                <dd className="mt-2 text-base leading-7 text-gray-600">{feature.description}</dd>
+                                <dd className="mt-2 text-base leading-7">{feature.description}</dd>
                             </div>
                         ))}
                     </dl>

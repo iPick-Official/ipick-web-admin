@@ -9,12 +9,12 @@ const Footer: React.FC = () => {
     return (
         <footer
             id="contact"
-            className="bg-gray-100 text-gray-800 py-10 px-6 text-center sm:text-left"
+            className="bg-gray-100 dark:bg-zinc-800 py-10 px-6 text-center sm:text-left"
         >
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                 {/* Company Info */}
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">iPick</h3>
+                    <h3 className="text-lg font-semibold mb-2">iPick</h3>
                     <p className="text-sm leading-relaxed">
                         iPick is your go-to ride-hailing app for fast, safe, and affordable travel. We bring you to places with care and convenience.
                     </p>
@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
 
                 {/* Quick Links */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-900 mb-2">Quick links</h4>
+                    <h4 className="text-md font-semibold mb-2">Quick links</h4>
                     <ul className="space-y-2 text-sm">
                         <li>
                             <a href="/driver-center" className="hover:text-green-600">
@@ -49,7 +49,7 @@ const Footer: React.FC = () => {
 
                 {/* Legal */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-900 mb-2">Legal</h4>
+                    <h4 className="text-md font-semibold mb-2">Legal</h4>
                     <ul className="space-y-2 text-sm">
                         <li>
                             <a href="/privacy-policy" className="hover:text-green-600">
@@ -76,7 +76,7 @@ const Footer: React.FC = () => {
 
                 {/* App Downloads */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-900 mb-4">Get the App</h4>
+                    <h4 className="text-md font-semibold mb-4">Get the App</h4>
                     <div className="flex flex-col gap-4 items-center sm:items-start">
                         <a
                             href="https://play.google.com/store/apps/details?id=com.ipick.starter&hl=en"

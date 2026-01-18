@@ -1,7 +1,7 @@
 'use client';
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Footer from "@/components/LandingPageFooter";
+import Navbar from "@/components/LandingPageNavbar";
 import { useEffect, useRef, useState } from "react";
 
 const sections = [
@@ -49,7 +49,7 @@ export default function CodeConduct() {
 
     return (
         <>
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white dark:bg-zinc-900 py-24 sm:py-32">
                 <Navbar />
                 <div className="relative isolate px-6 pt-14 lg:px-8">
                     {/* Background Gradient Shape - Top */}
@@ -64,7 +64,7 @@ export default function CodeConduct() {
                             }} />
                     </div>
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <h1 className="text-4xl font-bold text-gray-900 text-center mb-16">Code of Conduct</h1>
+                        <h1 className="text-4xl font-bold text-center mb-16">Code of Conduct</h1>
                         <div className="lg:hidden mb-4 flex justify-between items-center">
                             <button
                                 onClick={() => setTocOpen(!tocOpen)}
@@ -79,7 +79,7 @@ export default function CodeConduct() {
                             {(tocOpen || isDesktop) && (
                                 <aside className="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 sticky lg:top-32 self-start">
                                     <nav className="space-y-4 text-sm">
-                                        <p className="text-sm font-semibold text-gray-700">Contents</p>
+                                        <p className="text-sm font-semibold">Contents</p>
                                         <ul className="space-y-2">
                                             {sections.map(({ id, title }) => (
                                                 <li key={id}>
@@ -87,7 +87,7 @@ export default function CodeConduct() {
                                                         href={`#${id}`}
                                                         className={`block transition-colors ${activeId === id
                                                                 ? 'text-green-600 font-semibold'
-                                                                : 'text-gray-600 hover:text-green-600'
+                                                                : 'hover:text-green-600'
                                                             }`}
                                                     >
                                                         {title}
@@ -100,11 +100,11 @@ export default function CodeConduct() {
                             )}
 
                             {/* RIGHT COLUMN - Content */}
-                            <main className="lg:col-span-3 space-y-16 text-gray-700 leading-relaxed text-base">
+                            <main className="lg:col-span-3 space-y-16 leading-relaxed text-base">
                                 <section id="general">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">1. General Code of Conduct</h2>
+                                    <h2 className="text-xl font-semibold mb-2">1. General Code of Conduct</h2>
 
-                                    <ul className="list-none text-base text-gray-700 space-y-4">
+                                    <ul className="list-none text-base space-y-4">
                                         <li>
                                             <h3 className="font-semibold leading-tight">Respect for All</h3>
                                             <p className="mt-1">
@@ -143,9 +143,9 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="passenger">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Passenger Code of Conduct</h2>
+                                    <h2 className="text-xl font-semibold mb-2">2. Passenger Code of Conduct</h2>
 
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <div className="space-y-4 text-base">
                                         <div>
                                             <h3 className="font-semibold">Punctuality and Commitment</h3>
                                             <p>
@@ -207,9 +207,9 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="community">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">3. iPick Community Conduct</h2>
+                                    <h2 className="text-xl font-semibold mb-2">3. iPick Community Conduct</h2>
 
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <div className="space-y-4 text-base">
                                         <div>
                                             <h3 className="font-semibold">Adherence to Terms</h3>
                                             <p>
@@ -257,8 +257,8 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="breach">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Breach of Code</h2>
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <h2 className="text-xl font-semibold mb-2">4. Breach of Code</h2>
+                                    <div className="space-y-4 text-base">
                                         <p>
                                             Non-compliance with this Code of Conduct may result in actions taken by iPick, including temporary or permanent suspension of your account.
                                         </p>
@@ -266,8 +266,8 @@ export default function CodeConduct() {
                                 </section>
 
                                 <section id="commitment">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Commitment to Community</h2>
-                                    <div className="space-y-4 text-base text-gray-700">
+                                    <h2 className="text-xl font-semibold mb-2">5. Commitment to Community</h2>
+                                    <div className="space-y-4 text-base">
                                         <p>
                                             Non-compliance with this Code of Conduct may result in actions taken by iPick, including temporary or permanent suspension of your account.
                                         </p>
