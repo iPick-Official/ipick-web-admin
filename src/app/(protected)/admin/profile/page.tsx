@@ -91,7 +91,7 @@ export default function ProfilePage() {
             return;
         }
         try {
-            const res = await fetch(`/api/admin/${admin?._id}`, {
+            const res = await fetch(`/api/employees/${admin?._id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(passwordForm),
