@@ -41,7 +41,7 @@ export const navSections = [
             { label: "Employee Info", icon: <BsPeople size={20} />, path: "/admin/employee" },
             { label: "Role Info", icon: <UserCheck2Icon size={20} />, path: "/admin/role" },
             { label: "Analysis", icon: <BarChart2 size={20} />, path: "/admin/analytics" },
-            { label: "JSON View", icon: <FileJson size={20} />, path: "/admin/json-view" },
+            // { label: "JSON View", icon: <FileJson size={20} />, path: "/admin/json-view" },
         ],
     },
 ];

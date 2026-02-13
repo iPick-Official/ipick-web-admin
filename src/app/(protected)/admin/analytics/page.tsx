@@ -1,13 +1,13 @@
 "use client";
 
-import { Sidebar } from "@/components/Sidebar";
+import { RidershipData, MonthlyRidershipChart } from "@/components/ui/MonthlyRidershipChart";
 import {
   BarChart2,
   BusFront,
   DollarSign,
+  Sidebar,
   Users,
 } from "lucide-react";
-import { MonthlyRidershipChart, RidershipData } from "@/components/MonthlyRidershipChart";
 
 export default function Analytics() {
 

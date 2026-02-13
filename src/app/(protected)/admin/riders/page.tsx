@@ -1,19 +1,18 @@
 'use client';
 
-import { Sidebar } from '@/components/Sidebar';
 import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
-import { Pagination } from '@/components/Pagination';
-import { Loading } from '@/components/Loading';
 import { Download, Edit, Eye, Percent } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
-import { Detail } from '@/components/Details';
-
-import ImageView from '@/components/ImageView';
-import SortButton from '@/components/SortButton';
-import Modal from '@/components/Modal';
 import { exportRidersToCSV } from '@/app/utils/DownloadReports';
+import { Sidebar } from '@/components/ui/Sidebar';
+import { Detail } from '@/components/ui/Details';
+import { Loading } from '@/components/ui/Loading';
+import { Pagination } from '@/components/ui/Pagination';
+import SortButton from '@/components/ui/SortButton';
+import ImageView from '@/components/ui/ImageView';
+import Modal from '@/components/ui/Modal';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);

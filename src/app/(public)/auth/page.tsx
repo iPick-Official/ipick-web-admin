@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Loading } from "../../../components/Loading";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { Loading } from "@/components/ui/Loading";
 import Image from "next/image";
 
 export default function AuthPage() {

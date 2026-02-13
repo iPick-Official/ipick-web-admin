@@ -1,3 +1,5 @@
+export type DriverStatus = "approved" | "pending" | "inactive" | "rejected";
+
 // Reusable file/document structure
 export interface FileDocument {
   name: string;
@@ -86,6 +88,7 @@ export interface Driver {
   firstName: string;
   surName: string;
   address: string;
+  caseNum: string;
   city: string;
   province: string;
   zipCode: string;
@@ -93,8 +96,8 @@ export interface Driver {
   email: string;
   password: string;
   referralCode: string;
-  createdAt: string | null;
-  status: "pending" | "approved" | "rejected" | string;
+  createdAt?: string | null;
+  status: DriverStatus;
   type: "driver";
   carType: string;
   zone: string;
@@ -128,8 +131,8 @@ export interface DriverResponse {
   walletLogs: WalletLog[];
 }
 
-// Optional wallet on driver type
 export interface DriverWithWallet extends Driver {
   wallet?: Wallet;
   walletLogs?: WalletLog[];
 }
+

@@ -1,11 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sidebar } from "@/components/Sidebar";
-import { Loading } from '@/components/Loading';
-import { Download, PenBox, PlusIcon, GripVertical } from 'lucide-react';
+import { Download, PlusIcon } from 'lucide-react';
 import { TnvsConfigItem } from '@/types/tnvs-config';
-import Modal from '@/components/Modal';
 
 import {
     DndContext,
@@ -20,7 +17,10 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { DraggableCard } from '@/components/DraggableCard';
+import { Sidebar } from '@/components/ui/Sidebar';
+import { DraggableCard } from '@/components/ui/DraggableCard';
+import { Loading } from '@/components/ui/Loading';
+import Modal from '@/components/ui/Modal';
 
 /* ---------- Main Page ---------- */
 export default function TnvsConfig() {

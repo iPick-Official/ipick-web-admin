@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sidebar } from "@/components/Sidebar";
-import { Loading } from '@/components/Loading';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
-import Modal from '@/components/Modal';
 import { TimeMatrixItem } from '@/types/time-matrix';
+import { Sidebar } from '@/components/ui/Sidebar';
+import { Loading } from '@/components/ui/Loading';
+import Modal from '@/components/ui/Modal';
 
 export default function TnvsConfig() {
     const [loading, setLoading] = useState(false);

@@ -1,8 +1,8 @@
 // app/admin/dashboard/page.tsx
 "use client";
 
-import { MapView } from "@/components/MapView";
-import { Sidebar } from "@/components/Sidebar";
+import { MapView } from "@/components/ui/MapView";
+import { Sidebar } from "@/components/ui/Sidebar";
 
 export default function Dashboard() {
   return (

@@ -1,14 +1,20 @@
 'use client';
 
 import { exportBookingsToCSV } from '@/app/utils/DownloadReports';
-import { Loading } from '@/components/Loading';
-import { Pagination } from '@/components/Pagination';
-import { Sidebar } from '@/components/Sidebar';
-import SortButton from '@/components/SortButton';
+import { fetchJSON } from '@/app/utils/fetchJSON';
+import { sortByDate } from '@/app/utils/sortByDate';
+import { getStatusColor } from '@/app/utils/statusColor';
+import { Loading } from '@/components/ui/Loading';
+import { Pagination } from '@/components/ui/Pagination';
+import { Sidebar } from '@/components/ui/Sidebar';
 import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
-import { Download, Eye, RefreshCcw } from 'lucide-react';
+import { CheckCircleIcon, Eye, PauseCircleIcon, SparklesIcon, XCircleIcon } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
+import SortButton from '@/components/ui/SortButton';
+import StatsCard from '@/components/ui/StatsCard';
+import FilterToolbar from '@/components/ui/FilterToolbar';
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function BookingsPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -16,133 +22,63 @@ export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
+
+    const addDays = (dateString: string, days: number) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() + days);
+        return date.toISOString().split("T")[0];
+    };
+
     const [fromDate, setFromDate] = useState(today);
-    const [toDate, setToDate] = useState(today);
+    const [toDate, setToDate] = useState(addDays(today, 1));
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 100;
 
     useEffect(() => {
-        async function fetchBookings() {
-            setLoading(true);
-            try {
-                const res = await fetch('/api/bookings');
-                if (!res.ok) throw new Error('Failed to fetch bookings');
-                const data = await res.json();
-                setBookings(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchBookings();
+        setLoading(true);
+        fetchJSON<Booking[]>("/api/bookings")
+            .then(setBookings)
+            .catch(console.error)
+            .finally(() => setLoading(false));
     }, []);
-
-    // useEffect(() => {
-    //     async function fetchBookings() {
-    //         setLoading(true);
-    //         try {
-    //             const res = await fetch('/api/bookings/all');
-    //             if (!res.ok) throw new Error('Failed to fetch bookings');
-
-    //             const data = await res.json();
-
-    //             const excludeStart = new Date('2025-12-18');
-    //             const excludeEnd = new Date('2026-01-15');
-
-    //             const filteredBookings = data.filter(
-    //                 (booking: { createdAt: string | number | Date, referenceNumber: string }) => {
-    //                     const bookingDate = new Date(booking.createdAt);
-    //                     const bookingId = booking.referenceNumber === "ETSJRURPXA"
-    //                     // keep bookings NOT in the excluded range
-    //                     return bookingDate < excludeStart || bookingId;
-    //                 }
-    //             );
-
-    //             setBookings(filteredBookings);
-    //         } catch (error) {
-    //             console.error(error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
-
-    //     fetchBookings();
-    // }, []);
 
     async function fetchAllBookings() {
         setLoading(true);
-        try {
-            const res = await fetch('/api/bookings/all');
-            if (!res.ok) throw new Error('Failed to fetch bookings');
-            const data = await res.json();
-            setBookings(data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+        fetchJSON<Booking[]>("/api/bookings/all")
+            .then(setBookings)
+            .catch(console.error)
+            .finally(() => setLoading(false));
     }
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'finished':
-                return 'text-green-600';
-            case 'active':
-                return 'text-blue-600';
-            case 'cancelled':
-                return 'text-red-600';
-            case 'booked':
-                return 'text-yellow-600';
-            default:
-                return 'text-gray-500';
-        }
-    };
-
-    // Filtered and sorted bookings
     const displayedBookings = useMemo(() => {
-        let filtered = bookings;
+        return bookings.filter((b) => {
+            const updated = b.updatedAt ? new Date(b.updatedAt) : null;
 
-        // Filter by date range (defaults to today's date)
-        filtered = filtered.filter((b) => {
-            const bookingDate = new Date(b.updatedAt).toISOString().split('T')[0];
-            return bookingDate >= fromDate && bookingDate <= toDate;
-        });
+            const matchesDate =
+                !fromDate ||
+                !toDate ||
+                (updated &&
+                    updated >= new Date(fromDate) &&
+                    updated <= new Date(toDate));
 
-        // Status filter
-        if (statusFilter !== 'all') {
-            filtered = filtered.filter((b) => b.status === statusFilter);
-        }
+            const matchesStatus =
+                statusFilter === "all" || b.status === statusFilter;
 
-        // Search filter
-        if (searchTerm.trim() !== '') {
             const term = searchTerm.toLowerCase();
+            const matchesSearch =
+                !term ||
+                b._id?.toLowerCase().includes(term) ||
+                b.driverId?.toLowerCase().includes(term) ||
+                b.riderId?.toLowerCase().includes(term)
 
-            filtered = filtered.filter((b) => {
-                const bookingId = b._id ? b._id.toLowerCase() : '';
-                const driverId = b.driverId ? b.driverId.toLowerCase() : '';
-                const riderId = b.riderId ? b.riderId.toLowerCase() : '';
-
-                return (
-                    bookingId.includes(term) ||
-                    driverId.includes(term) || riderId.includes(term)
-                );
-            });
-        }
-
-        return filtered;
+            return matchesDate && matchesStatus && matchesSearch;
+        });
     }, [bookings, statusFilter, searchTerm, fromDate, toDate]);
 
     const sortedBookings = useMemo(() => {
-        const sorted = [...displayedBookings];
-        sorted.sort((a, b) => {
-            const dateA = new Date(a.updatedAt).getTime();
-            const dateB = new Date(b.updatedAt).getTime();
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-        return sorted;
+        return sortByDate(displayedBookings, "updatedAt", sortOrder);
     }, [displayedBookings, sortOrder]);
 
     // Reset pagination when filters change
@@ -169,165 +105,141 @@ export default function BookingsPage() {
         return { finished, cancelled, active, inactive, booked, totalBookings };
     }, [displayedBookings]);
 
+    const columns: Column<Booking>[] = [
+        { key: "_id", label: "Booking ID" },
+        { key: "riderId", label: "Rider ID" },
+        { key: "driverId", label: "Driver ID", render: (b) => b.driverId || "Unassigned" },
+        {
+            key: "status",
+            label: "Status",
+            render: (b) => (
+                <span className={`font-semibold ${getStatusColor(b.status)}`}>
+                    {b.status.toUpperCase()}
+                </span>
+            ),
+        },
+        {
+            key: "travelFare",
+            label: "Fare",
+            render: (b) => `₱${b.travelFare?.toFixed(2) ?? "0.00"}`,
+        },
+        { key: "origin", label: "Origin", render: (b) => b.origin?.name ?? "-" },
+        { key: "destination", label: "Destination", render: (b) => b.destination?.name ?? "-" },
+
+        // Timestamp column
+        {
+            key: "updatedAt",
+            label: "Timestamp",
+            render: (b) => new Date(b.updatedAt).toLocaleString(),
+            sortable: true,
+        },
+    ];
+
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
+                <FilterToolbar
+                    title="Bookings"
+                    dateFilters={[
+                        { label: "From", value: fromDate, onChange: setFromDate },
+                        { label: "To", value: toDate, onChange: setToDate },
+                    ]}
+                    selectFilters={[
+                        {
+                            label: "Status",
+                            value: statusFilter,
+                            onChange: setStatusFilter,
+                            options: [
+                                { label: "All", value: "all" },
+                                { label: "Completed", value: "finished" },
+                                { label: "Cancelled", value: "cancelled" },
+                                { label: "Active", value: "active" },
+                                { label: "Inactive", value: "inactive" },
+                                { label: "Booked", value: "booked" },
+                            ],
+                        },
+                    ]}
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    onRefresh={fetchAllBookings}
+                    onExport={() => exportBookingsToCSV(sortedBookings)}
+                    exportDisabled={loading}
+                />
 
-                {/* Header + Filters */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold ml-20">Bookings</h2>
+                <StatsCard
+                    columns={6}
+                    items={[
+                        {
+                            id: "booking",
+                            label: "Bookings",
+                            value: totals.totalBookings,
+                            icon: <CheckCircleIcon className="w-5 h-5" />,
+                            color: "green-600",
+                        },
+                        {
+                            id: "finished",
+                            label: "Completed",
+                            value: totals.finished,
+                            icon: <SparklesIcon className="w-5 h-5" />,
+                            color: "zinc-500",
+                        },
+                        {
+                            id: "cancelled",
+                            label: "Cancelled",
+                            value: totals.cancelled,
+                            icon: <XCircleIcon className="w-5 h-5" />,
+                            color: "red-600",
+                        },
+                        {
+                            id: "active",
+                            label: "Active",
+                            value: totals.active,
+                            icon: <SparklesIcon className="w-5 h-5" />,
+                            color: "blue-600",
+                        },
+                        {
+                            id: "inactive",
+                            label: "Inactive",
+                            value: totals.inactive,
+                            icon: <PauseCircleIcon className="w-5 h-5" />,
+                            color: "zinc-500",
+                        },
+                        {
+                            id: "booked",
+                            label: "Booked",
+                            value: totals.booked,
+                            icon: <CheckCircleIcon className="w-5 h-5" />,
+                            color: "yellow-600",
+                        },
+                    ]}
+                />
 
-                    <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
-                        {/* Date Filters */}
-                        {[
-                            { label: "From", value: fromDate, setter: setFromDate },
-                            { label: "To", value: toDate, setter: setToDate },
-                        ].map((d) => (
-                            <div key={d.label} className="flex items-center gap-2">
-                                <label className="text-sm">{d.label}:</label>
-                                <input
-                                    type="date"
-                                    value={d.value}
-                                    onChange={(e) => d.setter(e.target.value)}
-                                    className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-                                />
+                <DataTable
+                    columns={columns}
+                    data={paginatedRiders}
+                    loading={loading}
+                    rowKey={(b) => b._id}
+                    rowClassName={(b) => {
+                        const bookingDate = b.updatedAt.slice(0, 10);
+                        return bookingDate === today
+                            ? "bg-orange-50 dark:bg-zinc-800"
+                            : "bg-white dark:bg-zinc-900";
+                    }}
+                    sortOrder={sortOrder}
+                    onSortToggle={toggleSort}
+                    emptyMessage="No bookings found for selected date(s)."
+                    // onRowClick={(b) => fetchBookingDetails(b._id)}
+                    actionColumn={{
+                        label: "Action",
+                        render: (b) => (
+                            <div className="flex items-center text-green-700 justify-center">
+                                <Eye />
                             </div>
-                        ))}
+                        ),
+                    }}
+                />
 
-                        {/* Status Filter */}
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm">Status:</label>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-                            >
-                                <option value="all">All</option>
-                                <option value="active">Active</option>
-                                <option value="finished">Finished</option>
-                                <option value="cancelled">Cancelled</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="booked">Booked</option>
-                            </select>
-                        </div>
-
-                        {/* Search */}
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search Booking ID"
-                            className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
-                        />
-                        <button
-                            className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={fetchAllBookings}
-                        >
-                            <RefreshCcw />
-                        </button>
-                        <button
-                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => exportBookingsToCSV(sortedBookings)} disabled={loading}
-                        >
-                            <Download />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Totals Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
-                    {[
-                        { label: "Bookings", value: totals.totalBookings },
-                        { label: "Finished", value: totals.finished },
-                        { label: "Cancelled", value: totals.cancelled },
-                        { label: "Active", value: totals.active },
-                        { label: "Inactive", value: totals.inactive },
-                        { label: "Booked", value: totals.booked },
-                    ].map((item) => (
-                        <div
-                            key={item.label}
-                            className="relative bg-orange-50 dark:bg-zinc-800 border-l-4 border-orange-500 dark:border-green-800 shadow-sm rounded-lg px-4 py-6"
-                        >
-                            {/* Label in top-left */}
-                            <p className="absolute top-2 left-4 text-sm">{item.label}</p>
-
-                            {/* Value centered */}
-                            <div className="flex items-center justify-center h-full">
-                                <p className="text-orange-700 dark:text-orange-300 font-bold text-2xl">{item.value}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Table */}
-                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
-                    <div className="overflow-y-auto max-h-[75vh]">
-                        <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
-                                <tr>
-                                    {["Booking ID", "Rider ID", "Driver ID", "Status", "Fare", "Origin", "Destination"].map((col) => (
-                                        <th key={col} className="px-6 py-3 font-medium text-left">
-                                            {col}
-                                        </th>
-                                    ))}
-                                    {/* Timestamp column with sort button */}
-                                    <th className="px-6 py-3 font-medium text-left">
-                                        <SortButton
-                                            label="Timestamp"
-                                            sortOrder={sortOrder}
-                                            onToggle={toggleSort}
-                                        />
-                                    </th>
-                                    <th className="px-6 py-3 font-medium text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={9} className="py-6">
-                                            <div className="flex items-center justify-center w-full h-full">
-                                                <Loading />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : paginatedRiders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={9} className="text-center py-6 text-gray-500 italic">
-                                            No bookings found for selected date(s).
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    paginatedRiders.map((b) => {
-                                        const bookingDate = b.updatedAt.slice(0, 10);
-                                        const isToday = bookingDate === today;
-
-                                        return (
-                                            <tr
-                                                key={b._id}
-                                                className={`border-b ${isToday ? "bg-orange-50 dark:bg-zinc-800" : "bg-white dark:bg-zinc-900"} hover:bg-gray-800 hover:text-white transition`}
-                                            >
-                                                <td className="px-6 py-3">{b._id}</td>
-                                                <td className="px-6 py-3">{b.riderId}</td>
-                                                <td className="px-6 py-3">{b.driverId || "Unassigned"}</td>
-                                                <td className={`px-6 py-3 font-semibold ${getStatusColor(b.status)}`}>{b.status.toUpperCase()}</td>
-                                                <td className="px-6 py-3">₱{b.travelFare?.toFixed(2)}</td>
-                                                <td className="px-6 py-3">{b.origin?.name}</td>
-                                                <td className="px-6 py-3">{b.destination?.name}</td>
-                                                <td className="px-6 py-3">{new Date(b.updatedAt).toLocaleString()}</td>
-                                                <td className="px-6 py-3">
-                                                    <div className="flex items-center text-green-700 justify-center">
-                                                        <Eye />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
                 {totalPages > 1 && (
                     <Pagination
                         currentPage={currentPage}

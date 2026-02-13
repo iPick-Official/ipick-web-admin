@@ -1,17 +1,17 @@
 'use client';
 
-import { Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
-import { Loading } from "@/components/Loading";
-import ConfirmDialog from "@/components/ConfirmDialog";
-import Modal from "@/components/Modal";
 import { capitalize } from "@/app/utils/capitalized";
-import { ProfileForm } from "@/components/ProfileUpdate";
-import { PasswordForm } from "@/components/ProfileChangePass";
-import { Info } from "@/components/ProfileInfo";
 import { departments } from "@/app/utils/department";
-import { Avatar } from "@/components/Avatar";
+import { Sidebar } from "@/components/ui/Sidebar";
+import { Avatar } from "@/components/ui/Avatar";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { Loading } from "@/components/ui/Loading";
+import Modal from "@/components/ui/Modal";
+import { PasswordForm } from "@/components/ui/ProfileChangePass";
+import { ProfileForm } from "@/components/ui/ProfileUpdate";
+import { Info } from "@/components/ui/ProfileInfo";
 
 export default function ProfilePage() {
     const { admin, loading, updateAdmin } = useAdmin();
