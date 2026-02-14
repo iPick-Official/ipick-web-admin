@@ -1,12 +1,10 @@
+import { getStatusBadge } from "@/app/utils/getStatusBadge";
+import { Discounts } from "@/types/discount";
 import React from "react";
-import { Edit } from "lucide-react";
+import DataTable, { Column } from "../ui/DataTable";
 import { Detail } from "../ui/Details";
 import ImageView from "../ui/ImageView";
-import { Loading } from "../ui/Loading";
 import Modal from "../ui/Modal";
-import { Discounts } from "@/types/discount";
-import DataTable, { Column } from "../ui/DataTable";
-import { getStatusBadge } from "@/app/utils/getStatusBadge";
 
 interface Props {
     isOpen: boolean;
@@ -57,7 +55,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
 
     const filteredDiscounts = React.useMemo(() => {
         return discounts.filter((d) =>
-            [d.name, d.idNumber, d.riderId]
+            [d.name, d.idNumber, d.riderId, d.status]
                 .join(" ")
                 .toLowerCase()
                 .includes(search.toLowerCase())
@@ -144,7 +142,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                     {!selectedDiscount ? (
                         /* ================= LIST VIEW ================= */
                         <>
-                            <div className="p-4 border-b dark:border-zinc-700">
+                            <div className="p-4">
                                 <input
                                     type="text"
                                     placeholder="Search rider, ID number..."
@@ -168,7 +166,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                                 onRowClick={(d) => handleDiscountDetails(d)}
                             />
 
-                            <div className="flex justify-between items-center p-4 border-t dark:border-zinc-700 text-sm">
+                            <div className="flex justify-between items-center p-4 text-sm">
                                 <span>
                                     Page {page} of {totalPages || 1}
                                 </span>

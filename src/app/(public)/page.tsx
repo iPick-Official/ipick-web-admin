@@ -4,8 +4,8 @@ import Navbar from "@/components/LandingPageNavbar";
 import HeroHeader from "@/components/LandingPageHeader";
 import FeaturesSection from "@/components/LandingPageFeature";
 import Footer from "@/components/LandingPageFooter";
-import StatsSection from "@/components/ui/StatsSection";
 import { Loading } from "@/components/ui/Loading";
+import StatsSection from "@/components/StatsSection";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);

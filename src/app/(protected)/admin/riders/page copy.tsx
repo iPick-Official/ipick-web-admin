@@ -2,45 +2,38 @@
 
 import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
-import { CheckCircleIcon, Eye, XCircleIcon } from 'lucide-react';
+import { CheckCircleIcon, XCircleIcon, Eye } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
-import { Discounts } from '@/types/discount';
 import { exportRidersToCSV } from '@/app/utils/DownloadReports';
 import { Sidebar } from '@/components/ui/Sidebar';
 import { Pagination } from '@/components/ui/Pagination';
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import { sortByDate } from '@/app/utils/sortByDate';
-import { updateDiscountStatusRequest } from '@/app/utils/discountHelpers';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import DiscountDetailsModal from '@/components/riders-modal/DiscountDetailsModal';
 
 export default function RidersPage() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedDiscount, setSelectedDiscount] = useState<Discounts | null>(null);
-    const [rejectReason, setRejectReason] = useState('');
     const [riders, setRiders] = useState<Riders[]>([]);
-    const [discounts, setDiscounts] = useState<Discounts[]>([]);
     const [loading, setLoading] = useState(false);
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [fromDate, setFromDate] = useState<string>('');
-    const [toDate, setToDate] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-    const [isImageOpen, setIsImageOpen] = useState(false);
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-    const { sortOrder, toggleSort } = useSort("desc");
+
+    const { sortOrder, toggleSort } = useSort('desc');
     const itemsPerPage = 100;
 
     useEffect(() => {
         setLoading(true);
-        fetchJSON<Riders[]>("/api/rider")
+        fetchJSON<Riders[]>('/api/rider')
             .then(setRiders)
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
 
+    // Filter riders by date, status, and search term
     const displayedRiders = useMemo(() => {
         return riders.filter((r) => {
             const created = r.createdAt ? new Date(r.createdAt) : null;
@@ -70,13 +63,14 @@ export default function RidersPage() {
     }, [riders, searchTerm, fromDate, toDate, statusFilter]);
 
     const sortedRiders = useMemo(() => {
-        return sortByDate(displayedRiders, "createdAt", sortOrder);
+        return sortByDate(displayedRiders, 'createdAt', sortOrder);
     }, [displayedRiders, sortOrder]);
 
     // Reset pagination when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, fromDate, toDate]);
+    }, [searchTerm, fromDate, toDate, statusFilter]);
+
     const totalPages = Math.ceil(sortedRiders.length / itemsPerPage);
     const paginatedRiders = sortedRiders.slice(
         (currentPage - 1) * itemsPerPage,
@@ -114,78 +108,6 @@ export default function RidersPage() {
         },
     ];
 
-
-    {/* Rider Discounts Functions*/ }
-    const handleDiscountDetails = (discount: Discounts) => {
-        setSelectedDiscount(discount);
-    };
-
-    async function fetchDiscounts() {
-        setIsOpen(true);
-        setLoading(true);
-        fetchJSON<Discounts[]>("/api/discount")
-            .then(setDiscounts)
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }
-
-    useEffect(() => {
-        const fetchPhotoUrl = async () => {
-            if (!selectedDiscount?.photoUrl?.name) return;
-
-            try {
-                const res = await fetch(
-                    `/api/photo-url?filename=${encodeURIComponent(
-                        selectedDiscount.photoUrl.name
-                    )}`
-                );
-                const data = await res.json();
-                setPhotoUrl(data.url);
-            } catch (err) {
-                console.error('Failed to fetch photo URL:', err);
-                setPhotoUrl(null);
-            }
-        };
-
-        fetchPhotoUrl();
-    }, [selectedDiscount]);
-
-    const updateDiscountStatus = async (
-        id: string,
-        newStatus: "approved" | "rejected",
-        reason?: string
-    ) => {
-        try {
-            const { reviewedBy } = await updateDiscountStatusRequest({
-                id,
-                status: newStatus,
-                reason,
-            });
-
-            setDiscounts((prev) =>
-                prev.map((d) =>
-                    d._id === id
-                        ? { ...d, status: newStatus, reviewedBy, reason }
-                        : d
-                )
-            );
-
-            if (selectedDiscount?._id === id) {
-                setSelectedDiscount({
-                    ...selectedDiscount,
-                    status: newStatus,
-                    reviewedBy,
-                    reason,
-                });
-            }
-
-            console.log(`Discount ${newStatus}`);
-        } catch (error) {
-            console.error(error);
-            alert("Failed to update discount status");
-        }
-    };
-
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
@@ -199,7 +121,6 @@ export default function RidersPage() {
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
                     onExport={() => exportRidersToCSV(sortedRiders)}
-                    onDiscount={fetchDiscounts}
                     exportDisabled={loading}
                 />
 
@@ -226,9 +147,8 @@ export default function RidersPage() {
                     sortOrder={sortOrder}
                     onSortToggle={toggleSort}
                     emptyMessage="No bookings found for selected date(s)."
-                    // onRowClick={(r) => fetchBookingDetails(r._id)}
                     actionColumn={{
-                        label: "Action",
+                        label: 'Action',
                         render: (r) => (
                             <div className="flex items-center text-green-700 justify-center">
                                 <Eye />
@@ -237,7 +157,6 @@ export default function RidersPage() {
                     }}
                 />
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                     <Pagination
                         currentPage={currentPage}
@@ -246,21 +165,6 @@ export default function RidersPage() {
                     />
                 )}
             </div>
-            <DiscountDetailsModal
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
-                loading={loading}
-                discounts={discounts}
-                selectedDiscount={selectedDiscount}
-                setSelectedDiscount={setSelectedDiscount}
-                handleDiscountDetails={handleDiscountDetails}
-                updateDiscountStatus={updateDiscountStatus}
-                rejectReason={rejectReason}
-                setRejectReason={setRejectReason}
-                isImageOpen={isImageOpen}
-                setIsImageOpen={setIsImageOpen}
-                photoUrl={photoUrl}
-            />
         </div>
     );
 }

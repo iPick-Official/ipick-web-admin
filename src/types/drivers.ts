@@ -1,4 +1,7 @@
 export type DriverStatus = "approved" | "pending" | "inactive" | "rejected";
+export type SignedUrls = {
+  profile?: string | null;
+};
 
 // Reusable file/document structure
 export interface FileDocument {
@@ -97,6 +100,7 @@ export interface Driver {
   password: string;
   referralCode: string;
   createdAt?: string | null;
+  wallet?: Wallet;
   status: DriverStatus;
   type: "driver";
   carType: string;
@@ -135,4 +139,3 @@ export interface DriverWithWallet extends Driver {
   wallet?: Wallet;
   walletLogs?: WalletLog[];
 }
-

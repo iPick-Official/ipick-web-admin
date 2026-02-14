@@ -23,6 +23,7 @@ import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import { sortByDate } from '@/app/utils/sortByDate';
+import { BsCardChecklist } from 'react-icons/bs';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -283,7 +284,15 @@ export default function DriversPage() {
                 />
 
                 <StatsCard
+                columns={4}
                     items={[
+                        {
+                            id: "all",
+                            label: "Total Drivers",
+                            value: drivers.length,
+                            icon: <BsCardChecklist className="w-5 h-5" />,
+                            color: "blue",
+                        },
                         {
                             id: "approved",
                             label: "Approved",
@@ -306,6 +315,10 @@ export default function DriversPage() {
                             color: "red",
                         },
                     ]}
+                    onFilter={(status) => {
+                        console.log("Filter table by:", status);
+                        setStatusFilter(status);
+                    }}
                 />
 
                 <DataTable

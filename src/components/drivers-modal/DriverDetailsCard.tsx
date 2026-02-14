@@ -1,53 +1,15 @@
 import Image from "next/image";
 import { Detail } from "../ui/Details";
-
-type DriverStatus = "approved" | "pending" | "inactive" | "rejected";
-
-type Driver = {
-    id: string;
-    _id?: string;
-    name: string;
-    email: string;
-    mobnum: string;
-    carType?: string;
-    address: string;
-    city: string;
-    province: string;
-    zipCode: string;
-    caseNum: string;
-    status: DriverStatus;
-    wallet?: {
-        walletBalance: number;
-    };
-    createdAt?: string | null;
-    updatedBy?: string;
-    updatedAt?: string | { $date: string };
-};
-
-type SignedUrls = {
-    profile?: string | null;
-};
-
-type Admin = {
-    department: string;
-};
+import { CameraIcon } from "lucide-react";
+import { Driver, DriverStatus, SignedUrls } from "@/types/drivers";
+import { Admin } from "@/types/admin";
+import { getStatusBadge } from "@/app/utils/getStatusBadge";
 
 type Props = {
     selectedDriver: Driver;
     signedUrls: SignedUrls;
     admin?: Admin | null;
     updateDriverStatus: (id: string, status: DriverStatus) => void;
-};
-
-const statusStyles: Record<DriverStatus, string> = {
-    approved:
-        "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400",
-    pending:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400",
-    inactive:
-        "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
-    rejected:
-        "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400",
 };
 
 function parseDate(value: string | { $date: string } | undefined | null) {
@@ -78,19 +40,49 @@ export default function DriverDetailsCard({
                 <div className="flex flex-col w-full lg:w-72 gap-6">
 
                     {/* Profile + Status */}
-                    <div className="relative w-full h-97 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow-md">
+                    <div className="relative w-full h-97 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow-md group">
+
+                        {/* Image */}
                         <Image
                             src={signedUrls.profile || "/logo.png"}
                             alt={`${selectedDriver.name} Profile`}
                             fill
-                            className="object-cover"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                         />
 
+                        {/* Soft Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent 
+                            opacity-0 group-hover:opacity-100 transition duration-300" />
+
+                        {/* Status Badge */}
                         <span
-                            className={`absolute top-3 right-3 text-xs px-3 py-1 rounded-full font-medium ${statusStyles[selectedDriver.status]}`}
+                            className={`absolute top-3 right-3 text-xs px-3 py-1 rounded-full font-medium backdrop-blur-md
+                                ${getStatusBadge(selectedDriver.status)}`}
                         >
                             {selectedDriver.status.toUpperCase()}
                         </span>
+
+                        {/* Floating Upload Button */}
+                        <label
+                            className="absolute bottom-4 right-4 cursor-pointer 
+                                opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0
+                                transition-all duration-300 ease-out"
+                        >
+                            <div className="w-11 h-11 flex items-center justify-center 
+                                rounded-full bg-white/90 dark:bg-zinc-800/90 
+                                backdrop-blur-md shadow-lg 
+                                hover:scale-105 hover:bg-white transition text-black"
+                            >
+                                <CameraIcon/>
+                            </div>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                            // onChange={handleProfileUpload}
+                            />
+                        </label>
                     </div>
 
                     {/* Wallet Card */}
