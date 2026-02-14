@@ -1,5 +1,5 @@
 import React from "react";
-import { Download, RefreshCcwDot } from "lucide-react";
+import { Download, Percent, RefreshCcwDot } from "lucide-react";
 import { BsPersonAdd } from "react-icons/bs";
 
 interface DateFilter {
@@ -29,6 +29,7 @@ interface Props {
     onExport?: () => void;
     onRegister?: () => void;
     onRefresh?: () => void;
+    onDiscount?: () => void;
     exportDisabled?: boolean;
 }
 
@@ -41,6 +42,7 @@ const FilterToolbar: React.FC<Props> = ({
     onExport,
     onRegister,
     onRefresh,
+    onDiscount,
     exportDisabled = false,
 }) => {
     return (
@@ -134,6 +136,15 @@ const FilterToolbar: React.FC<Props> = ({
                         >
                             <RefreshCcwDot size={16} />
                             Load More
+                        </button>
+                    )}
+                    {onDiscount && (
+                        <button
+                            onClick={onDiscount}
+                            className="ml-auto flex items-center gap-2 px-4 py-2 bg-orange-700 hover:bg-orange-600 text-white rounded-md text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Percent size={16} />
+                            Discount
                         </button>
                     )}
                 </div>

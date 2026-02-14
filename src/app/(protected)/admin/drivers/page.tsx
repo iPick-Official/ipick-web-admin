@@ -289,21 +289,21 @@ export default function DriversPage() {
                             label: "Approved",
                             value: totals.approved,
                             icon: <CheckCircleIcon className="w-5 h-5" />,
-                            color: "green-600",
+                            color: "green",
                         },
                         {
                             id: "pending",
                             label: "Pending",
                             value: totals.pending,
                             icon: <ClockIcon className="w-5 h-5" />,
-                            color: "zinc-500",
+                            color: "yellow",
                         },
                         {
                             id: "rejected",
                             label: "Rejected",
                             value: totals.rejected,
                             icon: <XCircleIcon className="w-5 h-5" />,
-                            color: "red-500",
+                            color: "red",
                         },
                     ]}
                 />

@@ -94,7 +94,7 @@ export default function DriverDetailsCard({
                     </div>
 
                     {/* Wallet Card */}
-                    <div className="w-full bg-gradient-to-r from-slate-800 to-slate-500 text-white rounded-2xl p-4 shadow-md flex flex-col justify-center h-40">
+                    <div className="w-full bg-gradient-to-r from-slate-800 to-slate-500 text-white rounded-2xl p-4 shadow-md flex flex-col justify-center h-35">
                         <p className="text-xs uppercase tracking-wide opacity-80">
                             Wallet Balance
                         </p>

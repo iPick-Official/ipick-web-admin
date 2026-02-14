@@ -4,14 +4,12 @@ import { exportBookingsToCSV } from '@/app/utils/DownloadReports';
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import { sortByDate } from '@/app/utils/sortByDate';
 import { getStatusColor } from '@/app/utils/statusColor';
-import { Loading } from '@/components/ui/Loading';
 import { Pagination } from '@/components/ui/Pagination';
 import { Sidebar } from '@/components/ui/Sidebar';
 import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
 import { CheckCircleIcon, Eye, PauseCircleIcon, SparklesIcon, XCircleIcon } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
-import SortButton from '@/components/ui/SortButton';
 import StatsCard from '@/components/ui/StatsCard';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -69,6 +67,7 @@ export default function BookingsPage() {
             const term = searchTerm.toLowerCase();
             const matchesSearch =
                 !term ||
+                b.referenceNumber?.toLowerCase().includes(term) ||
                 b._id?.toLowerCase().includes(term) ||
                 b.driverId?.toLowerCase().includes(term) ||
                 b.riderId?.toLowerCase().includes(term)
@@ -106,9 +105,26 @@ export default function BookingsPage() {
     }, [displayedBookings]);
 
     const columns: Column<Booking>[] = [
-        { key: "_id", label: "Booking ID" },
+        {
+            key: "bookingInfo",
+            label: "Booking ID",
+            render: (b) => (
+                <div className="flex flex-col">
+                    <span className="font-semibold">
+                        Ref: {b.referenceNumber ?? "-"}
+                    </span>
+                    <span className="text-xs text-zinc-500">
+                        {b._id}
+                    </span>
+                </div>
+            ),
+        },
         { key: "riderId", label: "Rider ID" },
-        { key: "driverId", label: "Driver ID", render: (b) => b.driverId || "Unassigned" },
+        {
+            key: "driverId",
+            label: "Driver ID",
+            render: (b) => b.driverId || "Unassigned",
+        },
         {
             key: "status",
             label: "Status",
@@ -125,8 +141,6 @@ export default function BookingsPage() {
         },
         { key: "origin", label: "Origin", render: (b) => b.origin?.name ?? "-" },
         { key: "destination", label: "Destination", render: (b) => b.destination?.name ?? "-" },
-
-        // Timestamp column
         {
             key: "updatedAt",
             label: "Timestamp",
@@ -175,42 +189,42 @@ export default function BookingsPage() {
                             label: "Bookings",
                             value: totals.totalBookings,
                             icon: <CheckCircleIcon className="w-5 h-5" />,
-                            color: "green-600",
+                            color: "green",
                         },
                         {
                             id: "finished",
                             label: "Completed",
                             value: totals.finished,
                             icon: <SparklesIcon className="w-5 h-5" />,
-                            color: "zinc-500",
+                            color: "green",
                         },
                         {
                             id: "cancelled",
                             label: "Cancelled",
                             value: totals.cancelled,
                             icon: <XCircleIcon className="w-5 h-5" />,
-                            color: "red-600",
+                            color: "red",
                         },
                         {
                             id: "active",
                             label: "Active",
                             value: totals.active,
                             icon: <SparklesIcon className="w-5 h-5" />,
-                            color: "blue-600",
+                            color: "blue",
                         },
                         {
                             id: "inactive",
                             label: "Inactive",
                             value: totals.inactive,
                             icon: <PauseCircleIcon className="w-5 h-5" />,
-                            color: "zinc-500",
+                            color: "zinc",
                         },
                         {
                             id: "booked",
                             label: "Booked",
                             value: totals.booked,
                             icon: <CheckCircleIcon className="w-5 h-5" />,
-                            color: "yellow-600",
+                            color: "yellow",
                         },
                     ]}
                 />

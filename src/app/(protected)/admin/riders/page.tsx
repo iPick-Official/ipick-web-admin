@@ -2,17 +2,18 @@
 
 import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
-import { Download, Edit, Eye, Percent } from 'lucide-react';
+import { CheckCircleIcon, Eye, SparklesIcon, XCircleIcon } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
 import { exportRidersToCSV } from '@/app/utils/DownloadReports';
 import { Sidebar } from '@/components/ui/Sidebar';
-import { Detail } from '@/components/ui/Details';
-import { Loading } from '@/components/ui/Loading';
 import { Pagination } from '@/components/ui/Pagination';
-import SortButton from '@/components/ui/SortButton';
-import ImageView from '@/components/ui/ImageView';
-import Modal from '@/components/ui/Modal';
+import { fetchJSON } from '@/app/utils/fetchJSON';
+import { sortByDate } from '@/app/utils/sortByDate';
+import FilterToolbar from '@/components/ui/FilterToolbar';
+import StatsCard from '@/components/ui/StatsCard';
+import DataTable, { Column } from '@/components/ui/DataTable';
+import DiscountDetailsModal from '@/components/riders-modal/DiscountDetailsModal';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,10 +31,67 @@ export default function RidersPage() {
     const { sortOrder, toggleSort } = useSort("desc");
     const itemsPerPage = 100;
 
+    useEffect(() => {
+        setLoading(true);
+        fetchJSON<Riders[]>("/api/rider")
+            .then(setRiders)
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
+
+    const displayedRiders = useMemo(() => {
+        return riders.filter((r) => {
+            const updated = r.createdAt ? new Date(r.createdAt) : null;
+
+            const matchesDate =
+                !fromDate ||
+                !toDate ||
+                (updated &&
+                    updated >= new Date(fromDate) &&
+                    updated <= new Date(toDate));
+
+            const term = searchTerm.toLowerCase();
+            const matchesSearch =
+                !term ||
+                r._id?.toLowerCase().includes(term) ||
+                r.name?.toLowerCase().includes(term) ||
+                r.email?.toLowerCase().includes(term) ||
+                r.mobnum?.toLowerCase().includes(term)
+
+            return matchesDate && matchesSearch;
+        });
+    }, [riders, searchTerm, fromDate, toDate]);
+
+    const sortedRiders = useMemo(() => {
+        return sortByDate(displayedRiders, "createdAt", sortOrder);
+    }, [displayedRiders, sortOrder]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, fromDate, toDate]);
+
+    // Pagination
+    const totalPages = Math.ceil(sortedRiders.length / itemsPerPage);
+    const paginatedRiders = sortedRiders.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    // Totals
+    const totals = useMemo(() => {
+        const loggedIn = displayedRiders.filter((r) => r.isLogged).length;
+        const notLoggedIn = displayedRiders.filter((r) => !r.isLogged).length;
+        const totalRiders = displayedRiders.length;
+        return { loggedIn, notLoggedIn, totalRiders };
+    }, [displayedRiders]);
+
+    {/* Rider Discounts Functions*/ }
+
     const handleDiscountDetails = (discount: Discounts) => {
         setSelectedDiscount(discount);
     };
-
+    
     useEffect(() => {
         const fetchPhotoUrl = async () => {
             if (!selectedDiscount?.photoUrl?.name) return;
@@ -55,89 +113,14 @@ export default function RidersPage() {
         fetchPhotoUrl();
     }, [selectedDiscount]);
 
-    useEffect(() => {
-        async function fetchRiders() {
-            setLoading(true);
-            try {
-                const res = await fetch('/api/rider');
-                if (!res.ok) throw new Error('Failed to fetch riders');
-                const data = await res.json();
-                setRiders(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchRiders();
-    }, []);
-
     async function fetchDiscounts() {
         setIsOpen(true);
         setLoading(true);
-        try {
-            const res = await fetch('/api/discount');
-            if (!res.ok) throw new Error('Failed to fetch riders');
-            const data = await res.json();
-            setDiscounts(data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+        fetchJSON<Discounts[]>("/api/discount")
+            .then(setDiscounts)
+            .catch(console.error)
+            .finally(() => setLoading(false));
     }
-
-    // Filtered and sorted riders
-    const displayedRiders = useMemo(() => {
-        let filtered = [...riders];
-
-        if (fromDate && toDate) {
-            filtered = filtered.filter((r) => {
-                const created = r.createdAt ? new Date(r.createdAt).toISOString().split('T')[0] : '';
-                return created >= fromDate && created <= toDate;
-            });
-        }
-
-        if (searchTerm.trim() !== '') {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(
-                (r) =>
-                    r.id?.toLowerCase().includes(term) ||
-                    r.name?.toLowerCase().includes(term) ||
-                    r.email?.toLowerCase().includes(term) ||
-                    r.mobnum?.includes(term)
-            );
-        }
-
-        return filtered;
-    }, [riders, searchTerm, fromDate, toDate]);
-
-    const sortedRiders = useMemo(() => {
-        return [...displayedRiders].sort((a, b) => {
-            const dateA = new Date(a.createdAt || '').getTime();
-            const dateB = new Date(b.createdAt || '').getTime();
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-    }, [displayedRiders, sortOrder]);
-
-    // Reset pagination when filters change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, fromDate, toDate]);
-
-    // Pagination
-    const totalPages = Math.ceil(sortedRiders.length / itemsPerPage);
-    const paginatedRiders = sortedRiders.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    // Totals
-    const totals = useMemo(() => {
-        const loggedIn = displayedRiders.filter((r) => r.isLogged).length;
-        const notLoggedIn = displayedRiders.filter((r) => !r.isLogged).length;
-        return { loggedIn, notLoggedIn };
-    }, [displayedRiders]);
 
     const updateDiscountStatus = async (id: string, newStatus: 'approved' | 'rejected', reason?: string) => {
         try {
@@ -185,133 +168,114 @@ export default function RidersPage() {
         }
     };
 
+    const columns: Column<Riders>[] = [
+        {
+            key: "id",
+            label: "ID",
+        },
+        {
+            key: "name",
+            label: "Name",
+            render: (r) => r.name?.toUpperCase() || "-",
+        },
+        {
+            key: "email",
+            label: "Email",
+            render: (r) => r.email || "-",
+        },
+        {
+            key: "mobnum",
+            label: "Mobile",
+            render: (r) => r.mobnum || "-",
+        },
+        {
+            key: "address",
+            label: "Address",
+            render: (r) => r.address || "-",
+        },
+        {
+            key: "isLogged",
+            label: "Active",
+            render: (r) => (
+                <span
+                    className={`font-semibold ${r.isLogged ? "text-green-600" : "text-gray-500"
+                        }`}
+                >
+                    {r.isLogged ? "Yes" : "No"}
+                </span>
+            ),
+        },
+        {
+            key: "createdAt",
+            label: "Created At",
+            render: (r) =>
+                r.createdAt ? new Date(r.createdAt).toLocaleString() : "-",
+            sortable: true,
+        },
+    ];
+
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
-                {/* Header + Filters */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold ml-20">Passengers</h2>
-                    <div className="flex flex-wrap items-center gap-4 border border-gray-300 rounded-lg p-4">
-                        {/* Date Filters */}
-                        {[
-                            { label: 'From', value: fromDate, setter: setFromDate },
-                            { label: 'To', value: toDate, setter: setToDate },
-                        ].map((d) => (
-                            <div key={d.label} className="flex items-center gap-2">
-                                <label className="text-sm">{d.label}:</label>
-                                <input
-                                    type="date"
-                                    value={d.value}
-                                    onChange={(e) => d.setter(e.target.value)}
-                                    className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-                                />
+                <FilterToolbar
+                    title="Passengers"
+                    dateFilters={[
+                        { label: "From", value: fromDate, onChange: setFromDate },
+                        { label: "To", value: toDate, onChange: setToDate },
+                    ]}
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    onExport={() => exportRidersToCSV(sortedRiders)}
+                    onDiscount={fetchDiscounts}
+                    exportDisabled={loading}
+                />
+
+                <StatsCard
+                    columns={3}
+                    items={[
+                        {
+                            id: "totals",
+                            label: "Total Passenger",
+                            value: totals.totalRiders,
+                            icon: <XCircleIcon className="w-5 h-5" />,
+                            color: "blue",
+                        },
+                        {
+                            id: "active",
+                            label: "Active",
+                            value: totals.loggedIn,
+                            icon: <CheckCircleIcon className="w-5 h-5" />,
+                            color: "green",
+                        },
+                        {
+                            id: "inactive",
+                            label: "Inactive",
+                            value: totals.notLoggedIn,
+                            icon: <SparklesIcon className="w-5 h-5" />,
+                            color: "zinc",
+                        },
+                    ]}
+                />
+
+                <DataTable
+                    columns={columns}
+                    data={paginatedRiders}
+                    loading={loading}
+                    rowKey={(r) => r._id}
+                    sortOrder={sortOrder}
+                    onSortToggle={toggleSort}
+                    emptyMessage="No bookings found for selected date(s)."
+                    // onRowClick={(r) => fetchBookingDetails(r._id)}
+                    actionColumn={{
+                        label: "Action",
+                        render: (r) => (
+                            <div className="flex items-center text-green-700 justify-center">
+                                <Eye />
                             </div>
-                        ))}
-
-                        {/* Search */}
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search name, email, or mobile"
-                            className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
-                        />
-                        <button className="ml-auto px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-md shadow-sm text-sm font-medium transition" onClick={fetchDiscounts}>
-                            <Percent />
-                        </button>
-                        <button
-                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={() => exportRidersToCSV(sortedRiders)} disabled={loading}>
-                            <Download />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Totals Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-4">
-                    {[
-                        { label: 'Total Passengers', value: riders.length },
-                        { label: 'Logged In', value: totals.loggedIn },
-                        { label: 'Not Logged In', value: totals.notLoggedIn },
-                    ].map((item) => (
-                        <div
-                            key={item.label}
-                            className="relative bg-orange-50 dark:bg-zinc-800 border-l-4 border-orange-500 dark:border-green-800 shadow-sm rounded-lg px-4 py-6"
-                        >
-                            {/* Label in top-left */}
-                            <p className="absolute top-2 left-4 text-sm">{item.label}</p>
-
-                            {/* Value centered */}
-                            <div className="flex items-center justify-center h-full">
-                                <p className="text-orange-700 dark:text-orange-300 font-bold text-2xl">{item.value}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Table */}
-                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
-                    <div className="overflow-y-auto max-h-[75vh]">
-                        <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
-                                <tr>
-                                    {['ID', 'Name', 'Email', 'Mobile', 'Address', 'Logged'].map((col) => (
-                                        <th key={col} className="px-6 py-3 font-medium text-left">
-                                            {col}
-                                        </th>
-                                    ))}
-                                    <th className="px-6 py-3 font-medium text-left">
-                                        <SortButton
-                                            label="Created At"
-                                            sortOrder={sortOrder}
-                                            onToggle={toggleSort}
-                                        />
-                                    </th>
-                                    <th className="px-6 py-3 font-medium text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={8} className="py-6">
-                                            <div className="flex items-center justify-center w-full h-full">
-                                                <Loading />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : paginatedRiders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={8} className="text-center py-6 text-gray-500 italic">
-                                            No riders found for selected filters.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    paginatedRiders.map((r) => (
-                                        <tr key={r._id} className="border-b hover:bg-gray-800 hover:text-white transition">
-                                            <td className="px-6 py-3">{r.id}</td>
-                                            <td className="px-6 py-3">{r.name.toUpperCase() || '-'}</td>
-                                            <td className="px-6 py-3">{r.email || '-'}</td>
-                                            <td className="px-6 py-3">{r.mobnum || '-'}</td>
-                                            <td className="px-6 py-3">{r.address || '-'}</td>
-                                            <td className={`px-6 py-3 font-semibold ${r.isLogged ? 'text-green-600' : 'text-gray-500'}`}>
-                                                {r.isLogged ? 'Yes' : 'No'}
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                {r.createdAt ? new Date(r.createdAt).toLocaleString() : '-'}
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                <div className="flex items-center text-green-700 justify-center">
-                                                    <Eye />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                        ),
+                    }}
+                />
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -322,163 +286,22 @@ export default function RidersPage() {
                     />
                 )}
             </div>
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title='Discount Details' size="xxl">
-                <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
-                    <div className="overflow-y-auto max-h-[75vh]">
-                        {!selectedDiscount ? (
-                            <table className="min-w-full text-sm text-left border-collapse">
-                                <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
-                                    <tr>
-                                        {['ID', 'Name', 'ID Number', 'Type', 'Status', 'Expiration Date'].map((col) => (
-                                            <th key={col} className="px-6 py-3 font-medium text-left">
-                                                {col}
-                                            </th>
-                                        ))}
-                                        <th className="px-6 py-3 font-medium text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan={8} className="py-6">
-                                                <div className="flex items-center justify-center w-full h-full">
-                                                    <Loading />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : discounts.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={8} className="text-center py-6 text-gray-500 italic">
-                                                No riders found for selected filters.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        discounts.map((d) => (
-                                            <tr key={d._id} className="border-b hover:bg-gray-800 hover:text-white transition">
-                                                <td className="px-6 py-3">{d.riderId}</td>
-                                                <td className="px-6 py-3">{d.name}</td>
-                                                <td className="px-6 py-3">{d.idNumber}</td>
-                                                <td className="px-6 py-3 uppercase">{d.idType}</td>
-                                                <td className="px-6 py-3 uppercase">{d.status}</td>
-                                                <td className="px-6 py-3">{d.expirationDate ? new Date(d.expirationDate).toLocaleDateString() : '-'}</td>
-                                                <td className="px-6 py-3 text-green-700 text-right">
-                                                    <button onClick={() => handleDiscountDetails(d)}>
-                                                        <Edit />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        ) : (
-                            /* ================= DETAILS VIEW ================= */
-                            <div className="p-6 space-y-4">
-                                {/* Back button */}
-                                <button
-                                    onClick={() => setSelectedDiscount(null)}
-                                    className="text-sm text-blue-600 hover:underline"
-                                >
-                                    ← Back to list
-                                </button>
+            <DiscountDetailsModal
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                loading={loading}
+                discounts={discounts}
+                selectedDiscount={selectedDiscount}
+                setSelectedDiscount={setSelectedDiscount}
+                handleDiscountDetails={handleDiscountDetails}
+                updateDiscountStatus={updateDiscountStatus}
+                rejectReason={rejectReason}
+                setRejectReason={setRejectReason}
+                isImageOpen={isImageOpen}
+                setIsImageOpen={setIsImageOpen}
+                photoUrl={photoUrl}
+            />
 
-                                {/* Details grid */}
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <Detail label="Rider ID" value={selectedDiscount.riderId} />
-                                    <Detail label="Name" value={selectedDiscount.name} />
-                                    <Detail label="ID Number" value={selectedDiscount.idNumber} />
-                                    <Detail label="ID Type" value={selectedDiscount.idType.toUpperCase()} />
-                                    <Detail label="Status" value={selectedDiscount.status.toUpperCase()} />
-                                    <Detail label="Reason for rejected" value={selectedDiscount.reason} />
-                                    <Detail
-                                        label="Expiration Date"
-                                        value={
-                                            selectedDiscount.expirationDate
-                                                ? new Date(selectedDiscount.expirationDate).toLocaleDateString()
-                                                : '—'
-                                        }
-                                    />
-                                    <Detail
-                                        label="Photo"
-                                        value={
-                                            photoUrl ? (
-                                                <button
-                                                    onClick={() => setIsImageOpen(true)}
-                                                    className="text-blue-600 hover:underline"
-                                                >
-                                                    {selectedDiscount.photoUrl?.name || 'View Photo'}
-                                                </button>
-                                            ) : (
-                                                '—'
-                                            )
-                                        }
-                                    />
-
-                                    <ImageView
-                                        isOpen={isImageOpen}
-                                        imageUrl={photoUrl}
-                                        alt={selectedDiscount?.photoUrl?.name}
-                                        onClose={() => setIsImageOpen(false)}
-                                    />
-
-                                    <Detail label="Reviewed By" value={selectedDiscount.reviewedBy} />
-                                    <Detail
-                                        label="Reviewed At"
-                                        value={
-                                            selectedDiscount.updatedAt && new Date(selectedDiscount.updatedAt).toLocaleString()
-                                        }
-                                    />
-                                </div>
-
-                                {/* Approve / Reject buttons if status is pending */}
-                                {selectedDiscount.status === 'pending' && (
-                                    <>
-                                        <div className="mt-4 space-y-2">
-                                            <label className="text-sm font-medium">
-                                                Rejection Reason <span className="text-red-500">*</span>
-                                            </label>
-                                            <textarea
-                                                className="w-full border rounded p-2 text-sm bg-gray-100 dark:bg-zinc-900"
-                                                rows={3}
-                                                placeholder="Enter reason for rejection"
-                                                value={rejectReason}
-                                                onChange={(e) => setRejectReason(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="flex justify-end gap-4 mt-4">
-                                            <button
-                                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                                                onClick={() =>
-                                                    updateDiscountStatus(selectedDiscount._id, 'approved')
-                                                }
-                                            >
-                                                Approve
-                                            </button>
-                                            <button
-                                                className={`px-4 py-2 rounded text-white transition ${rejectReason?.trim()
-                                                    ? 'bg-red-600 hover:bg-red-700'
-                                                    : 'bg-red-400 cursor-not-allowed'
-                                                    }`}
-                                                disabled={!rejectReason?.trim() || !selectedDiscount}
-                                                onClick={() => {
-                                                    if (!selectedDiscount) return;
-                                                    updateDiscountStatus(
-                                                        selectedDiscount._id,
-                                                        'rejected',
-                                                        rejectReason
-                                                    );
-                                                }}
-                                            >
-                                                Reject
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 }

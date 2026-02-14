@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React, { ReactNode } from "react";
+import { Loading } from "./Loading";
 
 export interface Column<T> {
     key: keyof T | string;
@@ -76,9 +77,7 @@ const DataTable = <T extends Record<string, any>>({
                         {loading ? (
                             <tr>
                                 <td colSpan={columns.length + (actionColumn ? 1 : 0)} className="py-6">
-                                    <div className="flex items-center justify-center w-full h-full">
-                                        Loading...
-                                    </div>
+                                    <Loading />
                                 </td>
                             </tr>
                         ) : data.length === 0 ? (
