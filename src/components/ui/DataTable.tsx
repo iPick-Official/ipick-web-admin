@@ -66,7 +66,7 @@ const DataTable = <T extends Record<string, any>>({
                             ))}
 
                             {actionColumn && (
-                                <th className={`px-6 py-3 font-medium text-right ${actionColumn.className ?? ""}`}>
+                                <th className={`px-6 py-3 font-medium flex justify-end ${actionColumn.className ?? ""}`}>
                                     {actionColumn.label}
                                 </th>
                             )}

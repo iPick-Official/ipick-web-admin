@@ -10,10 +10,10 @@ import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
 import { CheckCircleIcon, Eye, PauseCircleIcon, SparklesIcon, XCircleIcon } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
+import { BsCardChecklist } from 'react-icons/bs';
 import StatsCard from '@/components/ui/StatsCard';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import { BsCardChecklist } from 'react-icons/bs';
 
 export default function BookingsPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -115,19 +115,6 @@ export default function BookingsPage() {
                         { label: "From", value: fromDate, onChange: setFromDate },
                         { label: "To", value: toDate, onChange: setToDate },
                     ]}
-                    selectFilters={[{
-                        label: "Status",
-                        value: statusFilter,
-                        onChange: setStatusFilter,
-                        options: [
-                            { label: "All", value: "all" },
-                            { label: "Completed", value: "finished" },
-                            { label: "Cancelled", value: "cancelled" },
-                            { label: "Active", value: "active" },
-                            { label: "Inactive", value: "inactive" },
-                            { label: "Booked", value: "booked" },
-                        ]
-                    }]}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
                     onRefresh={() => fetchJSON<Booking[]>("/api/bookings/all").then(setBookings)}

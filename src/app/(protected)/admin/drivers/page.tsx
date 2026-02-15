@@ -78,7 +78,7 @@ export default function DriversPage() {
         driverId: string,
         newStatus: string
     ) => {
-        if (!confirm(`Change driver status to "${newStatus}"?`)) return;
+        if (!confirm(`Change driver status to ${newStatus.toUpperCase()}?`)) return;
 
         try {
             const cookie = document.cookie
@@ -263,19 +263,6 @@ export default function DriversPage() {
                         { label: "From", value: fromDate, onChange: setFromDate },
                         { label: "To", value: toDate, onChange: setToDate },
                     ]}
-                    selectFilters={[
-                        {
-                            label: "Status",
-                            value: statusFilter,
-                            onChange: setStatusFilter,
-                            options: [
-                                { label: "All", value: "all" },
-                                { label: "Approved", value: "approved" },
-                                { label: "Pending", value: "pending" },
-                                { label: "Rejected", value: "rejected" },
-                            ],
-                        },
-                    ]}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
                     onExport={() => exportDriversToCSVWithPapa(sortedDrivers)}
@@ -284,41 +271,14 @@ export default function DriversPage() {
                 />
 
                 <StatsCard
-                columns={4}
+                    columns={4}
                     items={[
-                        {
-                            id: "all",
-                            label: "Total Drivers",
-                            value: drivers.length,
-                            icon: <BsCardChecklist className="w-5 h-5" />,
-                            color: "blue",
-                        },
-                        {
-                            id: "approved",
-                            label: "Approved",
-                            value: totals.approved,
-                            icon: <CheckCircleIcon className="w-5 h-5" />,
-                            color: "green",
-                        },
-                        {
-                            id: "pending",
-                            label: "Pending",
-                            value: totals.pending,
-                            icon: <ClockIcon className="w-5 h-5" />,
-                            color: "yellow",
-                        },
-                        {
-                            id: "rejected",
-                            label: "Rejected",
-                            value: totals.rejected,
-                            icon: <XCircleIcon className="w-5 h-5" />,
-                            color: "red",
-                        },
+                        { id: "all", label: "Total Drivers", value: drivers.length, icon: <BsCardChecklist className="w-5 h-5" />, color: "blue" },
+                        { id: "approved", label: "Approved", value: totals.approved, icon: <CheckCircleIcon className="w-5 h-5" />, color: "green" },
+                        { id: "pending", label: "Pending", value: totals.pending, icon: <ClockIcon className="w-5 h-5" />, color: "yellow" },
+                        { id: "rejected", label: "Rejected", value: totals.rejected, icon: <XCircleIcon className="w-5 h-5" />, color: "red" },
                     ]}
-                    onFilter={(status) => {
-                        console.log("Filter table by:", status);
-                        setStatusFilter(status);
-                    }}
+                    onFilter={(status) => { console.log("Filter table by:", status); setStatusFilter(status); }}
                 />
 
                 <DataTable
@@ -329,11 +289,13 @@ export default function DriversPage() {
                     emptyMessage="No drivers found for selected filters."
                     sortOrder={sortOrder}
                     onSortToggle={toggleSort}
-                    onRowClick={(d) => fetchDetailHistory(d._id)}
                     actionColumn={{
                         label: "Action",
                         render: (d) => (
-                            <div className="flex items-center justify-center text-green-700">
+                            <div
+                                className="flex items-center justify-center text-green-700"
+                                onClick={() => fetchDetailHistory(d._id)}
+                            >
                                 <Eye />
                             </div>
                         ),

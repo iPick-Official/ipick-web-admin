@@ -60,7 +60,7 @@ export default function RidersPage() {
             const term = searchTerm.toLowerCase();
             const matchesSearch =
                 !term ||
-                r._id?.toLowerCase().includes(term) ||
+                r.id?.toLowerCase().includes(term) ||
                 r.name?.toLowerCase().includes(term) ||
                 r.email?.toLowerCase().includes(term) ||
                 r.mobnum?.toLowerCase().includes(term);
@@ -226,9 +226,8 @@ export default function RidersPage() {
                     sortOrder={sortOrder}
                     onSortToggle={toggleSort}
                     emptyMessage="No bookings found for selected date(s)."
-                    // onRowClick={(r) => fetchBookingDetails(r._id)}
                     actionColumn={{
-                        label: "Action",
+                        label: 'Action',
                         render: (r) => (
                             <div className="flex items-center text-green-700 justify-center">
                                 <Eye />

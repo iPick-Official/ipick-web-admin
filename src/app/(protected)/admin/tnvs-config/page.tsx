@@ -21,6 +21,7 @@ import { Sidebar } from '@/components/ui/Sidebar';
 import { DraggableCard } from '@/components/ui/DraggableCard';
 import { Loading } from '@/components/ui/Loading';
 import Modal from '@/components/ui/Modal';
+import { fetchJSON } from '@/app/utils/fetchJSON';
 
 /* ---------- Main Page ---------- */
 export default function TnvsConfig() {
@@ -35,20 +36,15 @@ export default function TnvsConfig() {
     );
 
     useEffect(() => {
-        async function fetchTnvsConfig() {
-            setLoading(true);
-            try {
-                const res = await fetch('/api/tnvs-config');
-                const json = await res.json();
-                setData(Array.isArray(json) ? json : json.data ?? []);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        }
+        setLoading(true);
 
-        fetchTnvsConfig();
+        fetchJSON<{ data?: any[];[key: string]: any }>("/api/tnvs-config")
+            .then((json) => {
+                const items = Array.isArray(json) ? json : json.data ?? [];
+                setData(items);
+            })
+            .catch((err) => console.error("Error fetching TNVS config:", err))
+            .finally(() => setLoading(false));
     }, []);
 
     const filteredData = data.filter(item =>

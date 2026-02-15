@@ -10,7 +10,8 @@ import { Sidebar } from '@/components/ui/Sidebar';
 import { Loading } from '@/components/ui/Loading';
 import Modal from '@/components/ui/Modal';
 import { RegisterForm } from '@/components/ui/Registration';
-import SortButton from '@/components/ui/SortButton';
+import FilterToolbar from '@/components/ui/FilterToolbar';
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
@@ -34,10 +35,7 @@ export default function EmployeePage() {
         position: "",
         department: "",
         status: "",
-        photoUrl: {
-            name: "",
-            url: "",
-        }
+        photoUrl: { name: "", url: "" },
     });
 
     useEffect(() => {
@@ -55,7 +53,6 @@ export default function EmployeePage() {
                 setLoading(false);
             }
         }
-
         fetchEmployees();
     }, []);
 
@@ -69,62 +66,35 @@ export default function EmployeePage() {
         const compressedFile = await compressAndRenameImage(file);
         const formData = new FormData();
         formData.append("file", compressedFile);
-        const res = await fetch("/api/photo-upload", {
-            method: "POST",
-            body: formData,
-        });
+        const res = await fetch("/api/photo-upload", { method: "POST", body: formData });
 
         if (!res.ok) {
             const data = await res.json();
             throw new Error(data.message || "Image upload failed");
         }
-
         const data = await res.json();
-        return {
-            name: String(data.filename || data.fileName || compressedFile.name),
-            url: String(data.url || data.fileUrl),
-        };
+        return { name: String(data.filename || compressedFile.name), url: String(data.url) };
     }
 
-    // Fetch image and return a blob URL for preview
     async function fetchImageFromApi(filename: string): Promise<string> {
-        const res = await fetch(`/api/photo-url?filename=${(filename)}`);
-
-        if (!res.ok) {
-            throw new Error("Failed to fetch existing image");
-        }
-
+        const res = await fetch(`/api/photo-url?filename=${filename}`);
+        if (!res.ok) throw new Error("Failed to fetch existing image");
         const blob = await res.blob();
-
-        // Create and return a blob URL directly for preview
         return URL.createObjectURL(blob);
     }
 
     async function submitEmployee() {
         try {
             let photoUrl = registerForm.photoUrl;
+            if (selectedFile) photoUrl = await uploadProfileImage(selectedFile);
 
-            // upload only if user selected a new file
-            if (selectedFile) {
-                const uploaded = await uploadProfileImage(selectedFile);
-                photoUrl = { name: uploaded.name, url: uploaded.url };
-            }
-
-            const payload: RegisterFormType = {
-                ...registerForm,
-                photoUrl: { name: photoUrl?.name ?? "", url: photoUrl?.url ?? "" },
-            };
-
+            const payload: RegisterFormType = { ...registerForm, photoUrl };
             const isEdit = Boolean(editingEmployee?._id);
-            const res = await fetch(
-                isEdit ? `/api/employees/${editingEmployee!._id}` : "/api/auth/register",
-                {
-                    method: isEdit ? "PATCH" : "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                }
-            );
-
+            const res = await fetch(isEdit ? `/api/employees/${editingEmployee!._id}` : "/api/auth/register", {
+                method: isEdit ? "PATCH" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Operation failed");
             alert(isEdit ? "Employee updated successfully" : "Employee created successfully");
@@ -157,19 +127,16 @@ export default function EmployeePage() {
 
     const openEditEmployeeModal = async (emp: Admin) => {
         setEditingEmployee(emp);
-        setSelectedFile(null); // reset file selection
-
+        setSelectedFile(null);
         if (emp.photoUrl?.name) {
             try {
                 const previewUrl = await fetchImageFromApi(emp.photoUrl.name);
                 setProfileImage({ name: emp.photoUrl.name, url: previewUrl });
             } catch (err) {
-                console.error("Failed to fetch employee image:", err);
+                console.error(err);
                 setProfileImage(null);
             }
-        } else {
-            setProfileImage(null);
-        }
+        } else setProfileImage(null);
 
         setRegisterForm({
             username: emp.username || "",
@@ -184,27 +151,21 @@ export default function EmployeePage() {
             status: emp.status || "",
             photoUrl: emp.photoUrl || { name: "", url: "" },
         });
-
         setAddEmployee(true);
     };
 
-    // Filtered and sorted riders
     const displayedEmployee = useMemo(() => {
-        let filtered = [...employees];
-
-        if (searchTerm.trim() !== '') {
+        return employees.filter(e => {
             const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(
-                (e) =>
-                    e.department?.toLowerCase().includes(term) ||
-                    e.status?.toLowerCase().includes(term) ||
-                    e.username?.toLowerCase().includes(term) ||
-                    e.firstName?.toLowerCase().includes(term) ||
-                    e.lastName?.toLowerCase().includes(term) ||
-                    e.mobnum?.includes(term)
+            return (
+                e.department?.toLowerCase().includes(term) ||
+                e.status?.toLowerCase().includes(term) ||
+                e.username?.toLowerCase().includes(term) ||
+                e.firstName?.toLowerCase().includes(term) ||
+                e.lastName?.toLowerCase().includes(term) ||
+                e.mobnum?.includes(term)
             );
-        }
-        return filtered;
+        });
     }, [employees, searchTerm]);
 
     const sortedEmployee = useMemo(() => {
@@ -215,120 +176,77 @@ export default function EmployeePage() {
         });
     }, [displayedEmployee, sortOrder]);
 
+    // Define DataTable columns
+    const columns: Column<Admin>[] = [
+        { key: "employeeId", label: "ID" },
+        { key: "fullName", label: "Full Name", render: (row) => `${row.firstName} ${row.lastName}` },
+        { key: "username", label: "Username" },
+        { key: "mobnum", label: "Mobile" },
+        {
+            key: "department",
+            label: "Department",
+            render: (row) => departments.find(d => d.id === row.department)?.name || row.department,
+        },
+        { key: "status", label: "Status", render: (row) => row.status.toUpperCase() },
+        {
+            key: "createdAt",
+            label: "Created At",
+            sortable: true,
+            render: (row) => new Date(row.createdAt).toLocaleString(),
+        },
+    ];
+
     return (
         <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <h2 className="text-2xl font-semibold ml-20">Employees</h2>
-                    <div className="flex items-center gap-4 border border-gray-300 rounded-lg p-4">
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search name, email, or mobile"
-                            className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
-                        />
+                <FilterToolbar
+                    title="Employees"
+                    searchValue={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    onRegister={openAddEmployeeModal}
+                    onExport={() => ""}
+                    exportDisabled={loading}
+                />
 
-                        <button
-                            className="ml-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                            onClick={openAddEmployeeModal}
-                        >
-                            <PlusIcon />
-                        </button>
-                        <button
-                            className="ml-auto px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-md shadow-sm text-sm font-medium transition"
-                        >
-                            <Download />
-                        </button>
-                    </div>
-                </div>
+                <DataTable
+                    columns={columns}
+                    data={sortedEmployee}
+                    loading={loading}
+                    rowKey={(row) => row._id}
+                    sortOrder={sortOrder}
+                    onSortToggle={toggleSort}
+                    emptyMessage="No employees found."
+                    actionColumn={{
+                        label: "Action",
+                        render: (row) => (
+                            <div className="text-green-700">
+                                <PenBox
+                                    className="cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openEditEmployeeModal(row);
+                                    }}
+                                />
+                            </div>
+                        ),
+                    }}
+                />
 
-                {/* Table */}
-                <div className="shadow-md rounded-lg overflow-hidden bg-white dark:bg-zinc-800">
-                    <div className="overflow-y-auto max-h-[75vh]">
-                        <table className="min-w-full text-sm text-left border-collapse">
-                            <thead className="bg-gray-200 dark:bg-zinc-700 uppercase text-xs sticky top-0 z-10">
-                                <tr>
-                                    {['ID', 'Full Name', 'Username', 'Mobile', 'Department', 'Status'].map(col => (
-                                        <th key={col} className="px-6 py-3 font-medium">
-                                            {col}
-                                        </th>
-                                    ))}
-                                    <th className="px-6 py-3 font-medium text-left">
-                                        <SortButton
-                                            label="Created At"
-                                            sortOrder={sortOrder}
-                                            onToggle={toggleSort}
-                                        />
-                                    </th>
-                                    <th className="px-6 py-3 text-right">Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={9} className="py-6">
-                                            <div className="flex items-center justify-center w-full h-full">
-                                                <Loading />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : sortedEmployee.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={7} className="text-center py-6 text-gray-500 italic">
-                                            No employees found.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    sortedEmployee.map(emp => (
-                                        <tr
-                                            key={emp._id}
-                                            className="border-b hover:bg-gray-800 hover:text-white transition"
-                                        >
-                                            <td className="px-6 py-3">{emp.employeeId}</td>
-                                            <td className="px-6 py-3">{`${emp.firstName} ${emp.lastName}`}</td>
-                                            <td className="px-6 py-3">{emp.username}</td>
-                                            <td className="px-6 py-3">{emp.mobnum}</td>
-                                            <td className="px-6 py-3">
-                                                {
-                                                    departments.find((dept: { id: string; }) => dept.id === emp.department)?.name || emp.department
-                                                }
-                                            </td>
-                                            <td className="px-6 py-3 uppercase">{emp.status}</td>
-                                            <td className="px-6 py-3">
-                                                {new Date(emp.createdAt).toLocaleString()}
-                                            </td>
-                                            <td className="px-6 py-3 flex justify-end text-green-700">
-                                                <PenBox
-                                                    className="cursor-pointer"
-                                                    onClick={() => openEditEmployeeModal(emp)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-
-                        <Modal
-                            isOpen={addEmployee}
-                            onClose={() => setAddEmployee(false)}
-                            title={editingEmployee ? "Edit Information" : "Add Employee"}
-                            size="xl"
-                        >
-                            <RegisterForm
-                                form={registerForm}
-                                setForm={setRegisterForm}
-                                onSubmit={submitEmployee}
-                                onFileChange={handleFileChange}
-                                profileImage={profileImage}
-                            />
-                        </Modal>
-                    </div>
-                </div>
+                <Modal
+                    isOpen={addEmployee}
+                    onClose={() => setAddEmployee(false)}
+                    title={editingEmployee ? "Edit Information" : "Add Employee"}
+                    size="xl"
+                >
+                    <RegisterForm
+                        form={registerForm}
+                        setForm={setRegisterForm}
+                        onSubmit={submitEmployee}
+                        onFileChange={handleFileChange}
+                        profileImage={profileImage}
+                    />
+                </Modal>
             </div>
         </div>
     );

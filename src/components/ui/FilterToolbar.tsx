@@ -1,5 +1,5 @@
 import React from "react";
-import { Download, Percent, RefreshCcwDot } from "lucide-react";
+import { Download, Percent, Plus, RefreshCcwDot } from "lucide-react";
 import { BsPersonAdd } from "react-icons/bs";
 import { FilterProps } from "@/interface/filterToolbar";
 
@@ -17,7 +17,7 @@ const FilterToolbar: React.FC<FilterProps> = ({
 }) => {
     const buttons = [
         { action: onExport, label: "Export", icon: <Download size={16} />, bg: "bg-green-700", hover: "hover:bg-green-600", disabled: exportDisabled },
-        { action: onRegister, label: "Add Driver", icon: <BsPersonAdd size={16} />, bg: "bg-orange-700", hover: "hover:bg-orange-600", disabled: exportDisabled },
+        { action: onRegister, label: "Add", icon: <Plus size={16} />, bg: "bg-orange-700", hover: "hover:bg-orange-600", disabled: exportDisabled },
         { action: onRefresh, label: "Load More", icon: <RefreshCcwDot size={16} />, bg: "bg-orange-700", hover: "hover:bg-orange-600", disabled: exportDisabled },
         { action: onDiscount, label: "Discount", icon: <Percent size={16} />, bg: "bg-orange-700", hover: "hover:bg-orange-600", disabled: exportDisabled },
     ].filter(btn => btn.action);
