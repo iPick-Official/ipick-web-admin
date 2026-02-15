@@ -42,6 +42,14 @@ export default function BookingsPage() {
             .finally(() => setLoading(false));
     }, []);
 
+    async function fetchAllBooking() {
+        setLoading(true);
+        fetchJSON<Booking[]>("/api/bookings/all")
+            .then(setBookings)
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }
+
     const displayedBookings = useMemo(() => {
         return bookings.filter((b) => {
             const updated = b.updatedAt ? new Date(b.updatedAt) : null;
@@ -117,7 +125,7 @@ export default function BookingsPage() {
                     ]}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
-                    onRefresh={() => fetchJSON<Booking[]>("/api/bookings/all").then(setBookings)}
+                    onRefresh={fetchAllBooking}
                     onExport={() => exportBookingsToCSV(sortedBookings)}
                     exportDisabled={loading}
                 />

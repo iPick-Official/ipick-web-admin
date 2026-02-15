@@ -113,7 +113,7 @@ export default function BookingsAnalytics() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 p-8 overflow-auto space-y-6">
-        <FilterToolbar title="Monthly Bookings Analytics" onExport={() => ""} exportDisabled={loading} />
+        <FilterToolbar title="Bookings Analytics" onExport={() => ""} exportDisabled={loading} />
 
         {/* Summary Cards */}
         <StatsCard
