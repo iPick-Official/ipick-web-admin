@@ -15,6 +15,7 @@ import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DiscountDetailsModal from '@/components/riders-modal/DiscountDetailsModal';
+import { BsCardChecklist } from 'react-icons/bs';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -206,7 +207,7 @@ export default function RidersPage() {
                 <StatsCard
                     columns={3}
                     items={[
-                        { id: 'total', label: 'Total Passengers', value: totals.totalRiders, icon: <XCircleIcon className="w-5 h-5" />, color: 'blue' },
+                        { id: 'total', label: 'Total Passengers', value: riders.length, icon: <BsCardChecklist className="w-5 h-5" />, color: 'blue' },
                         { id: 'active', label: 'Active', value: totals.loggedIn, icon: <CheckCircleIcon className="w-5 h-5" />, color: 'green' },
                         { id: 'inactive', label: 'Inactive', value: totals.notLoggedIn, icon: <XCircleIcon className="w-5 h-5" />, color: 'zinc' },
                     ]}

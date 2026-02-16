@@ -18,7 +18,7 @@ export interface DataTableProps<T> {
     emptyMessage?: string;
     onRowClick?: (row: T) => void;
     rowClassName?: (row: T) => string;
-    rowKey: (row: T) => string;
+    rowKey?: (row: T) => string;
     sortOrder?: "asc" | "desc";
     onSortToggle?: () => void;
     actionColumn?: {
@@ -90,9 +90,9 @@ const DataTable = <T extends Record<string, any>>({
                                 </td>
                             </tr>
                         ) : (
-                            data.map((row) => (
+                            data.map((row, index) => (
                                 <tr
-                                    key={rowKey(row)}
+                                    key={rowKey ? rowKey(row) : index}
                                     className={`
                                         border-b
                                         transition

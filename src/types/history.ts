@@ -13,7 +13,7 @@ interface Computations {
   costPerMin: number;
 }
 
-interface Ride {
+export interface Ride {
   _id: string;
   riderId: string;
   driverId: string;
@@ -21,7 +21,7 @@ interface Ride {
   destination: Location;
   travelFare: number;
   status: string;
-  timestamp: string;
+  updatedAt: string;
   computations: Computations;
 }
 
@@ -36,9 +36,17 @@ export interface Message {
   updatedAt: string;
 }
 
-export interface DriverDataResponse {
-  driver: {
+export type DriverDataResponse = {
+  driver?: {
     history: Ride[];
     messages: Message[];
   };
-}
+};
+
+export type Rides = {
+  rideHistory?: {
+    driver?: {
+      history?: Ride[];
+    };
+  } | null;
+};
