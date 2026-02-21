@@ -12,6 +12,8 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import { getStatusColor } from '@/app/utils/statusColor';
+import { sortByDate } from '@/app/utils/sortByDate';
+import { BsCardChecklist } from 'react-icons/bs';
 import DriverDetailsCard from "@/components/drivers-modal/DriverDetailsCard";
 import PersonalRequirementsCard from "@/components/drivers-modal/PersonalRequirementsCard";
 import TransportRequirementsCard from "@/components/drivers-modal/TransportRequirementsCard";
@@ -22,8 +24,6 @@ import DriverModal from '@/components/drivers-modal/DriverModal';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import { sortByDate } from '@/app/utils/sortByDate';
-import { BsCardChecklist } from 'react-icons/bs';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");

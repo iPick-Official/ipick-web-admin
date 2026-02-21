@@ -14,12 +14,14 @@ import { BsCardChecklist } from 'react-icons/bs';
 import StatsCard from '@/components/ui/StatsCard';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import BookingDetailsModal from '@/components/bookins-modal/BookingDetails';
 
 export default function BookingsPage() {
     const { sortOrder, toggleSort } = useSort("desc");
     const [loading, setLoading] = useState(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null); // new state for modal
 
     const today = new Date().toISOString().split("T")[0];
     const addDays = (dateString: string, days: number) => {
@@ -42,14 +44,6 @@ export default function BookingsPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    async function fetchAllBooking() {
-        setLoading(true);
-        fetchJSON<Booking[]>("/api/bookings/all")
-            .then(setBookings)
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }
-
     const displayedBookings = useMemo(() => {
         return bookings.filter((b) => {
             const updated = b.updatedAt ? new Date(b.updatedAt) : null;
@@ -70,10 +64,7 @@ export default function BookingsPage() {
     }, [bookings, statusFilter, searchTerm, fromDate, toDate]);
 
     const sortedBookings = useMemo(() => sortByDate(displayedBookings, "updatedAt", sortOrder), [displayedBookings, sortOrder]);
-
-    // Reset pagination when filters change
     useEffect(() => setCurrentPage(1), [searchTerm, fromDate, toDate, statusFilter]);
-
     const totalPages = Math.ceil(sortedBookings.length / itemsPerPage);
     const paginatedBookings = sortedBookings.slice(
         (currentPage - 1) * itemsPerPage,
@@ -125,7 +116,6 @@ export default function BookingsPage() {
                     ]}
                     searchValue={searchTerm}
                     onSearchChange={setSearchTerm}
-                    onRefresh={fetchAllBooking}
                     onExport={() => exportBookingsToCSV(sortedBookings)}
                     exportDisabled={loading}
                 />
@@ -155,7 +145,14 @@ export default function BookingsPage() {
                     sortOrder={sortOrder}
                     onSortToggle={toggleSort}
                     emptyMessage="No bookings found for selected date(s)."
-                    actionColumn={{ label: "Action", render: (b) => <Eye className="text-green-700" /> }}
+                    actionColumn={{
+                        label: "Action",
+                        render: (b) => (
+                            <button onClick={() => setSelectedBooking(b)}>
+                                <Eye className="text-green-700" />
+                            </button>
+                        )
+                    }}
                 />
 
                 {totalPages > 1 && (
@@ -166,6 +163,13 @@ export default function BookingsPage() {
                     />
                 )}
             </div>
+
+            {/* Booking Details Modal */}
+            <BookingDetailsModal
+                isOpen={!!selectedBooking}
+                onClose={() => setSelectedBooking(null)}
+                booking={selectedBooking}
+            />
         </div>
     );
 }

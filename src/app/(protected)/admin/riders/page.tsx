@@ -16,6 +16,7 @@ import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DiscountDetailsModal from '@/components/riders-modal/DiscountDetailsModal';
 import { BsCardChecklist } from 'react-icons/bs';
+import RiderDetailsModal from '@/components/riders-modal/RiderDetails';
 
 export default function RidersPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +34,9 @@ export default function RidersPage() {
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
     const { sortOrder, toggleSort } = useSort("desc");
     const itemsPerPage = 100;
+
+    const [isRiderModalOpen, setIsRiderModalOpen] = useState(false);
+    const [selectedRider, setSelectedRider] = useState<Riders | null>(null);
 
     useEffect(() => {
         setLoading(true);
@@ -226,11 +230,17 @@ export default function RidersPage() {
                     rowKey={(r) => r._id}
                     sortOrder={sortOrder}
                     onSortToggle={toggleSort}
-                    emptyMessage="No bookings found for selected date(s)."
+                    emptyMessage="No riders found for selected date(s)."
                     actionColumn={{
                         label: 'Action',
                         render: (r) => (
-                            <div className="flex items-center text-green-700 justify-center">
+                            <div
+                                className="flex items-center text-green-700 justify-center cursor-pointer"
+                                onClick={() => {
+                                    setSelectedRider(r);
+                                    setIsRiderModalOpen(true);
+                                }}
+                            >
                                 <Eye />
                             </div>
                         ),
@@ -260,6 +270,11 @@ export default function RidersPage() {
                 isImageOpen={isImageOpen}
                 setIsImageOpen={setIsImageOpen}
                 photoUrl={photoUrl}
+            />
+            <RiderDetailsModal
+                isOpen={isRiderModalOpen}
+                onClose={() => setIsRiderModalOpen(false)}
+                rider={selectedRider}
             />
         </div>
     );

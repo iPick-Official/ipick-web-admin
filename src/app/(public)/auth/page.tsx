@@ -36,9 +36,7 @@ export default function AuthPage() {
                 router.push("/admin/profile");
                 return;
             }
-
             router.push("/admin/dashboard");
-
         } catch (err) {
             console.error(err);
             alert("Server error");

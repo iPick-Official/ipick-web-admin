@@ -17,3 +17,11 @@ export interface StatsCardProps {
 export interface StatsCardWithFilterProps extends StatsCardProps {
   onFilter?: (id: string) => void; // callback when a card is clicked
 }
+
+export interface DriverStats {
+  driverId: string;
+  totalBookings: number;
+  finished: number;
+  cancelled: number;
+  inactive: number;
+}

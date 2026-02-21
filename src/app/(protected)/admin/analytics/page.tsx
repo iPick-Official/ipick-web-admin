@@ -5,20 +5,13 @@ import { MonthlyRidershipChart, RidershipData } from "@/components/ui/MonthlyRid
 import { fetchJSON } from "@/app/utils/fetchJSON";
 import { Booking } from "@/types/bookings";
 import { Sidebar } from "@/components/ui/Sidebar";
-import StatsCard from "@/components/ui/StatsCard";
 import { BsCardChecklist } from "react-icons/bs";
 import { CheckCircleIcon, XCircleIcon, PauseCircleIcon } from "lucide-react";
 import { Loading } from "@/components/ui/Loading";
+import { DriverStats } from "@/interface/statsCard";
 import FilterToolbar from "@/components/ui/FilterToolbar";
 import DataTable, { Column } from "@/components/ui/DataTable";
-
-interface DriverStats {
-  driverId: string;
-  totalBookings: number;
-  finished: number;
-  cancelled: number;
-  inactive: number;
-}
+import StatsCard from "@/components/ui/StatsCard";
 
 export default function BookingsAnalytics() {
   const [bookings, setBookings] = useState<Booking[]>([]);
