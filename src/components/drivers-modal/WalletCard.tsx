@@ -45,7 +45,7 @@ const WalletCard: React.FC<Props> = ({ wallet, walletLogs }) => {
         <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 space-y-6">
             <StatsCard columns={2}
                 items={[
-                    { id: "all", label: "Total Rides", value: `₱${balance.toFixed(2)}`, icon: <FaMoneyBill className="w-5 h-5" />, color: "blue" },
+                    { id: "all", label: "Wallet Balance", value: `₱${balance.toFixed(2)}`, icon: <FaMoneyBill className="w-5 h-5" />, color: "green" },
                 ]} />
             {/* Wallet Transaction Table */}
             <div>

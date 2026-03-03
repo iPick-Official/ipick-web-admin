@@ -14,14 +14,14 @@ import { BsCardChecklist } from 'react-icons/bs';
 import StatsCard from '@/components/ui/StatsCard';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import BookingDetailsModal from '@/components/bookins-modal/BookingDetails';
+import BookingDetailsModal from '@/components/bookings-modal/BookingDetails';
 
 export default function BookingsPage() {
     const { sortOrder, toggleSort } = useSort("desc");
     const [loading, setLoading] = useState(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null); // new state for modal
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
     const today = new Date().toISOString().split("T")[0];
     const addDays = (dateString: string, days: number) => {

@@ -25,11 +25,6 @@ export function exportBookingsToCSV(bookings: Booking[]) {
       "Fare Duration (Mins)": booking.computations?.fareDurationInMins ?? 0,
       "Cost per KM": booking.computations?.costPerKM ?? 0,
       "Cost per Min": booking.computations?.costPerMin ?? 0,
-      // Ratings
-      "Rider Rating": booking.riderRating?.rating ?? "",
-      "Rider Comments": booking.riderRating?.comments ?? "",
-      "Driver Rating": booking.driverRating?.rating ?? "",
-      "Driver Comments": booking.driverRating?.comments ?? "",
       "Trip Status": booking.tripStatus,
     }))
   );
@@ -108,9 +103,7 @@ export function exportRidersToCSV(riders: Riders[]) {
   const csv = Papa.unparse(
     riders.map((rider) => ({
       "Rider ID": rider.id,
-      "Full Name": `${rider.firstName} ${rider.surName}`,
-      "First Name": rider.firstName,
-      Surname: rider.surName,
+      "Full Name": `${rider.name}`,
       Email: rider.email,
       "Contact Number": rider.mobnum,
       Address: rider.address,
