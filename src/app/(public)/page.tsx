@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import Navbar from "@/components/LandingPageNavbar";
+import Navbar from "@/components/Navbar";
 import HeroHeader from "@/components/LandingPageHeader";
 import FeaturesSection from "@/components/LandingPageFeature";
 import Footer from "@/components/LandingPageFooter";
 import { Loading } from "@/components/ui/Loading";
 import StatsSection from "@/components/StatsSection";
+import OverviewSection from "@/components/LandingPageOverview";
+import MissionValuesSection from "@/components/LandingPageMission";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -33,6 +35,8 @@ export default function Home() {
       <HeroHeader />
       <StatsSection />
       <FeaturesSection />
+      <OverviewSection />
+      <MissionValuesSection />
       <Footer />
     </div>
   );

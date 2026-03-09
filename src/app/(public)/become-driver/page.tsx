@@ -1,7 +1,7 @@
 'use client';
 
 import Footer from '@/components/LandingPageFooter';
-import Navbar from '@/components/LandingPageNavbar';
+import Navbar from '@/components/Navbar';
 import DownloadModal from '@/components/LandingPageDownload';
 import DriverOnboard from '@/components/LandingPageOnboard';
 import Image from 'next/image';

@@ -1,7 +1,7 @@
 'use client';
 
 import Footer from "@/components/LandingPageFooter";
-import Navbar from "@/components/LandingPageNavbar";
+import Navbar from "@/components/Navbar";
 import { useEffect, useRef, useState } from "react";
 
 const sections = [

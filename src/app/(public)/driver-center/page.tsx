@@ -1,7 +1,7 @@
 'use client'
 
 import Footer from '@/components/LandingPageFooter'
-import Navbar from '@/components/LandingPageNavbar'
+import Navbar from '@/components/Navbar'
 
 export default function DriverCenter() {
     return (
