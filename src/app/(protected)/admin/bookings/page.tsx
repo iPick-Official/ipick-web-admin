@@ -5,7 +5,6 @@ import { fetchJSON } from '@/app/utils/fetchJSON';
 import { sortByDate } from '@/app/utils/sortByDate';
 import { getStatusColor } from '@/app/utils/statusColor';
 import { Pagination } from '@/components/ui/Pagination';
-import { Sidebar } from '@/components/ui/Sidebar';
 import { useSort } from '@/hooks/useSort';
 import { Booking } from '@/types/bookings';
 import { CheckCircleIcon, Eye, PauseCircleIcon, SparklesIcon, XCircleIcon } from 'lucide-react';
@@ -106,7 +105,6 @@ export default function BookingsPage() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 <FilterToolbar
                     title="Bookings"

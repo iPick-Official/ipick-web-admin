@@ -97,7 +97,6 @@ export default function JsonViewPage() {
 
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6">
-            <Sidebar />
             <h1 className="text-3xl font-bold mb-4">JSON Visualizer</h1>
             {/* Hidden file input */}
             <input

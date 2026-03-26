@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { navSections } from "./SidebarSec";
 import { useAdmin } from "@/hooks/useAdmin";
 import { ADMIN_PERMISSIONS } from "@/config/adminPermissions";
@@ -14,6 +14,7 @@ export const Sidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const isProfileActive = pathname.startsWith("/admin/profile");
   const { admin, loading } = useAdmin();
 
   const [collapsed, setCollapsed] = useState(true);
@@ -32,13 +33,13 @@ export const Sidebar = () => {
   // Click outside sidebar or dropdown to collapse/close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && isMobile) {
         setCollapsed(true);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isMobile]);
 
   const filteredNavSections =
     permissions?.sections === "ALL"
@@ -57,21 +58,27 @@ export const Sidebar = () => {
   return (
     <>
       {/* Floating Menu Button */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className={`fixed top-4 z-50 p-3 rounded-full shadow-md bg-green-800 text-white hover:bg-gray-100 hover:text-black transition-all duration-300
-          ${collapsed ? "left-2" : "left-64"} 
-        `}
-        aria-label="Toggle Sidebar"
-        style={{ transform: "translateX(50%)" }}
-      >
-        {collapsed ? <Menu size={22} /> : <X size={22} />}
-      </button>
+      {isMobile && (
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={`fixed top-4 z-50 p-3 rounded-full shadow-md bg-green-800 text-white hover:bg-gray-100 hover:text-black transition-all duration-300
+            ${collapsed ? "left-2" : "left-64"} 
+          `}
+          aria-label="Toggle Sidebar"
+          style={{ transform: "translateX(50%)" }}
+        >
+          {collapsed ? <Menu size={22} /> : <X size={22} />}
+        </button>
+      )}
 
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full bg-white dark:bg-zinc-900 shadow-lg flex flex-col justify-between transition-transform duration-300 ease-in-out z-40 ${collapsed ? "-translate-x-full" : "translate-x-0"} w-64`}
+        className={`
+          ${isMobile ? "fixed top-0 left-0 h-full z-40 transition-transform duration-300 ease-in-out" : "sticky top-0 h-screen"} 
+          w-64 bg-white dark:bg-zinc-900 shadow-lg flex flex-col justify-between
+          ${isMobile ? (collapsed ? "-translate-x-full" : "translate-x-0") : "translate-x-0"}
+        `}
       >
         {/* Header */}
         <div className="flex items-center gap-2 p-2 m-2 border-b border-green-700/20">
@@ -101,17 +108,23 @@ export const Sidebar = () => {
                   const isActive = pathname.startsWith(item.path);
                   return (
                     <li key={item.label}>
-                      <Link href={item.path}>
+                      {isActive ? (
                         <div
-                          className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-200 cursor-pointer ${isActive
-                            ? "bg-slate-700 text-slate-100 font-medium"
-                            : "hover:bg-slate-200 hover:text-gray-900"
-                            }`}
+                          className="flex items-center gap-3 p-2 rounded-lg bg-slate-700 text-slate-100 font-medium cursor-default"
                         >
                           {item.icon}
                           <span className="whitespace-nowrap">{item.label}</span>
                         </div>
-                      </Link>
+                      ) : (
+                        <Link href={item.path}>
+                          <div
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-200 hover:text-gray-900 transition-all duration-200 cursor-pointer"
+                          >
+                            {item.icon}
+                            <span className="whitespace-nowrap">{item.label}</span>
+                          </div>
+                        </Link>
+                      )}
                     </li>
                   );
                 })}
@@ -121,7 +134,19 @@ export const Sidebar = () => {
         </div>
 
         {/* Profile */}
-        <div className="relative m-2 border-t border-green-700/20 rounded-lg ">
+        {isProfileActive ? (
+          <div className="flex items-center gap-3 w-full p-3 rounded-lg bg-slate-700 text-slate-100 font-medium cursor-default">
+            <Avatar
+              photoUrl={admin?.photoUrl?.url}
+              size={48}
+              alt="Admin profile"
+            />
+            <div className="flex-1 min-w-0 text-left">
+              <p className="truncate">{fullName}</p>
+              <p className="text-sm truncate">{admin?.email}</p>
+            </div>
+          </div>
+        ) : (
           <button
             onClick={() => router.push("/admin/profile")}
             className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-slate-800 hover:text-gray-200 transition-all duration-200"
@@ -136,7 +161,7 @@ export const Sidebar = () => {
               <p className="text-sm truncate">{admin?.email}</p>
             </div>
           </button>
-        </div>
+        )}
       </div>
 
       {/* Background Overlay */}

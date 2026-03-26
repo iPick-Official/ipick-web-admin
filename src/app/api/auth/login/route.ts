@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { username, password } = await req.json();
 
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/admin/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     });
 
     // Save secure access token
-    res.cookies.set("access_token", data.apiKey, {
+    res.cookies.set("access_token", data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

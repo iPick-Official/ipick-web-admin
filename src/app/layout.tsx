@@ -1,7 +1,7 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AdminGuard } from "@/components/AdminGuard";
 import { Providers } from "./providers";
 
 const geistSans = Geist({
@@ -16,22 +16,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "iPick",
-  description: "Design for ridehail",
+  description: "Bringing you to places.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AdminGuard>
-          <Providers>{children}</Providers>
-        </AdminGuard>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

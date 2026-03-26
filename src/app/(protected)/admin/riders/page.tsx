@@ -193,7 +193,6 @@ export default function RidersPage() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 <FilterToolbar
                     title="Passengers"

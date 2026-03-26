@@ -10,11 +10,8 @@ export async function PATCH(
     const resolvedParams = await context.params;
     const { id } = resolvedParams;
 
-    // Parse JSON body
     const body = await req.json();
 
-    // Determine action: edit info or change password
-    // For example, if body contains newPassword => change password
     const endpoint = body.newPassword ? "change-password" : "edit-information";
 
     // Get token from cookies

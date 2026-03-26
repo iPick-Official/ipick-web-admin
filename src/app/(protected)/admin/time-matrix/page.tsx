@@ -54,7 +54,6 @@ export default function TnvsConfig() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 <FilterToolbar
                     title="Time Matrix"

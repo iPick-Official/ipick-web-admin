@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
-import { capitalize } from "@/app/utils/capitalized";
 import { departments } from "@/app/utils/department";
-import { Sidebar } from "@/components/ui/Sidebar";
 import { Avatar } from "@/components/ui/Avatar";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Loading } from "@/components/ui/Loading";
@@ -116,7 +114,6 @@ export default function ProfilePage() {
 
     return (
         <div className="max-w-5xl mx-auto px-6 py-20">
-            <Sidebar />
             <div className="relative flex items-center gap-6 bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-200 dark:border-zinc-700">
                 {/* Version */}
                 <span className="absolute top-3 right-3 text-xs text-gray-400 dark:text-gray-500">

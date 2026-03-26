@@ -9,20 +9,20 @@ export async function GET() {
     if (!token) {
       return NextResponse.json(
         { message: "Unauthorized: No token found" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     // Call your NestJS backend using streaming
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getAllRiders`,
+      `${process.env.NEXT_PUBLIC_API_URL}/users`,
       {
         method: "GET",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!backendRes.ok) {
@@ -37,7 +37,7 @@ export async function GET() {
     if (!stream) {
       return NextResponse.json(
         { message: "No data from backend" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function GET() {
     console.error("Error fetching riders:", error);
     return NextResponse.json(
       { message: "Failed to fetch riders" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

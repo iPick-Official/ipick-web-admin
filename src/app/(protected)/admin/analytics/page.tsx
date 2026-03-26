@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import { MonthlyRidershipChart, RidershipData } from "@/components/ui/MonthlyRidershipChart";
 import { fetchJSON } from "@/app/utils/fetchJSON";
 import { Booking } from "@/types/bookings";
-import { Sidebar } from "@/components/ui/Sidebar";
 import { BsCardChecklist } from "react-icons/bs";
 import { CheckCircleIcon, XCircleIcon, PauseCircleIcon } from "lucide-react";
 import { Loading } from "@/components/ui/Loading";
@@ -104,7 +103,6 @@ export default function BookingsAnalytics() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
       <div className="flex-1 p-8 overflow-auto space-y-6">
         <FilterToolbar title="Bookings Analytics" onExport={() => ""} exportDisabled={loading} />
 

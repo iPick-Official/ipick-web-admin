@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 function extractFileName(input?: string | null) {
   if (!input) return null;
 
-  // already a filename
   if (!input.startsWith("http")) return input;
 
   try {
@@ -15,6 +14,8 @@ function extractFileName(input?: string | null) {
   }
 }
 
+const signedUrlCache = new Map<string, string>();
+
 export function useSignedS3Url(rawKey?: string | null) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,31 +23,55 @@ export function useSignedS3Url(rawKey?: string | null) {
   const filename = extractFileName(rawKey);
 
   useEffect(() => {
-    const fetchPhotoUrl = async () => {
-      if (!filename) {
-        setSignedUrl(null);
-        return;
-      }
+    if (!filename) {
+      setSignedUrl(null);
+      return;
+    }
 
+    if (signedUrlCache.has(filename)) {
+      setSignedUrl(signedUrlCache.get(filename)!);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchPhotoUrl = async () => {
       setLoading(true);
 
       try {
         const res = await fetch(
           `/api/photo-url?filename=${encodeURIComponent(filename)}`,
-          { cache: "no-store" } // Next.js safety
+          { cache: "no-store" },
         );
 
+        if (!res.ok) throw new Error("Failed request");
+
         const data = await res.json();
-        setSignedUrl(data.url ?? null);
+
+        if (!cancelled) {
+          const url = data.url ?? null;
+
+          if (url) {
+            signedUrlCache.set(filename, url);
+          }
+
+          setSignedUrl(url);
+        }
       } catch (err) {
-        console.error("Failed to fetch photo URL:", err);
-        setSignedUrl(null);
+        if (!cancelled) {
+          console.error("Failed to fetch photo URL:", err);
+          setSignedUrl(null);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchPhotoUrl();
+
+    return () => {
+      cancelled = true;
+    };
   }, [filename]);
 
   return { signedUrl, loading };

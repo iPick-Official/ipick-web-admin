@@ -9,7 +9,6 @@ import { useSort } from '@/hooks/useSort';
 import { useAdmin } from '@/hooks/useAdmin';
 import { exportDriversToCSVWithPapa } from '@/app/utils/DownloadReports';
 import { Pagination } from "@/components/ui/Pagination";
-import { Sidebar } from "@/components/ui/Sidebar";
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import { getStatusColor } from '@/app/utils/statusColor';
 import { sortByDate } from '@/app/utils/sortByDate';
@@ -255,7 +254,6 @@ export default function DriversPage() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
             <div className="flex-1 p-8 overflow-auto space-y-6">
                 <FilterToolbar
                     title="Drivers"
