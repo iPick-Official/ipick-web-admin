@@ -5,12 +5,12 @@ export async function POST(req: Request) {
     const { username, password } = await req.json();
 
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/admin/login`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
-      }
+      },
     );
 
     const data = await backendRes.json();
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     if (!backendRes.ok) {
       return NextResponse.json(
         { message: data.message || "Invalid login" },
-        { status: backendRes.status }
+        { status: backendRes.status },
       );
     }
 
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     });
 
     // Save secure access token
-    res.cookies.set("access_token", data.access_token, {
+    res.cookies.set("access_token", data.apiKey, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

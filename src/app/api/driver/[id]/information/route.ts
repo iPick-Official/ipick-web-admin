@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 export async function GET(
   _request: Request,
-  context: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get access token from secure cookies
@@ -12,7 +12,7 @@ export async function GET(
     if (!token) {
       return NextResponse.json(
         { message: "Unauthorized: No token found" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -21,14 +21,14 @@ export async function GET(
 
     // Call your NestJS backend for a single driver
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/driver/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/driver/${id}`,
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "x-api-key": token,
           "Content-Type": "application/json",
         },
-      },
+      }
     );
 
     const data = await backendRes.json();
@@ -36,7 +36,7 @@ export async function GET(
     if (!backendRes.ok) {
       return NextResponse.json(
         data || { message: "Failed to fetch driver details" },
-        { status: backendRes.status },
+        { status: backendRes.status }
       );
     }
 
@@ -46,7 +46,7 @@ export async function GET(
     console.error("Error fetching driver by ID:", error);
     return NextResponse.json(
       { message: "Failed to fetch driver details" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

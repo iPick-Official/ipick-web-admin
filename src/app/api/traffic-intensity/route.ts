@@ -1,38 +1,37 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { handleApiResponse } from "@/app/utils/api";
 
 export async function GET() {
   try {
     const token = (await cookies()).get("access_token")?.value;
-
     if (!token) {
-      const response = NextResponse.json(
-        { message: "Unauthorized: No token found" },
-        { status: 401 },
-      );
-      (await cookies()).delete("access_token");
-      (await cookies()).delete("refresh_token");
-      return response;
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
-    const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/traffic`,
+    // Call your NestJS backend
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/traffic-intensity`,
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "x-api-key": token,
           "Content-Type": "application/json",
         },
-      },
+        cache: "no-store", // optional: always fetch fresh data
+      }
     );
 
-    return handleApiResponse(backendRes);
-  } catch (error) {
-    console.error("API error:", error);
-    return NextResponse.json(
-      { message: "Failed to fetch data" },
-      { status: 500 },
-    );
+    const data = await res.json();
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { message: data.message || "Failed to fetch employees" },
+        { status: res.status }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("API Error:", err);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
