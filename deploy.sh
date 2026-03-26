@@ -1,7 +1,5 @@
 #!/bin/bash
 
-gcloud components update
-
 gcloud config set project ipick-admin
 
 gcloud auth application-default set-quota-project ipick-admin

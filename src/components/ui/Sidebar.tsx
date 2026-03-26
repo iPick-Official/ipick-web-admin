@@ -92,7 +92,7 @@ export const Sidebar = () => {
               bg-clip-text text-transparent
             "
           >
-            Central Hub
+            CentralHub
           </span>
         </div>
 
