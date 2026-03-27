@@ -1,24 +1,16 @@
-# Step 1: Build
+# Step 1: Build the app
 FROM node:20 AS builder
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm ci
-
+RUN npm install
 COPY . .
-
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV ESLINT_IGNORE_DURING_BUILD=true
-
+# Disable ESLint during build to avoid build crash
+ENV NEXT_DISABLE_ESLINT=true
 RUN npm run build
 
-# Step 2: Run
+# Step 2: Run the app
 FROM node:20
 WORKDIR /app
-
 COPY --from=builder /app ./
-
-ENV PORT=8080
 EXPOSE 8080
-
 CMD ["npm", "run", "start"]
