@@ -23,6 +23,7 @@ import DriverModal from '@/components/drivers-modal/DriverModal';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -290,34 +291,13 @@ export default function DriversPage() {
                     actionColumn={{
                         label: "Action",
                         render: (d) => (
-                            <div className="flex items-center justify-end gap-1">
-                                {/* Eye / View */}
-                                <button
-                                    onClick={() => fetchDetailHistory(d._id)}
-                                    className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-700 shadow-sm transition transform hover:scale-105"
-                                    title="View Details"
-                                >
-                                    <Eye className="w-4 h-4" />
-                                </button>
-
-                                {/* Wallet / Transaction */}
-                                <button
-                                    onClick={() => fetchDetailHistory(d._id)}
-                                    className="p-1.5 rounded-md bg-red-100 hover:bg-red-200 text-red-700 shadow-sm transition transform hover:scale-105"
-                                    title="Wallet History"
-                                >
-                                    <Wallet className="w-4 h-4" />
-                                </button>
-
-                                {/* Edit */}
-                                <button
-                                    onClick={() => fetchDetailHistory(d._id)}
-                                    className="p-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-sm transition transform hover:scale-105"
-                                    title="Edit"
-                                >
-                                    <EditIcon className="w-4 h-4" />
-                                </button>
-                            </div>
+                            <ActionButtons
+                                id={d._id}
+                                onView={fetchDetailHistory}
+                                showView={true}
+                                showWallet={true}
+                                showEdit={true}
+                            />
                         ),
                     }}
                 />

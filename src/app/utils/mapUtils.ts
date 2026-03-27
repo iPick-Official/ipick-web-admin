@@ -27,5 +27,5 @@ export const mapOptions = {
     latLngBounds: PHILIPPINES_BOUNDS,
     strictBounds: false,
   },
-  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID,
+  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || "4bc0535556f8db1a820",
 };

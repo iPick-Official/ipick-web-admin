@@ -14,6 +14,7 @@ import StatsCard from '@/components/ui/StatsCard';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import BookingDetailsModal from '@/components/bookings-modal/BookingDetails';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function BookingsPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -146,9 +147,11 @@ export default function BookingsPage() {
                     actionColumn={{
                         label: "Action",
                         render: (b) => (
-                            <button onClick={() => setSelectedBooking(b)}>
-                                <Eye className="text-green-700" />
-                            </button>
+                            <ActionButtons
+                                id={b._id}
+                                onView={() => setSelectedBooking(b)}
+                                showView={true}
+                            />
                         )
                     }}
                 />
