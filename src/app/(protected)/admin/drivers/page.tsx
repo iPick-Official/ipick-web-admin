@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircleIcon, ClockIcon, Eye, XCircleIcon } from 'lucide-react';
+import { CheckCircleIcon, ClockIcon, EditIcon, Eye, Wallet, XCircleIcon } from 'lucide-react';
 import { Driver, DriverResponse, DriverWithWallet, WalletLog } from '@/types/drivers';
 import { useEffect, useState, useMemo } from 'react';
 import { useSignedDocs } from '@/hooks/useSignedDocs';
@@ -38,7 +38,7 @@ export default function DriversPage() {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 100;
+    const itemsPerPage = 10;
 
     const [activeTab, setActiveTab] = useState("Details");
     const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet"];
@@ -290,11 +290,33 @@ export default function DriversPage() {
                     actionColumn={{
                         label: "Action",
                         render: (d) => (
-                            <div
-                                className="flex items-center justify-center text-green-700"
-                                onClick={() => fetchDetailHistory(d._id)}
-                            >
-                                <Eye />
+                            <div className="flex items-center justify-end gap-1">
+                                {/* Eye / View */}
+                                <button
+                                    onClick={() => fetchDetailHistory(d._id)}
+                                    className="p-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-700 shadow-sm transition transform hover:scale-105"
+                                    title="View Details"
+                                >
+                                    <Eye className="w-4 h-4" />
+                                </button>
+
+                                {/* Wallet / Transaction */}
+                                <button
+                                    onClick={() => fetchDetailHistory(d._id)}
+                                    className="p-1.5 rounded-md bg-red-100 hover:bg-red-200 text-red-700 shadow-sm transition transform hover:scale-105"
+                                    title="Wallet History"
+                                >
+                                    <Wallet className="w-4 h-4" />
+                                </button>
+
+                                {/* Edit */}
+                                <button
+                                    onClick={() => fetchDetailHistory(d._id)}
+                                    className="p-1.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-sm transition transform hover:scale-105"
+                                    title="Edit"
+                                >
+                                    <EditIcon className="w-4 h-4" />
+                                </button>
                             </div>
                         ),
                     }}

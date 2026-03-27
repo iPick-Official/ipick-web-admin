@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADMIN_PERMISSIONS } from "./config/adminPermissions";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
   const department = req.cookies.get("admin_department")?.value;
 

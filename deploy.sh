@@ -13,4 +13,4 @@ gcloud run deploy ipick-web-admin \
   --region asia-southeast1 \
   --allow-unauthenticated \
   --timeout=300s \
-  --set-env-vars="NEXT_PUBLIC_API_URL=https://ipick-server-app-667662506856.asia-southeast1.run.app,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyC6v-zGYmYBrbltWjr6wNsiZ4yza4jij9k,NEXT_PUBLIC_GOOGLE_MAP_ID=4bc0535556f8db1a820cf5f5"
+  --set-env-vars="NEXT_PUBLIC_API_URL=https://mobapi.ipick.ph,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyC6v-zGYmYBrbltWjr6wNsiZ4yza4jij9k,NEXT_PUBLIC_GOOGLE_MAP_ID=4bc0535556f8db1a820cf5f5"
