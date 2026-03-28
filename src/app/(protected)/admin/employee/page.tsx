@@ -12,6 +12,7 @@ import Modal from '@/components/ui/Modal';
 import { RegisterForm } from '@/components/ui/Registration';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function EmployeePage() {
     const [editingEmployee, setEditingEmployee] = useState<Admin | null>(null);
@@ -57,8 +58,8 @@ export default function EmployeePage() {
     }, []);
 
     const handleFileChange = (file: File) => {
-        setSelectedFile(file);
         const previewUrl = URL.createObjectURL(file);
+        setSelectedFile(file);
         setProfileImage({ name: file.name, url: previewUrl });
     };
 
@@ -219,15 +220,16 @@ export default function EmployeePage() {
                     actionColumn={{
                         label: "Action",
                         render: (row) => (
-                            <div className="text-green-700">
-                                <PenBox
-                                    className="cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        openEditEmployeeModal(row);
-                                    }}
-                                />
-                            </div>
+                            <ActionButtons
+                                id={row._id}
+                                showView
+                                showEdit
+                                showDelete
+                                onEdit={(id) => {
+                                    const emp = employees.find(e => e._id === id);
+                                    if (emp) openEditEmployeeModal(emp);
+                                }}
+                            />
                         ),
                     }}
                 />

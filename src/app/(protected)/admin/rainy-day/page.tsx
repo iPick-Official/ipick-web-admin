@@ -8,6 +8,7 @@ import { fetchJSON } from '@/app/utils/fetchJSON';
 import Modal from '@/components/ui/Modal';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function RainyDaySurge() {
     const [loading, setLoading] = useState(false);
@@ -83,13 +84,10 @@ export default function RainyDaySurge() {
                     actionColumn={{
                         label: "Action",
                         render: (row) => (
-                            <PenBox
-                                className="cursor-pointer text-green-700"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingItem(row);
-                                    setOpenModal(true);
-                                }}
+                            <ActionButtons
+                                id={row._id}
+                                onEdit={() => setEditingItem(row)}
+                                showEdit={true}
                             />
                         ),
                     }}
@@ -97,8 +95,11 @@ export default function RainyDaySurge() {
 
                 {/* Modal */}
                 <Modal
-                    isOpen={openModal}
-                    onClose={() => setOpenModal(false)}
+                    isOpen={openModal || !!editingItem}
+                    onClose={() => {
+                        setOpenModal(false);
+                        setEditingItem(null);
+                    }}
                     title={editingItem ? "Edit Rainy Day Surge" : "Add Rainy Day Surge"}
                     size="lg"
                 >

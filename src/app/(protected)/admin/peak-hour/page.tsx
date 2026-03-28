@@ -8,6 +8,7 @@ import Modal from '@/components/ui/Modal';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import { fetchJSON } from '@/app/utils/fetchJSON';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function PeakHourPage() {
     const [loading, setLoading] = useState(false);
@@ -74,13 +75,10 @@ export default function PeakHourPage() {
                     actionColumn={{
                         label: "Action",
                         render: (row) => (
-                            <PenBox
-                                className="text-green-700"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // prevent row click
-                                    setEditingItem(row);
-                                    setOpenModal(true);
-                                }}
+                            <ActionButtons
+                                id={row._id}
+                                onEdit={() => setEditingItem(row)}
+                                showEdit={true}
                             />
                         ),
                     }}
@@ -88,8 +86,11 @@ export default function PeakHourPage() {
 
                 {/* Modal placeholder for Add/Edit */}
                 <Modal
-                    isOpen={openModal}
-                    onClose={() => setOpenModal(false)}
+                    isOpen={openModal || !!editingItem}
+                    onClose={() => {
+                        setOpenModal(false);
+                        setEditingItem(null);
+                    }}
                     title={editingItem ? "Edit Peak Hour" : "Add Peak Hour"}
                     size="lg"
                 >

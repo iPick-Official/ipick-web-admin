@@ -9,8 +9,8 @@ interface RegisterFormProps {
     form: RegisterFormType;
     setForm: React.Dispatch<React.SetStateAction<RegisterFormType>>;
     onSubmit: () => void;
-    onFileChange?: (file: File) => void; // optional prop for image selection
-    profileImage?: { name: string; url: string } | null; // optional preview
+    onFileChange?: (file: File) => void;
+    profileImage?: { name: string; url: string } | null;
 }
 
 export function RegisterForm({ form, setForm, onSubmit, onFileChange, profileImage }: RegisterFormProps) {
@@ -50,7 +50,7 @@ export function RegisterForm({ form, setForm, onSubmit, onFileChange, profileIma
     }, [form, profileImage]);
 
     const renderInput = (key: keyof RegisterFormType) => {
-        if (key === "photoUrl") return null; // file handled separately
+        if (key === "photoUrl") return null;
         const isDepartmentOrPosition = key === "department" || key === "position";
         const isStatus = key === "status";
         const isRequired = requiredFields.includes(key);
@@ -160,12 +160,8 @@ export function RegisterForm({ form, setForm, onSubmit, onFileChange, profileIma
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
-
-                                    // Update preview
                                     const url = URL.createObjectURL(file);
-                                    onFileChange(file);
-
-                                    // Also update form.photoUrl.name
+                                    onFileChange?.(file);
                                     setForm((prev) => ({
                                         ...prev,
                                         photoUrl: { name: file.name, url },

@@ -1,10 +1,17 @@
 import { getStatusBadge } from "@/app/utils/getStatusBadge";
 import { Discounts } from "@/types/discount";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import DataTable, { Column } from "../ui/DataTable";
 import { Detail } from "../ui/Details";
 import ImageView from "../ui/ImageView";
 import Modal from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
+import FilterToolbar from "../ui/FilterToolbar";
+import { exportBookingsToCSV } from "@/app/utils/DownloadReports";
+import { sortByDate } from "@/app/utils/sortByDate";
+import StatsCard from "../ui/StatsCard";
+import { CheckCircleIcon, XCircleIcon, SparklesIcon } from "lucide-react";
+import { BsCardChecklist } from "react-icons/bs";
 
 interface Props {
     isOpen: boolean;
@@ -12,19 +19,13 @@ interface Props {
     loading: boolean;
     discounts: Discounts[];
     selectedDiscount: Discounts | null;
-    setSelectedDiscount: React.Dispatch<
-        React.SetStateAction<Discounts | null>
-    >;
+    setSelectedDiscount: React.Dispatch<React.SetStateAction<Discounts | null>>;
     handleDiscountDetails: (d: Discounts) => void;
-    updateDiscountStatus: (
-        id: string,
-        status: "approved" | "rejected",
-        reason?: string
-    ) => void;
+    updateDiscountStatus: (id: string, status: "approved" | "rejected", reason?: string) => void;
     rejectReason: string;
-    setRejectReason: (value: string) => void;
+    setRejectReason: (v: string) => void;
     isImageOpen: boolean;
-    setIsImageOpen: (value: boolean) => void;
+    setIsImageOpen: (v: boolean) => void;
     photoUrl?: string | null;
 }
 
@@ -43,68 +44,53 @@ const DiscountDetailsModal: React.FC<Props> = ({
     setIsImageOpen,
     photoUrl,
 }) => {
+    const [fromDate, setFromDate] = useState();
+    const [toDate, setToDate] = useState();
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
-    const [search, setSearch] = React.useState("");
-    const [page, setPage] = React.useState(1);
-    const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc");
+    const displayedDiscounts = useMemo(() => {
+        return discounts.filter((d) => {
+            const updated = d.updatedAt ? new Date(d.updatedAt) : null;
+            const matchesDate =
+                !fromDate || !toDate ||
+                (updated && updated >= new Date(fromDate) && updated <= new Date(toDate));
+            const matchesStatus = statusFilter === "all" || d.status === statusFilter;
+            const term = searchTerm.toLowerCase();
+            const matchesSearch =
+                !term ||
+                d._id?.toLowerCase().includes(term) ||
+                d.riderId?.toLowerCase().includes(term);
 
-    const toggleSort = () => {
-        setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    };
-    const pageSize = 8;
-
-    const filteredDiscounts = React.useMemo(() => {
-        return discounts.filter((d) =>
-            [d.name, d.idNumber, d.riderId, d.status]
-                .join(" ")
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
-    }, [discounts, search]);
-
-    const sortedDiscounts = React.useMemo(() => {
-        const sorted = [...filteredDiscounts];
-
-        sorted.sort((a, b) => {
-            const dateA = a.expirationDate
-                ? new Date(a.expirationDate).getTime()
-                : 0;
-
-            const dateB = b.expirationDate
-                ? new Date(b.expirationDate).getTime()
-                : 0;
-
-            return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            return matchesDate && matchesStatus && matchesSearch;
         });
+    }, [discounts, statusFilter, searchTerm, fromDate, toDate]);
 
-        return sorted;
-    }, [filteredDiscounts, sortOrder]);
+    const sortedDiscount = useMemo(() => sortByDate(displayedDiscounts, "updatedAt", sortOrder), [displayedDiscounts, sortOrder]);
+    useEffect(() => setCurrentPage(1), [searchTerm, fromDate, toDate, statusFilter]);
+    const totalPages = Math.ceil(sortedDiscount.length / itemsPerPage);
+    const paginatedDiscounts = sortedDiscount.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
-    const totalPages = Math.ceil(sortedDiscounts.length / pageSize);
-
-    const paginatedDiscounts = React.useMemo(() => {
-        const start = (page - 1) * pageSize;
-        return sortedDiscounts.slice(start, start + pageSize);
-    }, [sortedDiscounts, page]);
+    const totals = useMemo(() => {
+        return {
+            totalDiscounts: displayedDiscounts.length,
+            approved: displayedDiscounts.filter(d => d.status === 'approved').length,
+            pending: displayedDiscounts.filter(d => d.status === 'pending').length,
+            rejected: displayedDiscounts.filter(d => d.status === 'rejected').length,
+        };
+    }, [displayedDiscounts]);
 
     const columns: Column<Discounts>[] = [
-        {
-            key: "riderId",
-            label: "ID",
-        },
-        {
-            key: "name",
-            label: "Name",
-        },
-        {
-            key: "idNumber",
-            label: "ID Number",
-        },
-        {
-            key: "idType",
-            label: "Type",
-            render: (d) => d.idType?.toUpperCase(),
-        },
+        { key: "riderId", label: "ID" },
+        { key: "name", label: "Name" },
+        { key: "idNumber", label: "ID Number" },
+        { key: "idType", label: "Type", render: (d) => d.idType?.toUpperCase() },
         {
             key: "status",
             label: "Status",
@@ -118,11 +104,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                                 : "bg-yellow-500"
                             } animate-pulse`}
                     />
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusBadge(
-                            d.status
-                        )}`}
-                    >
+                    <span className={`px-3 py-1 text-xs rounded-full font-semibold ${getStatusBadge(d.status)}`}>
                         {d.status}
                     </span>
                 </div>
@@ -130,196 +112,117 @@ const DiscountDetailsModal: React.FC<Props> = ({
         },
     ];
 
+    const isPending = selectedDiscount?.status === "pending";
+
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            title="Discounts Details"
-            size="xxl"
-        >
-            <div className="shadow-md rounded-lg overflow-hidden max-h-[75vh] bg-white dark:bg-zinc-800">
-                <div className="overflow-y-auto max-h-[75vh]">
-                    {!selectedDiscount ? (
-                        /* ================= LIST VIEW ================= */
-                        <>
-                            <div className="p-4">
-                                <input
-                                    type="text"
-                                    placeholder="Search rider, ID number..."
-                                    value={search}
-                                    onChange={(e) => {
-                                        setSearch(e.target.value);
-                                        setPage(1);
-                                    }}
-                                    className="w-full px-4 py-2 rounded-lg border bg-gray-50 dark:bg-zinc-900 focus:ring-2 focus:ring-green-500 outline-none"
-                                />
-                            </div>
+        <Modal isOpen={isOpen} onClose={onClose} title="Discounts Details" size="full">
+            <div className="max-h-[75vh] overflow bg-white dark:bg-zinc-800 rounded-lg shadow-md p-5">
 
-                            <DataTable
-                                columns={columns}
-                                data={paginatedDiscounts}
-                                loading={loading}
-                                rowKey={(d) => d._id}
-                                sortOrder={sortOrder}
-                                onSortToggle={toggleSort}
-                                emptyMessage="No discounts found."
-                                onRowClick={(d) => handleDiscountDetails(d)}
-                            />
+                {!selectedDiscount ? (
+                    <div className="flex-1 p-8 overflow-auto space-y-6">
+                        {/* SEARCH */}
+                        <FilterToolbar
+                            title="Bookings"
+                            searchValue={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            // onExport={() => exportBookingsToCSV(sortedBookings)}
+                            exportDisabled={loading}
+                        />
 
-                            <div className="flex justify-between items-center p-4 text-sm">
-                                <span>
-                                    Page {page} of {totalPages || 1}
-                                </span>
+                        <StatsCard
+                            columns={4}
+                            items={[
+                                { id: "all", label: "All", value: totals.totalDiscounts, icon: <BsCardChecklist className="w-5 h-5" />, color: "blue" },
+                                { id: "approved", label: "Approved", value: totals.approved, icon: <CheckCircleIcon className="w-5 h-5" />, color: "green" },
+                                { id: "pending", label: "Pending", value: totals.pending, icon: <XCircleIcon className="w-5 h-5" />, color: "yellow" },
+                                { id: "rejected", label: "Rejected", value: totals.rejected, icon: <SparklesIcon className="w-5 h-5" />, color: "red" },
+                            ]}
+                            onFilter={setStatusFilter}
+                        />
 
-                                <div className="flex gap-2">
-                                    <button
-                                        disabled={page === 1}
-                                        onClick={() => setPage((p) => p - 1)}
-                                        className="px-3 py-1 rounded bg-gray-200 dark:bg-zinc-700 disabled:opacity-40"
-                                    >
-                                        Prev
-                                    </button>
+                        {/* TABLE */}
+                        <DataTable
+                            columns={columns}
+                            data={paginatedDiscounts}
+                            loading={loading}
+                            rowKey={(d) => d._id}
+                            sortOrder={sortOrder}
+                            onSortToggle={() => setSortOrder(p => p === "asc" ? "desc" : "asc")}
+                            emptyMessage="No discounts found."
+                            onRowClick={handleDiscountDetails}
+                        />
+                    </div>
+                ) : (
+                    <div className="p-6 space-y-4 text-sm">
+                        <button onClick={() => setSelectedDiscount(null)} className="text-blue-600">
+                            ← Back
+                        </button>
 
-                                    <button
-                                        disabled={page === totalPages || totalPages === 0}
-                                        onClick={() => setPage((p) => p + 1)}
-                                        className="px-3 py-1 rounded bg-gray-200 dark:bg-zinc-700 disabled:opacity-40"
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        /* ================= DETAILS VIEW ================= */
-                        <div className="p-6 space-y-4">
-                            <button
-                                onClick={() => setSelectedDiscount(null)}
-                                className="text-sm text-blue-600 hover:underline"
-                            >
-                                ← Back to list
-                            </button>
-
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <Detail label="Rider ID" value={selectedDiscount.riderId} />
-                                <Detail label="Name" value={selectedDiscount.name} />
-                                <Detail label="ID Number" value={selectedDiscount.idNumber} />
-                                <Detail
-                                    label="ID Type"
-                                    value={selectedDiscount.idType.toUpperCase()}
-                                />
-                                <Detail
-                                    label="Status"
-                                    value={selectedDiscount.status.toUpperCase()}
-                                />
-                                <Detail
-                                    label="Reason for rejected"
-                                    value={selectedDiscount.reason}
-                                />
-                                <Detail
-                                    label="Expiration Date"
-                                    value={
-                                        selectedDiscount.expirationDate
-                                            ? new Date(
-                                                selectedDiscount.expirationDate
-                                            ).toLocaleDateString()
-                                            : "—"
-                                    }
-                                />
-                                <Detail
-                                    label="Photo"
-                                    value={
-                                        photoUrl ? (
-                                            <button
-                                                onClick={() =>
-                                                    setIsImageOpen(true)
-                                                }
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                View Photo
-                                            </button>
-                                        ) : (
-                                            "—"
-                                        )
-                                    }
-                                />
-                                <Detail
-                                    label="Reviewed By"
-                                    value={selectedDiscount.reviewedBy}
-                                />
-                                <Detail
-                                    label="Reviewed At"
-                                    value={
-                                        selectedDiscount.updatedAt &&
-                                        new Date(
-                                            selectedDiscount.updatedAt
-                                        ).toLocaleString()
-                                    }
-                                />
-                            </div>
-
-                            {/* Approve / Reject */}
-                            {selectedDiscount.status === "pending" && (
-                                <>
-                                    <div className="mt-4 space-y-2">
-                                        <label className="text-sm font-medium">
-                                            Rejection Reason{" "}
-                                            <span className="text-red-500">*</span>
-                                        </label>
-                                        <textarea
-                                            className="w-full border rounded p-2 text-sm bg-gray-100 dark:bg-zinc-900"
-                                            rows={3}
-                                            placeholder="Enter reason for rejection"
-                                            value={rejectReason}
-                                            onChange={(e) =>
-                                                setRejectReason(e.target.value)
-                                            }
-                                        />
-                                    </div>
-
-                                    <div className="flex justify-end gap-4 mt-4">
-                                        <button
-                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                                            onClick={() =>
-                                                updateDiscountStatus(
-                                                    selectedDiscount._id,
-                                                    "approved"
-                                                )
-                                            }
-                                        >
-                                            Approve
+                        {/* DETAILS */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <Detail label="Rider ID" value={selectedDiscount.riderId} />
+                            <Detail label="Name" value={selectedDiscount.name} />
+                            <Detail label="ID Number" value={selectedDiscount.idNumber} />
+                            <Detail label="ID Type" value={selectedDiscount.idType.toUpperCase()} />
+                            <Detail label="Status" value={selectedDiscount.status.toUpperCase()} />
+                            <Detail label="Reason" value={selectedDiscount.reason} />
+                            <Detail label="Expiration" value={selectedDiscount.expirationDate ? new Date(selectedDiscount.expirationDate).toLocaleDateString() : "—"} />
+                            <Detail
+                                label="Photo"
+                                value={
+                                    photoUrl ? (
+                                        <button onClick={() => setIsImageOpen(true)} className="text-blue-600">
+                                            View
                                         </button>
-
-                                        <button
-                                            disabled={!rejectReason?.trim()}
-                                            className={`px-4 py-2 rounded text-white ${rejectReason?.trim()
-                                                ? "bg-red-600 hover:bg-red-700"
-                                                : "bg-red-400 cursor-not-allowed"
-                                                }`}
-                                            onClick={() =>
-                                                updateDiscountStatus(
-                                                    selectedDiscount._id,
-                                                    "rejected",
-                                                    rejectReason
-                                                )
-                                            }
-                                        >
-                                            Reject
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-
-                            <ImageView
-                                isOpen={isImageOpen}
-                                imageUrl={photoUrl}
-                                alt={selectedDiscount?.photoUrl?.name}
-                                onClose={() => setIsImageOpen(false)}
+                                    ) : "—"
+                                }
                             />
                         </div>
-                    )}
-                </div>
+
+                        {/* ACTIONS */}
+                        {isPending && (
+                            <>
+                                <textarea
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value)}
+                                    placeholder="Rejection reason..."
+                                    className="w-full p-2 border rounded bg-gray-100 dark:bg-zinc-900"
+                                />
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        className="px-4 py-2 bg-green-600 text-white rounded"
+                                        onClick={() => updateDiscountStatus(selectedDiscount._id, "approved")}
+                                    >
+                                        Approve
+                                    </button>
+                                    <button
+                                        disabled={!rejectReason.trim()}
+                                        className="px-4 py-2 bg-red-600 text-white rounded disabled:opacity-50"
+                                        onClick={() => updateDiscountStatus(selectedDiscount._id, "rejected", rejectReason)}
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        <ImageView
+                            isOpen={isImageOpen}
+                            imageUrl={photoUrl}
+                            alt={selectedDiscount.photoUrl?.name}
+                            onClose={() => setIsImageOpen(false)}
+                        />
+                    </div>
+                )}
             </div>
+            {totalPages > 1 && !selectedDiscount && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            )}
         </Modal>
     );
 };

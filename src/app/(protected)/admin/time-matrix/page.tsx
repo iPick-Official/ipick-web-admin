@@ -8,6 +8,7 @@ import { fetchJSON } from '@/app/utils/fetchJSON';
 import Modal from '@/components/ui/Modal';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import ActionButtons from '@/components/ui/ActionButtons';
 
 export default function TnvsConfig() {
     const [loading, setLoading] = useState(false);
@@ -73,13 +74,10 @@ export default function TnvsConfig() {
                     actionColumn={{
                         label: "Action",
                         render: (row) => (
-                            <PenBox
-                                className="cursor-pointer text-green-700"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // prevent row click
-                                    setEditingItem(row);
-                                    setOpenModal(true);
-                                }}
+                            <ActionButtons
+                                id={row._id}
+                                onEdit={() => setEditingItem(row)}
+                                showEdit={true}
                             />
                         ),
                         className: "text-right",
@@ -88,8 +86,11 @@ export default function TnvsConfig() {
 
                 {/* Modal */}
                 <Modal
-                    isOpen={openModal}
-                    onClose={() => setOpenModal(false)}
+                    isOpen={openModal || !!editingItem}
+                    onClose={() => {
+                        setOpenModal(false);
+                        setEditingItem(null);
+                    }}
                     title={editingItem ? "Edit Time Matrix" : "Add Time Matrix"}
                     size="lg"
                 >
