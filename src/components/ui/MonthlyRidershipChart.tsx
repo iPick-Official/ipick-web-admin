@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,72 +23,98 @@ interface ChartProps {
 }
 
 export const MonthlyRidershipChart: React.FC<ChartProps> = ({ data }) => (
-  <div className="w-full h-64 bg-white dark:bg-zinc-800 rounded-xl shadow-md p-4 transition-colors">
+  <div className="w-full h-72 bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-5 transition-colors">
     <ResponsiveContainer>
-      <LineChart
+      <BarChart
         data={data}
-        margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+        margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+        barCategoryGap="30%"
       >
-        {/* Grid */}
-        <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
+        {/* Gradients */}
+        <defs>
+          <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.9} />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.4} />
+          </linearGradient>
+          <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
+            <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+          </linearGradient>
+          <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4} />
+          </linearGradient>
+          <linearGradient id="gray" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6b7280" stopOpacity={0.9} />
+            <stop offset="100%" stopColor="#6b7280" stopOpacity={0.4} />
+          </linearGradient>
+        </defs>
 
-        {/* X and Y Axis */}
+        {/* Grid */}
+        <CartesianGrid
+          vertical={false}
+          strokeDasharray="3 3"
+          stroke="#e5e7eb"
+        />
+
+        {/* Axes */}
         <XAxis
           dataKey="month"
-          tick={{ fill: "#6b7280", fontSize: 12 }}
-          axisLine={{ stroke: "#d1d5db" }}
+          tick={{ fill: "#9ca3af", fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
         />
         <YAxis
-          tick={{ fill: "#6b7280", fontSize: 12 }}
-          axisLine={{ stroke: "#d1d5db" }}
+          tick={{ fill: "#9ca3af", fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
         />
 
         {/* Tooltip */}
         <Tooltip
+          cursor={{ fill: "rgba(0,0,0,0.04)" }}
           contentStyle={{
-            backgroundColor: "#1f2937",
-            borderRadius: 8,
+            backgroundColor: "#111827",
+            borderRadius: 12,
             border: "none",
             color: "#fff",
+            fontSize: "0.8rem",
           }}
           labelStyle={{ fontWeight: 600 }}
         />
 
-        {/* Lines */}
-        <Line
-          type="monotone"
-          dataKey="total"
-          name="Total"
-          stroke="#1652f9"
-          strokeWidth={3}
-          dot={{ r: 4, fill: "#1652f9", stroke: "#fff", strokeWidth: 2 }}
-          activeDot={{ r: 6 }}
-        />
-        <Line
-          type="monotone"
+        {/* Stacked Bars */}
+        <Bar
           dataKey="completed"
-          name="Completed"
-          stroke="#10b981" // green
-          strokeWidth={2}
-          dot={{ r: 3, fill: "#10b981", stroke: "#fff", strokeWidth: 1 }}
+          stackId="a"
+          fill="url(#green)"
+          radius={[0, 0, 0, 0]}
+          animationDuration={800}
         />
-        <Line
-          type="monotone"
+        <Bar
           dataKey="cancelled"
-          name="Cancelled"
-          stroke="#ef4444" // red
-          strokeWidth={2}
-          dot={{ r: 3, fill: "#ef4444", stroke: "#fff", strokeWidth: 1 }}
+          stackId="a"
+          fill="url(#red)"
+          radius={[0, 0, 0, 0]}
+          animationDuration={800}
         />
-        <Line
-          type="monotone"
+        <Bar
           dataKey="inactive"
-          name="Inactive"
-          stroke="#6b7280" // gray
-          strokeWidth={2}
-          dot={{ r: 3, fill: "#6b7280", stroke: "#fff", strokeWidth: 1 }}
+          stackId="a"
+          fill="url(#gray)"
+          radius={[0, 0, 0, 0]}
+          animationDuration={800}
         />
-      </LineChart>
+
+        {/* Total overlay (top highlight) */}
+        <Bar
+          dataKey="total"
+          fill="url(#blue)"
+          radius={[8, 8, 0, 0]}
+          barSize={28}
+          animationDuration={1000}
+        />
+      </BarChart>
     </ResponsiveContainer>
   </div>
 );
