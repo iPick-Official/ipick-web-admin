@@ -7,7 +7,7 @@ import ImageView from "../ui/ImageView";
 import Modal from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
 import FilterToolbar from "../ui/FilterToolbar";
-import { exportBookingsToCSV } from "@/app/utils/DownloadReports";
+import { exportBookingsToCSV, exportDiscountsToCSV } from "@/app/utils/DownloadReports";
 import { sortByDate } from "@/app/utils/sortByDate";
 import StatsCard from "../ui/StatsCard";
 import { CheckCircleIcon, XCircleIcon, SparklesIcon } from "lucide-react";
@@ -63,6 +63,8 @@ const DiscountDetailsModal: React.FC<Props> = ({
             const matchesSearch =
                 !term ||
                 d._id?.toLowerCase().includes(term) ||
+                d.name.toLocaleLowerCase().includes(term) ||
+                d.idNumber.toLocaleLowerCase().includes(term) ||
                 d.riderId?.toLowerCase().includes(term);
 
             return matchesDate && matchesStatus && matchesSearch;
@@ -125,7 +127,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                             title="Bookings"
                             searchValue={searchTerm}
                             onSearchChange={setSearchTerm}
-                            // onExport={() => exportBookingsToCSV(sortedBookings)}
+                            onExport={() => exportDiscountsToCSV(sortedDiscount)}
                             exportDisabled={loading}
                         />
 

@@ -3,6 +3,7 @@ import { saveAs } from "file-saver";
 import { Booking } from "@/types/bookings";
 import { DriverWithWallet } from "@/types/drivers";
 import { Riders } from "@/types/riders";
+import { Discounts } from "@/types/discount";
 
 export function exportBookingsToCSV(bookings: Booking[]) {
   const csv = Papa.unparse(
@@ -26,7 +27,7 @@ export function exportBookingsToCSV(bookings: Booking[]) {
       "Cost per KM": booking.computations?.costPerKM ?? 0,
       "Cost per Min": booking.computations?.costPerMin ?? 0,
       "Trip Status": booking.tripStatus,
-    }))
+    })),
   );
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -92,7 +93,7 @@ export function exportDriversToCSVWithPapa(drivers: DriverWithWallet[]) {
       "Car Model": driver.transportRequirements.carModel,
       // Wallet info if available
       "Wallet Balance": driver.wallet?.walletBalance ?? 0,
-    }))
+    })),
   );
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -109,9 +110,24 @@ export function exportRidersToCSV(riders: Riders[]) {
       Address: rider.address,
       "Created At": rider.createdAt ?? "",
       "Is Logged In": rider.isLogged ? "Yes" : "No",
-    }))
+    })),
   );
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   saveAs(blob, "riders-report.csv");
+}
+
+export function exportDiscountsToCSV(discounts: Discounts[]) {
+  const csv = Papa.unparse(
+    discounts.map((d) => ({
+      "Rider ID": d.riderId,
+      "Full Name": d.name,
+      "ID Number": d.idNumber,
+      "ID Type": d.idType,
+      "Status": d.status,
+    })),
+  );
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  saveAs(blob, "discounts-report.csv");
 }

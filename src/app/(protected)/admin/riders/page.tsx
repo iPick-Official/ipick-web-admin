@@ -14,7 +14,7 @@ import { updateDiscountStatusRequest } from '@/app/utils/discountHelpers';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import DiscountDetailsModal from '@/components/riders-modal/DiscountDetailsModal';
+import DiscountDetailsModal from '@/components/riders-modal/DiscountModal';
 import { BsCardChecklist } from 'react-icons/bs';
 import RiderDetailsModal from '@/components/riders-modal/RiderDetails';
 import ActionButtons from '@/components/ui/ActionButtons';
