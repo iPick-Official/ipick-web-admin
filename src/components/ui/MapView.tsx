@@ -96,17 +96,17 @@ export const MapView = () => {
           }}
           label={label}
           title={`${driver.firstName} ${driver.surName}`}
-          onLoad={async (marker) => {
-            const avatar = await loadAvatar(driver);
-            if (!avatar) return;
+          // onLoad={async (marker) => {
+          //   const avatar = await loadAvatar(driver);
+          //   if (!avatar) return;
 
-            marker.setIcon({
-              url: avatar,
-              scaledSize: new window.google.maps.Size(40, 40),
-              anchor: new window.google.maps.Point(20, 20),
-              labelOrigin: new window.google.maps.Point(20, 50),
-            });
-          }}
+          //   marker.setIcon({
+          //     url: avatar,
+          //     scaledSize: new window.google.maps.Size(40, 40),
+          //     anchor: new window.google.maps.Point(20, 20),
+          //     labelOrigin: new window.google.maps.Point(20, 50),
+          //   });
+          // }}
         />
       ))}
     </GoogleMap>

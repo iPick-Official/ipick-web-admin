@@ -24,6 +24,7 @@ import FilterToolbar from '@/components/ui/FilterToolbar';
 import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import ActionButtons from '@/components/ui/ActionButtons';
+import DriverCertificate from '@/components/drivers-modal/DriverCertificate';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -42,9 +43,7 @@ export default function DriversPage() {
     const itemsPerPage = 10;
 
     const [activeTab, setActiveTab] = useState("Details");
-    const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet"];
-
-    // --- Top level hooks for all documents ---
+    const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet", "Certificate"];
     const docKeys = {
 
         profile: selectedDriver?.personalRequirements?.profilePicture?.url,
@@ -137,6 +136,9 @@ export default function DriversPage() {
                 wallet={selectedDriver?.wallet}
                 walletLogs={walletLogs}
             />
+        ),
+        Certificate: (
+            <DriverCertificate driver={selectedDriver!} />
         ),
     };
 
@@ -294,9 +296,9 @@ export default function DriversPage() {
                             <ActionButtons
                                 id={d._id}
                                 onView={fetchDetailHistory}
-                                showView={true}
-                                showWallet={true}
-                                showEdit={true}
+                                showView
+                                showWallet
+                                showEdit
                             />
                         ),
                     }}
