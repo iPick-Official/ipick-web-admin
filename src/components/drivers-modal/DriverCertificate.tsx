@@ -43,7 +43,7 @@ export default function DriverCertificate({ driver }: Props) {
             <div
                 ref={certRef}
                 className="
-                    w-[794px] h-[1123px] p-12 border-[1px] rounded-xl
+                    w-[794px] h-[1123px] p-20
                     bg-white text-black border-gray-800
                     grid grid-rows-[auto_1fr_auto]"
             >
@@ -78,6 +78,7 @@ export default function DriverCertificate({ driver }: Props) {
                                     ["Plate Number", driver.transportRequirements?.plateNumber],
                                     ["License Number", driver.personalRequirements.driverLicenseNumber],
                                     ["Contact Number", `+63${driver.mobnum}`],
+                                    ["LTFRB Case Number", driver.caseNum],
                                 ].map(([label, value]) => (
                                     <tr key={label}>
                                         <td className="font-semibold px-4 py-2 w-1/3 border border-gray-300 bg-gray-200">{label}</td>
@@ -89,7 +90,7 @@ export default function DriverCertificate({ driver }: Props) {
                     </div>
 
                     <p className="mt-10 text-sm">iPick does not assume any responsibility over the actions of our driver partners or any inference that may be drawn from this certification which is issued based solely on iPick's system.</p>
-                    <p className="mt-10 text-md">Best Regards,</p>
+                    <p className="mt-10 mb-5 text-md">Best Regards,</p>
                     <div className="flex flex-col items-start">
                         <img src="/ray-signature.png" alt="Ray Anthony Oreto" className="h-25 object-contain" />
                     </div>

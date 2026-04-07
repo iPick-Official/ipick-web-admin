@@ -77,7 +77,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <div className="relative flex items-center gap-6 bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-200 dark:border-zinc-700">
                 <span className="absolute top-3 right-3 text-xs text-gray-400 dark:text-gray-500">
-                    {process.env.NEXT_PUBLIC_VERSION_NUMBER}
+                    {process.env.NEXT_PUBLIC_VERSION_NUMBER || "1.0.2"}
                 </span>
                 <div className="w-25 h-25 rounded-full overflow-hidden border-2 border-gray-200 dark:border-zinc-700 ring-2 ring-green-500 dark:ring-green-700">
                     <Avatar photoUrl={admin?.photoUrl?.url} />
