@@ -89,21 +89,18 @@ export default function DriverCertificate({ driver }: Props) {
                     </div>
 
                     <p className="mt-10 text-sm">iPick does not assume any responsibility over the actions of our driver partners or any inference that may be drawn from this certification which is issued based solely on iPick's system.</p>
-                    <p className="mt-15 text-md">Best Regards,</p>
-                </div>
-
-                {/* FOOTER */}
-                <div className="mt-6">
+                    <p className="mt-10 text-md">Best Regards,</p>
                     <div className="flex flex-col items-start">
-                        <img src="/ray-signature.png" alt="IPICK Logo" className="h-30 object-contain" />
+                        <img src="/ray-signature.png" alt="Ray Anthony Oreto" className="h-25 object-contain" />
                     </div>
                     <div className="flex flex-col w-1/3">
-                        <div className="pt-2 font-semibold">
-                            Anthony Ray Oreto
+                        <div className="font-semibold">
+                            Ray Anthony Oreto
                         </div>
                         <p className="text-sm mt-1 opacity-80">Head of Drivers Operation</p>
                     </div>
                 </div>
+
                 {/* BUTTON */}
                 <button
                     onClick={downloadPDF}
