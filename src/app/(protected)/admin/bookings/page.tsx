@@ -150,7 +150,17 @@ export default function BookingsPage() {
                             <ActionButtons
                                 id={b._id}
                                 onView={() => setSelectedBooking(b)}
-                                showView={true}
+                                showView
+                                showDirections
+                                onDirections={() => {
+                                    const originCoords = b.origin?.coordinates;
+                                    const destinationCoords = b.destination?.coordinates;
+                                    if (!originCoords || !destinationCoords) return;
+                                    const origin = `${originCoords[0]},${originCoords[1]}`;
+                                    const destination = `${destinationCoords[0]},${destinationCoords[1]}`;
+                                    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+                                    window.open(url, "_blank");
+                                }}
                             />
                         )
                     }}

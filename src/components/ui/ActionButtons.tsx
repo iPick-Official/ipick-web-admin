@@ -1,5 +1,5 @@
 import React from "react";
-import { Eye, Wallet, Edit as EditIcon, Trash } from "lucide-react";
+import { Eye, Wallet, Edit as EditIcon, Trash, Map, MapIcon } from "lucide-react";
 
 interface ActionButtonsProps {
     id: string;
@@ -7,10 +7,12 @@ interface ActionButtonsProps {
     onWallet?: (id: string) => void;
     onEdit?: (id: string) => void;
     onDelete?: (id: string) => void;
+    onDirections?: (id: string) => void;
     showView?: boolean;
     showWallet?: boolean;
     showEdit?: boolean;
     showDelete?: boolean
+    showDirections?: boolean;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
@@ -19,10 +21,12 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     onWallet,
     onEdit,
     onDelete,
+    onDirections,
     showView,
     showWallet,
     showEdit,
     showDelete,
+    showDirections
 }) => {
     return (
         <div className="flex items-center justify-end gap-1">
@@ -79,6 +83,20 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     title="Delete"
                 >
                     <Trash className="w-4 h-4" />
+                </button>
+            )}
+
+            {/* Directions */}
+            {showDirections && (
+                <button
+                    onClick={() => onDirections?.(id)}
+                    className="p-1.5 rounded-md 
+            bg-blue-100 hover:bg-blue-200 text-blue-700 
+            dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-300
+            shadow-sm transition transform hover:scale-105"
+                    title="View Directions"
+                >
+                    <MapIcon className="w-4 h-4" />
                 </button>
             )}
         </div>
