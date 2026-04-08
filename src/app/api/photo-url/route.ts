@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   try {
     const apiRes = await fetch(
       `${
-        process.env.NEXT_PUBLIC_API_URL
+        process.env.NEXT_PUBLIC_API_URL_S3
       }/files/url?filename=${encodeURIComponent(filename)}`
     );
 
