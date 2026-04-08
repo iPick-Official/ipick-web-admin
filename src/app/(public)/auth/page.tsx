@@ -13,7 +13,7 @@ export default function AuthPage() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    async function handleLogin(e: React.SyntheticEvent) {
+    async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
 
@@ -36,7 +36,7 @@ export default function AuthPage() {
                 router.push("/admin/profile");
                 return;
             }
-            router.push("/admin/bookings");
+            router.push("/admin/dashboard");
         } catch (err) {
             console.error(err);
             alert("Server error");

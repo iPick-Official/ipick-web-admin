@@ -16,7 +16,7 @@ export async function handleApiResponse(res: Response) {
       { status: 401 },
     );
     cookieStore.delete("access_token");
-    cookieStore.delete("refresh_token"); // optional
+    cookieStore.delete("admin"); // optional
     return response;
   }
 

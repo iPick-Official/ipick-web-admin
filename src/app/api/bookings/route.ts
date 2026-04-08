@@ -1,53 +1,38 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { handleApiResponse } from "@/app/utils/api";
 
 export async function GET() {
   try {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("access_token")?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
 
+    // If no token, simulate a 401 response and let the util handle it
     if (!token) {
-      return NextResponse.json(
-        { message: "Unauthorized: No token found" },
-        { status: 401 },
+      return handleApiResponse(
+        new Response(JSON.stringify({ message: "Unauthorized" }), {
+          status: 401,
+        }),
       );
     }
 
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getLimitedBookings`,
+      `${process.env.NEXT_PUBLIC_API_URL}/bookings`,
       {
         method: "GET",
-        cache: "no-store",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       },
     );
 
-    if (!backendRes.ok) {
-      const errorData = await backendRes.json().catch(() => null);
-      return NextResponse.json(errorData || { message: "Backend error" }, {
-        status: backendRes.status,
-      });
-    }
-
-    // Stream the backend response directly to the client
-    const stream = backendRes.body;
-    if (!stream) {
-      return NextResponse.json(
-        { message: "No data from backend" },
-        { status: 500 },
-      );
-    }
-
-    return new NextResponse(stream, {
-      headers: { "Content-Type": "application/json" },
-    });
+    return handleApiResponse(backendRes);
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("API error:", error);
+
     return NextResponse.json(
-      { message: "Failed to fetch bookings" },
+      { message: "Failed to fetch data" },
       { status: 500 },
     );
   }

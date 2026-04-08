@@ -14,16 +14,13 @@ export async function GET() {
     }
 
     // Call your NestJS backend using streaming
-    const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/getAllRiders`,
-      {
-        method: "GET",
-        headers: {
-          "x-api-key": token,
-          "Content-Type": "application/json",
-        },
+    const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-    );
+    });
 
     if (!backendRes.ok) {
       const errorData = await backendRes.json().catch(() => null);
