@@ -5,13 +5,11 @@ export const useDrivers = () => {
   return useQuery<Driver[]>({
     queryKey: ["drivers"],
     queryFn: async () => {
-      const res = await fetch("/api/driver");
+      const res = await fetch("/api/driver?status=approved&logged=true");
       if (!res.ok) throw new Error("Failed to fetch drivers");
-
-      const data: Driver[] = await res.json();
-      return data.filter((d) => d.status === "approved" && d.isLogged === true);
+      return res.json();
     },
-    staleTime: 30_000, // 30s
-    refetchInterval: 30_000,
+    staleTime: 5 * 60_000, 
+    refetchInterval: false, 
   });
 };
