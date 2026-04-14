@@ -25,6 +25,7 @@ import StatsCard from '@/components/ui/StatsCard';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import ActionButtons from '@/components/ui/ActionButtons';
 import DriverCertificate from '@/components/drivers-modal/DriverCertificate';
+import EndorsementLetter from '@/components/drivers-modal/EndorsementLetter';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -43,7 +44,7 @@ export default function DriversPage() {
     const itemsPerPage = 10;
 
     const [activeTab, setActiveTab] = useState("Details");
-    const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet", "Certificate"];
+    const tabs = ["Details", "Personal", "Transport", "Ride History", "Messages", "Wallet", "Certificate", "Endorsement Letter"];
     const docKeys = {
 
         profile: selectedDriver?.personalRequirements?.profilePicture?.url,
@@ -139,6 +140,9 @@ export default function DriversPage() {
         ),
         Certificate: (
             <DriverCertificate driver={selectedDriver!} />
+        ),
+        "Endorsement Letter": (
+            <EndorsementLetter driver={selectedDriver!} />
         ),
     };
 

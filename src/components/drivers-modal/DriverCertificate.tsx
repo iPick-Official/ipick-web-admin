@@ -77,7 +77,7 @@ export default function DriverCertificate({ driver }: Props) {
                                 {[
                                     ["Plate Number", driver.transportRequirements?.plateNumber],
                                     ["License Number", driver.personalRequirements.driverLicenseNumber],
-                                    ["Contact Number", `+63${driver.mobnum}`],
+                                    ["Contact Number", driver.mobnum],
                                     ["LTFRB Case Number", driver.caseNum],
                                 ].map(([label, value]) => (
                                     <tr key={label}>

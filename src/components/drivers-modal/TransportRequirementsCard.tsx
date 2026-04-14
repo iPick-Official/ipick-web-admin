@@ -40,11 +40,9 @@ const TransportRequirementsCard: React.FC<Props> = ({
     const details = [
         { label: "Plate Number", value: transportRequirements.plateNumber || "-" },
         { label: "OR Number", value: transportRequirements.orNumber || "-" },
-        {
-            label: "Vehicle Model",
-            value: `${transportRequirements.carBrand || "-"} ${transportRequirements.carModel || ""}`,
-        },
-        { label: "Vehicle", value: transportRequirements.carBrand || "-" },
+        { label: "CR Number", value: transportRequirements.crNumber || "-" },
+        { label: "Brand", value: transportRequirements.carBrand || "-" },
+        { label: "Vehicle Model", value: `${transportRequirements.carModel || ""}` },
         { label: "Color", value: transportRequirements.carColor || "-" },
     ];
 
