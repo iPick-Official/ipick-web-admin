@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } | Promise<{ id: string }> }
+  context: { params: { id: string } | Promise<{ id: string }> },
 ) {
   try {
     // Resolve params if it's a Promise
@@ -29,11 +29,11 @@ export async function PATCH(
       {
         method: "PATCH",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-      }
+      },
     );
 
     if (!backendRes.ok) {
@@ -50,7 +50,7 @@ export async function PATCH(
     console.error("Error updating admin:", error);
     return NextResponse.json(
       { message: "Failed to update admin" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

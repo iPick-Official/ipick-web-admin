@@ -26,6 +26,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import ActionButtons from '@/components/ui/ActionButtons';
 import DriverCertificate from '@/components/drivers-modal/DriverCertificate';
 import EndorsementLetter from '@/components/drivers-modal/EndorsementLetter';
+import TopUpModal from '@/components/drivers-modal/TopUpModal';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -41,6 +42,9 @@ export default function DriversPage() {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isTopUpOpen, setIsTopUpOpen] = useState(false);
+    const [topUpDriver, setTopUpDriver] = useState<DriverWithWallet | null>(null);
+    const [amount, setAmount] = useState(0);
     const itemsPerPage = 10;
 
     const [activeTab, setActiveTab] = useState("Details");
@@ -259,6 +263,27 @@ export default function DriversPage() {
         },
     ];
 
+    const handleWallet = async (id: string) => {
+        const driver = drivers.find((d) => d._id === id);
+        if (!driver) return;
+        const data = await fetchJSON<DriverResponse>(
+            `/api/driver/${id}/information`
+        );
+        setTopUpDriver({ ...data.driver, wallet: data.wallet });
+        setIsTopUpOpen(true);
+        setAmount(0);
+    };
+
+    const handleTopUp = async (id: string) => {
+        const driver = drivers.find((d) => d._id === id);
+        if (!driver) return;
+        const data = await fetchJSON<DriverResponse>(
+            `/api/driver/${id}/information`
+        );
+        setTopUpDriver({ ...data.driver, wallet: data.wallet });
+        setIsTopUpOpen(true);
+    };
+
     return (
         <div className="flex h-screen overflow-hidden">
             <div className="flex-1 p-8 overflow-auto space-y-6">
@@ -300,6 +325,7 @@ export default function DriversPage() {
                             <ActionButtons
                                 id={d._id}
                                 onView={fetchDetailHistory}
+                                onWallet={handleWallet}
                                 showView
                                 showWallet
                                 showEdit
@@ -328,6 +354,14 @@ export default function DriversPage() {
                     />
                 )}
             </div>
+            <TopUpModal
+                isOpen={isTopUpOpen}
+                onClose={() => setIsTopUpOpen(false)}
+                driver={topUpDriver}
+                amount={amount}
+                setAmount={setAmount}
+                // onConfirm={handleTopUp}
+            />
         </div >
     );
 }

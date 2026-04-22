@@ -1,33 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { handleApiResponse } from "@/app/utils/api";
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+    const token = (await cookies()).get("access_token")?.value;
 
     if (!token) {
-      cookieStore.delete("access_token");
-      cookieStore.delete("refresh_token");
-
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Unauthorized: No token found" },
         { status: 401 },
       );
+      (await cookies()).delete("access_token");
+      (await cookies()).delete("refresh_token");
+      return response;
     }
 
     const { id } = await context.params;
     const body = await request.json();
 
-    // Decide endpoint
-    const endpoint = body?.newPassword ? "change-password" : "edit-information";
-
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/${id}/${endpoint}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/wallet/${id}`,
       {
         method: "PATCH",
         headers: {
@@ -40,10 +36,9 @@ export async function PATCH(
 
     return handleApiResponse(backendRes);
   } catch (error) {
-    console.error("Error updating admin:", error);
-
+    console.error("API error:", error);
     return NextResponse.json(
-      { message: "Failed to update admin" },
+      { message: "Failed to fetch data" },
       { status: 500 },
     );
   }
