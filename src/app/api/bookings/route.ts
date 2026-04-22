@@ -1,53 +1,37 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { handleApiResponse } from "@/app/utils/api";
 
 export async function GET() {
   try {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("access_token")?.value;
+    const token = (await cookies()).get("access_token")?.value;
 
     if (!token) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: "Unauthorized: No token found" },
         { status: 401 },
       );
+      (await cookies()).delete("access_token");
+      (await cookies()).delete("refresh_token");
+      return response;
     }
 
     const backendRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/admin/getLimitedBookings`,
       {
         method: "GET",
-        cache: "no-store",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       },
     );
 
-    if (!backendRes.ok) {
-      const errorData = await backendRes.json().catch(() => null);
-      return NextResponse.json(errorData || { message: "Backend error" }, {
-        status: backendRes.status,
-      });
-    }
-
-    // Stream the backend response directly to the client
-    const stream = backendRes.body;
-    if (!stream) {
-      return NextResponse.json(
-        { message: "No data from backend" },
-        { status: 500 },
-      );
-    }
-
-    return new NextResponse(stream, {
-      headers: { "Content-Type": "application/json" },
-    });
+    return handleApiResponse(backendRes);
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("API error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch bookings" },
+      { message: "Failed to fetch data" },
       { status: 500 },
     );
   }

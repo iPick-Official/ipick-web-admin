@@ -112,6 +112,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                 </div>
             ),
         },
+        { key: "reviewedBy", label: "Reviewed by" },
     ];
 
     const isPending = selectedDiscount?.status === "pending";
@@ -179,6 +180,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                                     ) : "—"
                                 }
                             />
+                            <Detail label="Reviewed By:" value={selectedDiscount.reviewedBy} />
                         </div>
 
                         {/* ACTIONS */}

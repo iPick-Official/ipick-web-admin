@@ -22,13 +22,15 @@ export async function POST(req: Request) {
       );
     }
 
+    const user = data.user;
+
     const res = NextResponse.json({
       message: "Login successful",
-      admin: data.admin,
+      user,
     });
 
     // Save secure access token
-    res.cookies.set("access_token", data.apiKey, {
+    res.cookies.set("access_token", data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -36,9 +38,9 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24,
     });
 
-    // Save admin data (client-accessible)
-    res.cookies.set("admin", JSON.stringify(data.admin), {
-      httpOnly: false, // frontend can read this
+    // Save user data (client-accessible)
+    res.cookies.set("admin", JSON.stringify(user), {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",

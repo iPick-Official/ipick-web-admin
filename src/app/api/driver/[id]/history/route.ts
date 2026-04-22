@@ -25,10 +25,10 @@ export async function GET(
       {
         method: "GET",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     // If history is not found (404), return empty array
