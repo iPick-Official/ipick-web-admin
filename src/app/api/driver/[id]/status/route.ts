@@ -22,28 +22,24 @@ export async function PATCH(
 
     const { id } = await context.params;
     const body = await request.json();
-
-    // Decide endpoint
-    const endpoint = body?.newPassword ? "change-password" : "edit-information";
-
     const backendRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/${id}/${endpoint}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/${id}/status`,
       {
-        method: "PATCH",
+        method: "PATCH", // 👈 changed
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body), // 👈 required for PATCH
       },
     );
 
     return handleApiResponse(backendRes);
   } catch (error) {
-    console.error("Error updating admin:", error);
+    console.error("API error:", error);
 
     return NextResponse.json(
-      { message: "Failed to update admin" },
+      { message: "Failed to update status" },
       { status: 500 },
     );
   }
