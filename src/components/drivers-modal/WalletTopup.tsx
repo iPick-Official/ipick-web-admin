@@ -169,9 +169,9 @@ export default function TopUpModal({
 
                             <div className="grid grid-cols-3 gap-2 mt-3">
                                 {[
-                                    { label: "Initial top up", value: `Initial top up of ${amount}` },
-                                    { label: "Incentive bonus", value: `Incentive bonus ${amount}` },
-                                    { label: "Adjustment", value: `Adjustment ${amount}` },
+                                    { label: "Initial top up", value: `Initial top up of ₱${amount}` },
+                                    { label: "Incentive bonus", value: `Incentive bonus ₱${amount}` },
+                                    { label: "Adjustment", value: `Adjustment ₱${amount}` },
                                 ].map((item) => (
                                     <button
                                         key={item.label}

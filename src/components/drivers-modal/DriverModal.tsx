@@ -50,7 +50,7 @@ const DriverModal: React.FC<DriverModalProps> = ({
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-colors duration-200
-                    ${activeTab === tab
+                                            ${activeTab === tab
                                             ? "bg-zinc-900 text-white dark:bg-zinc-200 dark:text-zinc-900 shadow"
                                             : "text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
                                         }`}
