@@ -36,13 +36,13 @@ const StatsCard: React.FC<StatsCardWithFilterProps> = ({
     const gridClass = columnMap[columns] ?? columnMap[3];
     const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
 
-    const handleClick = (id: string, color: string) => {
+    const handleClick = (id: string) => {
         setSelectedFilter(id);
         if (onFilter) onFilter(id);
     };
 
     return (
-        <div className={`grid ${gridClass} gap-5 ${className}`}>
+        <div className={`grid ${gridClass} gap-3 ${className}`}>
             {items.map(item => {
                 const styles = colorMap[item.color ?? "zinc"];
                 const isSelected = selectedFilter === item.id;
@@ -51,35 +51,34 @@ const StatsCard: React.FC<StatsCardWithFilterProps> = ({
                 return (
                     <div
                         key={item.id}
-                        onClick={() => handleClick(item.id, item.color ?? "zinc")}
+                        onClick={() => handleClick(item.id)}
                         className={`
-                            group relative backdrop-blur-sm bg-gradient-to-br from-white to-zinc-50
-                            dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700
-                            rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300
-                            overflow-hidden cursor-pointer
-                            ${isSelected ? `ring-2 ${ringClass}` : ""}
-                            `}
+              flex items-center justify-between
+              rounded-full px-4 py-2
+              bg-zinc-100 dark:bg-zinc-800
+              text-sm
+              transition-all duration-200
+              cursor-pointer
+              hover:bg-zinc-200 dark:hover:bg-zinc-700
+              ${isSelected ? `ring-2 ${ringClass} bg-white dark:bg-zinc-900` : ""}
+            `}
                     >
-                        {/* Accent Glow */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${styles} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                        {/* Content */}
-                        <div className="relative z-10">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{item.label}</p>
-                                {item.icon && (
-                                    <div className={`${styles.split(" ")[2]} transition-transform group-hover:scale-110`}>
-                                        {item.icon}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="mt-4">
-                                <h3 className="text-2xl lg:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">{item.value}</h3>
-                            </div>
+                        {/* Left */}
+                        <div className="flex items-center gap-2">
+                            {item.icon && (
+                                <div className={`${styles.split(" ")[2]} text-base`}>
+                                    {item.icon}
+                                </div>
+                            )}
+                            <span className="text-zinc-700 dark:text-zinc-300">
+                                {item.label}
+                            </span>
                         </div>
 
-                        {/* Bottom Accent Bar */}
-                        <div className={`absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r ${styles.split(" ")[0]} opacity-70`} />
+                        {/* Right */}
+                        <span className="font-semibold text-zinc-900 dark:text-white">
+                            {item.value}
+                        </span>
                     </div>
                 );
             })}

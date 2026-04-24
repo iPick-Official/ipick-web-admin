@@ -17,7 +17,6 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Sidebar } from '@/components/ui/Sidebar';
 import { DraggableCard } from '@/components/ui/DraggableCard';
 import { Loading } from '@/components/ui/Loading';
 import Modal from '@/components/ui/Modal';

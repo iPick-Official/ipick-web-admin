@@ -1,5 +1,4 @@
 'use client';
-import { Sidebar } from "@/components/ui/Sidebar";
 import { useState, useRef } from "react";
 import { JsonView, defaultStyles } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";

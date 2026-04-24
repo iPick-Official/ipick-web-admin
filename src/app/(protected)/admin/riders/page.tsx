@@ -2,11 +2,10 @@
 
 import { Riders } from '@/types/riders';
 import { useEffect, useState, useMemo } from 'react';
-import { CheckCircleIcon, Eye, XCircleIcon } from 'lucide-react';
+import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import { useSort } from '@/hooks/useSort';
 import { Discounts } from '@/types/discount';
 import { exportRidersToCSV } from '@/app/utils/DownloadReports';
-import { Sidebar } from '@/components/ui/Sidebar';
 import { Pagination } from '@/components/ui/Pagination';
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import { sortByDate } from '@/app/utils/sortByDate';

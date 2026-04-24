@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PenBox } from 'lucide-react';
 import { RainyDaySurgeItem } from '@/types/rainy-day';
-import { Sidebar } from '@/components/ui/Sidebar';
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import Modal from '@/components/ui/Modal';
 import FilterToolbar from '@/components/ui/FilterToolbar';

@@ -45,6 +45,7 @@ export default function DriversPage() {
     const [isTopUpOpen, setIsTopUpOpen] = useState(false);
     const [topUpDriver, setTopUpDriver] = useState<DriverWithWallet | null>(null);
     const [amount, setAmount] = useState(0);
+    const [description, setDescription] = useState("");
     const itemsPerPage = 10;
 
     const [activeTab, setActiveTab] = useState("Details");
@@ -328,7 +329,6 @@ export default function DriversPage() {
                                 onWallet={handleWallet}
                                 showView
                                 showWallet
-                                showEdit
                             />
                         ),
                     }}
@@ -360,7 +360,9 @@ export default function DriversPage() {
                 driver={topUpDriver}
                 amount={amount}
                 setAmount={setAmount}
-                // onConfirm={handleTopUp}
+                description={description}
+                setDescription={setDescription}
+            // onConfirm={handleTopUp}
             />
         </div >
     );

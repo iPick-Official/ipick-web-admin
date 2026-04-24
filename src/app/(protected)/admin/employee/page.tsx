@@ -1,13 +1,10 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { Admin } from '@/types/admin';
 import { RegisterFormType } from '@/types/registration';
 import { departments } from '@/app/utils/department';
 import { compressAndRenameImage } from '@/app/utils/compressor';
 import { useSort } from '@/hooks/useSort';
-import { Sidebar } from '@/components/ui/Sidebar';
-import { Loading } from '@/components/ui/Loading';
 import Modal from '@/components/ui/Modal';
 import { RegisterForm } from '@/components/ui/Registration';
 import FilterToolbar from '@/components/ui/FilterToolbar';

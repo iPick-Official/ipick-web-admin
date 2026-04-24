@@ -1,5 +1,6 @@
 import React from "react";
-import { Eye, Wallet, Edit as EditIcon, Trash, Map, MapIcon } from "lucide-react";
+import { Eye, Wallet, Edit as EditIcon, Trash, MapIcon } from "lucide-react";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface ActionButtonsProps {
     id: string;
@@ -28,6 +29,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     showDelete,
     showDirections
 }) => {
+    const { admin } = useAdmin();
     return (
         <div className="flex items-center justify-end gap-1">
             {/* View */}
@@ -45,14 +47,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             )}
 
             {/* Wallet */}
-            {showWallet && (
+            {showWallet && admin?.department === "executive_leadership" && (
                 <button
                     onClick={() => onWallet?.(id)}
                     className="p-1.5 rounded-md 
-                        bg-orange-100 hover:bg-orange-200 text-orange-700 
-                        dark:bg-orange-900 dark:hover:bg-orange-800 dark:text-orange-300
-                        shadow-sm transition transform hover:scale-105"
-                    title="Wallet History"
+                    bg-orange-100 hover:bg-orange-200 text-orange-700 
+                    dark:bg-orange-900 dark:hover:bg-orange-800 dark:text-orange-300
+                    shadow-sm transition transform hover:scale-105"
                 >
                     <Wallet className="w-4 h-4" />
                 </button>

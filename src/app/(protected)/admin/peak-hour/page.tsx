@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { PeakHour } from '@/types/peak-hour';
-import { Sidebar } from '@/components/ui/Sidebar';
 import Modal from '@/components/ui/Modal';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import FilterToolbar from '@/components/ui/FilterToolbar';

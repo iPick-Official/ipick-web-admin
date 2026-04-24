@@ -33,6 +33,7 @@ const WalletCard: React.FC<Props> = ({ wallet, walletLogs }) => {
                 </span>
             ),
         },
+        { key: "topupBy", label: "Topup By" },
         {
             key: "createdAt",
             label: "Date",

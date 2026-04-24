@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Download, PenBox, PlusIcon } from 'lucide-react';
 import { TrafficIntensityItem } from '@/types/traffic-intensity';
-import { Sidebar } from '@/components/ui/Sidebar';
-import { Loading } from '@/components/ui/Loading';
 import { fetchJSON } from '@/app/utils/fetchJSON';
 import Modal from '@/components/ui/Modal';
 import FilterToolbar from '@/components/ui/FilterToolbar';

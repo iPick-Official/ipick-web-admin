@@ -35,15 +35,19 @@ const PersonalRequirementsCard: React.FC<Props> = ({
             value: personalRequirements.pwd === 1 ? "Yes" : "No",
         },
         {
-            label: "Emergency Contact",
+            label: "Emergency Contact Name",
             value: personalRequirements.emergencyContactName || "-",
+        },
+        {
+            label: "Emergency Contact Number",
+            value: personalRequirements.emergencyContactMobNum || "-",
         },
         {
             label: "License Number",
             value: personalRequirements.driverLicenseNumber || "-",
         },
         {
-            label: "License Expiry",
+            label: "License Expiry Date",
             value: personalRequirements.driverLicenseExpDate || "-",
         },
     ];

@@ -13,11 +13,11 @@ export async function POST(req: Request) {
       {
         method: "POST",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-      }
+      },
     );
 
     const data = await backendRes.json();
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       backendRes.ok
         ? { message: "Registration successful", admin: data.admin }
         : { message: data.message || "Registration failed" },
-      { status: backendRes.ok ? 201 : backendRes.status }
+      { status: backendRes.ok ? 201 : backendRes.status },
     );
   } catch (err) {
     console.error("Register API error:", err);

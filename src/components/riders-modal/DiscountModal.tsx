@@ -10,7 +10,7 @@ import FilterToolbar from "../ui/FilterToolbar";
 import { exportBookingsToCSV, exportDiscountsToCSV } from "@/app/utils/DownloadReports";
 import { sortByDate } from "@/app/utils/sortByDate";
 import StatsCard from "../ui/StatsCard";
-import { CheckCircleIcon, XCircleIcon, SparklesIcon } from "lucide-react";
+import { CheckCircleIcon, XCircleIcon, SparklesIcon, Clock } from "lucide-react";
 import { BsCardChecklist } from "react-icons/bs";
 
 interface Props {
@@ -137,8 +137,8 @@ const DiscountDetailsModal: React.FC<Props> = ({
                             items={[
                                 { id: "all", label: "All", value: totals.totalDiscounts, icon: <BsCardChecklist className="w-5 h-5" />, color: "blue" },
                                 { id: "approved", label: "Approved", value: totals.approved, icon: <CheckCircleIcon className="w-5 h-5" />, color: "green" },
-                                { id: "pending", label: "Pending", value: totals.pending, icon: <XCircleIcon className="w-5 h-5" />, color: "yellow" },
-                                { id: "rejected", label: "Rejected", value: totals.rejected, icon: <SparklesIcon className="w-5 h-5" />, color: "red" },
+                                { id: "pending", label: "Pending", value: totals.pending, icon: <Clock className="w-5 h-5" />, color: "yellow" },
+                                { id: "rejected", label: "Rejected", value: totals.rejected, icon: <XCircleIcon className="w-5 h-5" />, color: "red" },
                             ]}
                             onFilter={setStatusFilter}
                         />
