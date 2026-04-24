@@ -26,7 +26,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import ActionButtons from '@/components/ui/ActionButtons';
 import DriverCertificate from '@/components/drivers-modal/DriverCertificate';
 import EndorsementLetter from '@/components/drivers-modal/EndorsementLetter';
-import TopUpModal from '@/components/drivers-modal/TopUpModal';
+import TopUpModal from '@/components/drivers-modal/WalletTopup';
 
 export default function DriversPage() {
     const { sortOrder, toggleSort } = useSort("desc");
@@ -45,6 +45,7 @@ export default function DriversPage() {
     const [isTopUpOpen, setIsTopUpOpen] = useState(false);
     const [topUpDriver, setTopUpDriver] = useState<DriverWithWallet | null>(null);
     const [amount, setAmount] = useState(0);
+    const [balance, setBalance] = useState(0);
     const [description, setDescription] = useState("");
     const itemsPerPage = 10;
 
@@ -272,17 +273,61 @@ export default function DriversPage() {
         );
         setTopUpDriver({ ...data.driver, wallet: data.wallet });
         setIsTopUpOpen(true);
+        setBalance(data.wallet.walletBalance)
         setAmount(0);
     };
 
+    const handleTransaction = async (userId: string) => {
+        try {
+            const payload = {
+                amount: Number(amount),
+                bookingId: Date.now(),
+                userId,
+                userType: "driver",
+                description: description,
+                topupBy: admin?.firstName,
+            };
+
+            const res = await fetch(`/api/wallet/transaction`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.message || "Top up failed");
+
+            console.log("Top up success:", data);
+
+            setAmount(0);
+            setDescription("");
+            setIsTopUpOpen(false);
+        } catch (err) {
+            console.error("Top up error:", err);
+        }
+    };
+
     const handleTopUp = async (id: string) => {
-        const driver = drivers.find((d) => d._id === id);
-        if (!driver) return;
-        const data = await fetchJSON<DriverResponse>(
-            `/api/driver/${id}/information`
-        );
-        setTopUpDriver({ ...data.driver, wallet: data.wallet });
-        setIsTopUpOpen(true);
+        if (!window.confirm(`Top up wallet with ₱${amount}?`)) return;
+
+        try {
+            const res = await fetch(`/api/wallet/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ walletBalance: amount + balance }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.message || "Top up failed");
+
+            console.log("Top up success:", data);
+            handleTransaction(id);
+            setAmount(0);
+            setDescription("");
+            setIsTopUpOpen(false);
+        } catch (err) {
+            console.error("Top up error:", err);
+        }
     };
 
     return (
@@ -362,7 +407,7 @@ export default function DriversPage() {
                 setAmount={setAmount}
                 description={description}
                 setDescription={setDescription}
-            // onConfirm={handleTopUp}
+                onConfirm={handleTopUp}
             />
         </div >
     );

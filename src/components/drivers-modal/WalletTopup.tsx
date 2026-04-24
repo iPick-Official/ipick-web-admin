@@ -6,7 +6,7 @@ import { Driver } from '@/types/drivers';
 interface TopUpModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm?: () => void;
+    onConfirm?: (id: string) => void;
     driver: Driver | null;
     amount: number;
     setAmount: (value: number) => void;
@@ -28,7 +28,7 @@ export default function TopUpModal({
     if (!driver) return null;
 
     const handlePreset = (value: number) => {
-        setAmount(value); // ✅ set instead of add
+        setAmount(value);
     };
 
     const handleDescription = (value: string) => {
@@ -37,6 +37,7 @@ export default function TopUpModal({
 
     const handleClear = () => {
         setAmount(0);
+        setDescription("");
     };
 
     const handleAmountChange = (value: string) => {
@@ -47,7 +48,7 @@ export default function TopUpModal({
 
     const handleConfirm = () => {
         if (!amount || amount <= 0) return;
-        onConfirm?.(); // ✅ safe call
+        onConfirm?.(driver._id);
     };
 
     return (
@@ -208,7 +209,7 @@ export default function TopUpModal({
 
                         <button
                             onClick={handleConfirm}
-                            disabled={!amount || amount <= 0}
+                            disabled={!amount || amount <= 0 || !description}
                             className="rounded-xl bg-green-600 px-5 py-2 
                                 text-sm font-semibold text-white 
                                 shadow-md hover:bg-green-700 
