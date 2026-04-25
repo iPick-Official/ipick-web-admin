@@ -125,7 +125,7 @@ const DiscountDetailsModal: React.FC<Props> = ({
                     <div className="flex-1 p-8 overflow-auto space-y-6">
                         {/* SEARCH */}
                         <FilterToolbar
-                            title="Bookings"
+                            title="Discounts"
                             searchValue={searchTerm}
                             onSearchChange={setSearchTerm}
                             onExport={() => exportDiscountsToCSV(sortedDiscount)}
