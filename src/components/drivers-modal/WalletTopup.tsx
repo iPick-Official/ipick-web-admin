@@ -176,13 +176,15 @@ export default function TopUpModal({
                                     <button
                                         key={item.label}
                                         onClick={() => handleDescription(item.value)}
-                                        className="rounded-full border 
-                                            border-gray-200 dark:border-gray-700 
-                                            bg-gray-50 dark:bg-gray-800 
-                                            py-2 text-sm font-medium 
-                                            text-gray-700 dark:text-gray-200 
-                                            hover:bg-gray-100 dark:hover:bg-gray-700 
-                                            active:scale-95 transition"
+                                        disabled={!amount || amount <= 0}
+                                        className={`rounded-full border 
+                                                border-gray-200 dark:border-gray-700 
+                                                py-2 text-sm font-medium transition
+                                                ${!amount || amount <= 0
+                                                ? "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+                                                : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95"
+                                            }
+                                        `}
                                     >
                                         {item.label}
                                     </button>

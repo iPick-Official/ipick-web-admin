@@ -275,6 +275,7 @@ export default function DriversPage() {
         setIsTopUpOpen(true);
         setBalance(data.wallet.walletBalance)
         setAmount(0);
+        setDescription("");
     };
 
     const handleTransaction = async (userId: string) => {
