@@ -1,60 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { handleApiResponse } from "@/app/utils/api";
 
 export async function PATCH(
-  req: NextRequest,
-  context: { params: { id: string } | Promise<{ id: string }> }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Resolve params if it's a Promise
-    const resolvedParams = await context.params;
-    const { id } = resolvedParams;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token")?.value;
 
-    // Parse JSON body
-    const statusDto = await req.json();
-
-    // Get token from cookies
-    const token = (await cookies()).get("access_token")?.value;
     if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      cookieStore.delete("access_token");
+      cookieStore.delete("refresh_token");
+
+      return NextResponse.json(
+        { message: "Unauthorized: No token found" },
+        { status: 401 },
+      );
     }
 
-    // Call NestJS backend
+    const { id } = await context.params;
+    const body = await request.json();
     const backendRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/discounts/${id}/status`,
       {
         method: "PATCH",
         headers: {
-          "x-api-key": token,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(statusDto),
-      }
+        body: JSON.stringify(body), // 👈 required for PATCH
+      },
     );
 
-    if (!backendRes.ok) {
-      const errorData = await backendRes.json().catch(() => null);
-      return NextResponse.json(errorData || { message: "Backend error" }, {
-        status: backendRes.status,
-      });
-    }
-
-    const stream = backendRes.body;
-    if (!stream) {
-      return NextResponse.json(
-        { message: "No data from backend" },
-        { status: 500 }
-      );
-    }
-
-    return new NextResponse(stream, {
-      headers: { "Content-Type": "application/json" },
-    });
+    return handleApiResponse(backendRes);
   } catch (error) {
-    console.error("Error updating driver status:", error);
+    console.error("API error:", error);
+
     return NextResponse.json(
-      { message: "Failed to update driver status" },
-      { status: 500 }
+      { message: "Failed to update status" },
+      { status: 500 },
     );
   }
 }
