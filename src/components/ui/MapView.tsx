@@ -10,7 +10,7 @@ import { Driver } from "@/types/drivers";
 
 export const MapView = () => {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY! || "AIzaSyB_y34Rj98FVASuJx5eD-100EFwGzHJqZg",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY! || "AIzaSyAGHdVo7rNRWl2mNFZHv8gc9tV9D9RU76s",
   });
 
   const { data: drivers = [], isLoading } = useDrivers();
